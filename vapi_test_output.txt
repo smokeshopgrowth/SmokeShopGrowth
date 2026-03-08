@@ -1,0 +1,13 @@
+Initializing Outreach Agent...
+Vapi Configuration Found.
+Loaded 1 leads. Scanning for HOT targets...
+
+[HOT LEAD] Test Shop | Score: 10
+  Attempting AI Voice Call to +14352377373...
+  [Voice Call Error] Status 400: {"statusCode":400,"message":"Couldn't Start Call. Numbers Bought On Vapi Have A Daily Outbound Call Limit. Import Your Own Twilio Numbers To Scale Without Limits.","error":"Bad Request","subscriptionLimits":{"concurrencyBlocked":false,"concurrencyLimit":10,"remainingConcurrentCalls":9}}
+
+Outreach complete! Data saved to test_lead_outreached.csv
+
+--- Summary ---
+HOT Leads Evaluated: 1
+Successfully Contacted: 0
