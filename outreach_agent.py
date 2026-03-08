@@ -5,17 +5,11 @@ import time
 import random
 import urllib.parse
 from dotenv import load_dotenv
-from twilio.rest import Client
 import requests
 from qualifier import clean_business_name
 
 # Load environment variables from .env file
 load_dotenv()
-
-# Twilio Credentials
-TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
 
 # Vapi Credentials
 VAPI_API_KEY = os.getenv('VAPI_API_KEY')
@@ -30,32 +24,6 @@ def load_leads(csv_path):
     with open(csv_path, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         return list(reader), reader.fieldnames
-
-def send_sms(client, to_number, message_body):
-    try:
-        if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN:
-            print("  [SMS Skip] Twilio credentials not found in .env")
-            return False
-            
-        # Basic phone formatting check for Twilio (requires E.164 usually)
-        # Assuming US numbers for this script
-        formatted_number = to_number.strip()
-        if not formatted_number.startswith("+"):
-            formatted_number = "+1" + "".join(filter(str.isdigit, formatted_number))
-            if len(formatted_number) == 2: # Only "+1"
-                print(f"  [SMS Skip] Invalid phone number format: {to_number}")
-                return False
-
-        message = client.messages.create(
-            body=message_body,
-            from_=TWILIO_PHONE_NUMBER,
-            to=formatted_number
-        )
-        print(f"  [SMS Sent] Message SID: {message.sid}")
-        return True
-    except Exception as e:
-        print(f"  [SMS Error] Failed to send SMS: {e}")
-        return False
 
 def dispatch_vapi_call(to_number, business_name, address, reason):
     try:
@@ -75,21 +43,21 @@ def dispatch_vapi_call(to_number, business_name, address, reason):
         spoken_address = ', '.join(addr_parts[-2:]) if len(addr_parts) >= 2 else address
         if "Broken website" in reason:
             first_msg = random.choice([
-                f"Hey, is this {b_name}? Hey real quick, I tried pulling up your website just now and it doesn't seem to be loading. Did you guys know about that?",
-                f"Hey there, this is Alex. I was trying to find {b_name} online and the website looks like it might be down. Is the owner around?",
-                f"Hey, is this {b_name}? Yeah I just tried your website and it's showing an error. Quick question for whoever handles the site.",
+                f"Hey, is this {b_name}? I was just trying to pull up your website and it looks like it might be down. Did you guys know about that?",
+                f"Hey there, this is Alex. I was trying to find {b_name} online and the website seems to be having some issues. Is the owner around?",
+                f"Hi, is this {b_name}? Yeah I just tried your website and it's showing an error. Is the person who handles the site available?",
             ])
         elif "No website" in reason:
             first_msg = random.choice([
-                f"Hey, is this {b_name}? Quick question, I was just searching for you guys online and noticed there's no website showing up. Is the owner in?",
-                f"Hey, this is Alex. I was looking up {b_name} on Google and couldn't find a website for you guys. Is that something you've been thinking about?",
-                f"Hey, is this {b_name}? I was looking you guys up online and noticed there's no website showing up for your shop. Is the owner in?",
+                f"Hey, is this {b_name}? I was just searching for you guys online and couldn't find a website. Is the owner in today?",
+                f"Hey, this is Alex. I was looking up {b_name} on Google and noticed there's no website showing up for your shop. Is that something you guys have been thinking about?",
+                f"Hi, is this {b_name}? I was trying to look you guys up online but didn't see a website. Is the owner around by any chance?",
             ])
         else:
             first_msg = random.choice([
-                f"Hey, is this {b_name}? Real quick, I was looking at your site online and had an idea that could bring in more customers. Is the owner available?",
-                f"Hey, this is Alex. I was checking out {b_name}'s website and had a thought that could help you guys get more walk-ins. Is now an okay time?",
-                f"Hey, is this {b_name}? I was looking at your shop online and had a quick question for whoever handles the website side of things.",
+                f"Hey, is this {b_name}? I was looking at your site online and had an idea that could help bring in more walk-ins. Is the owner available?",
+                f"Hey, this is Alex. I was checking out {b_name}'s website and had a thought to help you guys out. Is now an okay time?",
+                f"Hi, is this {b_name}? I was looking at your shop online and was hoping to speak with whoever handles the website side of things.",
             ])
         
         # System prompt that guides the AI through the full conversation flow
@@ -149,35 +117,12 @@ def generate_demo_url(business_name, city):
     return f"{DEMO_BASE_URL}?{params}"
 
 
-def generate_sms_script(business_name, address, reason):
-    # Short and punchy for SMS
-    b_name = clean_business_name(business_name)
-    
-    script = f"Hey {b_name}, I noticed your vape shop on {address} doesn't have a modern website. "
-    
-    if "Broken website" in reason:
-        script = f"Hey {b_name}, I noticed your website is currently down or broken! "
-    elif "No website" in reason:
-        script = f"Hey {b_name}, I noticed your shop on {address} doesn't have a website yet. "
-        
-    script += "I build high-converting sites for smoke shops that handle inventory and drive local traffic. Text back if you want to see a free custom demo I made for you!"
-    return script
-
-
 
 def run_outreach(csv_path):
     print("Initializing Outreach Agent...")
     leads, headers = load_leads(csv_path)
     
     # Initialize Clients
-    twilio_client = None
-    if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
-        try:
-            twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-            print("Twilio Client Initialized.")
-        except Exception as e:
-            print(f"Warning: Failed to init Twilio: {e}")
-            
     if VAPI_API_KEY:
         print("Vapi Configuration Found.")
     else:
@@ -209,22 +154,9 @@ def run_outreach(csv_path):
             hot_count += 1
             print(f"\n[HOT LEAD] {b_name} | Score: {score}")
             
-            sms_sent = False
             voice_sent = False
             
-            # SMS
-            if phone:
-                print(f"  Attempting SMS to {phone}...")
-                sms_script = generate_sms_script(b_name, address, reason)
-                if twilio_client:
-                    # In a real run without credentials, this will just return False
-                    sms_sent = send_sms(twilio_client, phone, sms_script)
-                else:
-                    print(f"  [Dry Run SMS] -> {sms_script}")
-            else:
-                print("  [SMS Skip] No phone number provided in CSV.")
-                
-            # Voice Call via Vapi — prime them to receive the SMS
+            # Voice Call via Vapi
             if phone:
                  print(f"  Attempting AI Voice Call to {phone}...")
                  if VAPI_API_KEY and VAPI_ASSISTANT_ID:
@@ -234,20 +166,11 @@ def run_outreach(csv_path):
             else:
                  print("  [Voice Skip] No phone number provided in CSV.")
                  
-            # Demo Link Follow-Up SMS fired right after the voice call
-            if phone and voice_sent:
-                addr_parts = [p.strip() for p in address.split(',')]
-                city = addr_parts[-2] if len(addr_parts) >= 2 else address
-                demo_url = generate_demo_url(b_name, city)
-                demo_sms = f"Hey! This is Alex — I just called about your website. Here's the free custom demo I built for {b_name}: {demo_url} \nReply YES if you want it live this week!"
-                print(f"  Sending Demo Link SMS to {phone}...")
-                if twilio_client:
-                    send_sms(twilio_client, phone, demo_sms)
-                else:
-                    print(f"  [Dry Run Demo SMS] -> {demo_sms}")
-                 
+            # Note: We previously sent an SMS here. Since Twilio is removed,
+            # we rely on the Vapi call agent collecting an email, or calling them back.
+            
             # Mark as contacted if we actually sent something
-            if sms_sent or voice_sent:
+            if voice_sent:
                 lead['Outreach Status'] = 'Contacted'
                 contacted_count += 1
                 

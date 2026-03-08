@@ -98,7 +98,7 @@ const assistantConfig = {
     // ── Voice ─────────────────────────────────────────────────────────────────
     voice: {
         provider: "11labs",
-        voiceId: process.env.ELEVENLABS_VOICE_ID || "21m00Tcm4TlvDq8ikWAM", // Rachel — replace with your voice
+        voiceId: process.env.ELEVENLABS_VOICE_ID || "ErXwobaYiN019PkySvjV", // Antoni (Male Voice)
         model: "eleven_turbo_v2_5", // lowest latency
         stability: 0.5,
         similarityBoost: 0.75,

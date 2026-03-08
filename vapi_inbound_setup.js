@@ -62,7 +62,7 @@ const inboundAssistant = {
     },
     voice: {
         provider: "11labs",
-        voiceId: process.env.ELEVENLABS_VOICE_ID || "21m00Tcm4TlvDq8ikWAM",
+        voiceId: process.env.ELEVENLABS_VOICE_ID || "ErXwobaYiN019PkySvjV", // Antoni (Male Voice)
         model: "eleven_turbo_v2_5",
         stability: 0.5,
         similarityBoost: 0.75,
