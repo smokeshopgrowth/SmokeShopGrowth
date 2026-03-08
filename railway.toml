@@ -1,0 +1,7 @@
+[build]
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "gunicorn --bind 0.0.0.0:${PORT:-8080} webhook:app"
+healthcheckPath = "/health"
+restartPolicyType = "on_failure"

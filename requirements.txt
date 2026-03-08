@@ -1,1 +1,15 @@
+<<<<<<< HEAD
+flask==3.0.3
+stripe==10.12.0
+python-dotenv==1.0.1
+gspread==6.1.2
+google-auth==2.29.0
+google-auth-oauthlib==1.2.0
+twilio==9.3.2
+sendgrid==6.11.0
+playwright==1.47.0
+requests==2.32.3
+gunicorn==23.0.0
+=======
 
+>>>>>>> 47a012672ea79790c56b96e384c39e5732d7e131

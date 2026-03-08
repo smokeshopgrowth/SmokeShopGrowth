@@ -1,0 +1,24 @@
+[
+  {
+    "business_name": "Smoke Therapy",
+    "tagline": "Premium Smoke Shop",
+    "address": "123 Main St",
+    "city": "Houston",
+    "state": "TX",
+    "phone": "713-555-8899",
+    "instagram": "smoketherapy713",
+    "hours": "Mon-Sat 10AM-9PM",
+    "menu_link": "https://www.instagram.com/smoketherapy713"
+  },
+  {
+    "business_name": "Rock N Roll Smoke Shop",
+    "tagline": "Vapes, CBD, and More",
+    "address": "456 Rocker Ave",
+    "city": "Houston",
+    "state": "TX",
+    "phone": "832-555-1234",
+    "instagram": "rocknrollsmoke",
+    "hours": "Mon-Sun 11AM-10PM",
+    "menu_link": "https://www.instagram.com/rocknrollsmoke"
+  }
+]

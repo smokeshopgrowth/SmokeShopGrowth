@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-bind="title">Smoke Shop Premium</title>
+  <meta name="description" data-bind="meta-description" content="Premium smoke shop website template." />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="config.js"></script>
+</head>
+
+<body>
+
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div id="smoke-canvas"></div>
+  <div class="cursor-glow" id="cursor-glow"></div>
+
+  <!-- ── Nav ───────────────────────────────────────────────────────────────── -->
+  <nav class="nav">
+    <span class="nav-logo" data-bind="name">Smoke Shop</span>
+    <div class="nav-actions">
+      <a data-bind="href:phone-tel" class="btn btn-glass" id="nav-phone">Call Us</a>
+      <a href="#contact" class="btn btn-primary">Get Website</a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-content gs-reveal">
+      <h1>
+        Dominate Local Search For<br>
+        <span class="text-gradient" data-bind="name">Your Smoke Shop</span>
+      </h1>
+      <p>Premium websites designed to help <strong data-bind="name">your shop</strong> in <strong data-bind="city">your
+          city</strong> rank higher, build trust, and bring in more foot traffic.</p>
+
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">Claim This Design</a>
+        <a data-bind="href:googleMaps" class="btn btn-glass" target="_blank" rel="noopener">Find Us</a>
+      </div>
+    </div>
+    <div class="hero-visual gs-reveal">
+      <img src="https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=1974&auto=format&fit=crop"
+        class="hero-img" alt="Premium Smoke Shop Interior" />
+    </div>
+  </section>
+
+  <!-- ── Fast Info Strip ────────────────────────────────────────────────────── -->
+  <div class="info-grid gs-reveal">
+    <div class="info-card">
+      <span class="info-label">Location</span>
+      <span class="info-value"><a data-bind="href:googleMaps" target="_blank" data-bind-text="address">123 Main
+          St</a></span>
+    </div>
+    <div class="info-card">
+      <span class="info-label">Contact</span>
+      <span class="info-value"><a data-bind="href:phone-tel" data-bind-text="phone">(713) 555-0100</a></span>
+    </div>
+    <div class="info-card">
+      <span class="info-label">Hours</span>
+      <span class="info-value" data-bind="hours">Open daily</span>
+    </div>
+    <div class="info-card">
+      <span class="info-label">Social</span>
+      <span class="info-value"><a data-bind="href:instagram" target="_blank" rel="noopener">@yourshop</a></span>
+    </div>
+  </div>
+
+  <!-- ── Products ───────────────────────────────────────────────────────────── -->
+  <section class="products-section pt-8rem">
+    <div class="section-inner gs-reveal">
+      <h2 class="section-title">Premium Inventory</h2>
+      <p class="section-subtitle">We stock the highest quality products in <span data-bind="city">your city</span>.</p>
+      <div class="categories-wrapper" id="categories-grid">
+        <!-- Filled by bindBusiness() from BUSINESS.categories -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Features ──────────────────────────────────────────────────────────── -->
+  <section>
+    <div class="section-inner">
+      <h2 class="section-title text-gradient text-center mb-3-5rem">
+        Why <span data-bind="name">Your Shop</span> Needs This
+      </h2>
+      <div class="features-grid">
+        <div class="feature-bento gs-reveal">
+          <span class="feature-icon">📱</span>
+          <h3>Mobile Perfection</h3>
+          <p>Over 80% of smoke shop searches happen on phones. This site feels like a native app.</p>
+        </div>
+        <div class="feature-bento gs-reveal">
+          <span class="feature-icon">📍</span>
+          <h3>Local SEO Boost</h3>
+          <p>Structured perfectly for Google Maps to capture customers right around the corner.</p>
+        </div>
+        <div class="feature-bento gs-reveal">
+          <span class="feature-icon">⚡</span>
+          <h3>Lightning Fast</h3>
+          <p>Built with modern web standards ensuring near-instant load times on any connection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Testimonials ──────────────────────────────────────────────────────── -->
+  <section>
+    <div class="section-inner">
+      <h2 class="section-title neon-text text-center mb-2-5rem">What Shop Owners Say</h2>
+      <div class="testimonials-grid" id="testimonials-grid">
+        <!-- Filled by bindBusiness() from BUSINESS.testimonials -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Pricing ───────────────────────────────────────────────────────────── -->
+  <section id="pricing">
+    <div class="section-inner">
+      <h2 class="section-title text-gradient text-center mb-3-5rem">Flexible Pricing</h2>
+      <div class="pricing-grid">
+
+        <!-- Tier 1 -->
+        <div class="pricing-card gs-reveal">
+          <h3 class="tier-name">Starter</h3>
+          <p class="price-tag neon-text">$199<span class="price-sub"> setup</span></p>
+          <p class="price-monthly">then $19/mo</p>
+          <ul class="checklist">
+            <li>Landing Page Only</li>
+            <li>Custom Domain</li>
+            <li>Google Maps Optimization</li>
+            <li>Directions + Hours Info</li>
+            <li>Click-to-Call Button</li>
+            <li>Mobile-First Design</li>
+          </ul>
+          <a href="https://buy.stripe.com/cNi8wO5Na2DwfSB9WJ1Jm05" class="btn btn-glass btn-block-large" target="_blank"
+            rel="noopener noreferrer">Get Starter</a>
+        </div>
+
+        <!-- Tier 2 -->
+        <div class="pricing-card popular gs-reveal">
+          <span class="popular-badge">Most Popular</span>
+          <h3 class="tier-name">Growth</h3>
+          <p class="price-tag neon-text">$299<span class="price-sub"> setup</span></p>
+          <p class="price-monthly">then $29/mo</p>
+          <ul class="checklist">
+            <li>Landing Page + Inventory</li>
+            <li>Custom Domain</li>
+            <li>Google Maps Optimization</li>
+            <li>Product Category Pages</li>
+            <li>Click-to-Call Button</li>
+            <li>Mobile-First Design</li>
+          </ul>
+          <a href="https://buy.stripe.com/dRmfZgcby1zs9ud2uh1Jm06" class="glow-btn btn-block-large" target="_blank"
+            rel="noopener noreferrer">Get Growth</a>
+        </div>
+
+        <!-- Tier 3 -->
+        <div class="pricing-card gs-reveal">
+          <h3 class="tier-name">Pro</h3>
+          <p class="price-tag neon-text">$499<span class="price-sub"> setup</span></p>
+          <p class="price-monthly">then $49/mo</p>
+          <ul class="checklist">
+            <li>Everything in Growth</li>
+            <li>E-Commerce Capabilities</li>
+            <li>Age Verification Modal</li>
+            <li>Advanced SEO Setup</li>
+            <li>Monthly Analytics Report</li>
+            <li>Priority Support</li>
+          </ul>
+          <a href="https://buy.stripe.com/eVq28qdfC5PI7m57OB1Jm04" class="btn btn-glass btn-block-large" target="_blank"
+            rel="noopener noreferrer">Get Pro</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ─────────────────────────────────────────────────────────────── -->
+  <section id="contact">
+    <div class="contact-container gs-reveal">
+      <h2 class="section-title">Secure Your Site</h2>
+      <p class="section-subtitle">Lock in this premium design for <span data-bind="name">your shop</span> today.
+        <br><span class="text-gradient font-bold">Pick your plan when we talk.</span>
+      </p>
+
+      <form class="premium-form" id="leadForm">
+        <input id="formShop" placeholder="Shop Name" autocomplete="organization" required />
+        <input id="formCity" placeholder="City" autocomplete="address-level2" required />
+        <input id="formPhone" placeholder="Your Phone" type="tel" autocomplete="tel" required />
+        <input id="formEmail" placeholder="Your Email" type="email" autocomplete="email" required />
+        <button type="submit" class="btn btn-primary btn-submit-large">
+          Launch My Website
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+  <footer>
+    <p>
+      &copy; <span data-bind="name">Your Shop</span> · Demo created by <a href="https://smokeshopgrowth.com"
+        target="_blank" rel="noopener" class="text-accent font-semibold">SmokeShopGrowth</a>
+    </p>
+  </footer>
+
+  <!-- ── Demo Banner ─────────────────────────────────────────────────────────── -->
+  <div class="demo-banner">
+    Demo website generated for <span data-bind="name">this smoke shop</span> in <span data-bind="city">your city</span>
+  </div>
+
+  <!-- ── Scripts ─────────────────────────────────────────────────────────────── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <script>
+    (function bindBusiness() {
+      const B = window.BUSINESS;
+      if (!B) return;
+
+      const phoneDigits = (B.phone || "").replace(/\D/g, "");
+      const phoneTel = "tel:" + (phoneDigits.length === 10 ? "+1" + phoneDigits : phoneDigits.length === 11 && phoneDigits[0] === "1" ? "+" + phoneDigits : "+" + phoneDigits);
+      const lookup = {
+        name: B.name || "",
+        city: B.city || "",
+        phone: B.phone || "",
+        address: B.address || "",
+        hours: B.hours || "",
+        price: B.price || "",
+        instagram: B.instagram || "#",
+        googleMaps: B.googleMaps || "#",
+        "phone-tel": phoneTel,
+        title: `${B.name} | Premium Smoke Shop`,
+        "meta-description": `Premium website demo for ${B.name} in ${B.city}.`,
+      };
+
+      document.querySelectorAll("[data-bind]").forEach(el => {
+        const raw = el.getAttribute("data-bind");
+        if (raw.startsWith("href:")) {
+          const key = raw.replace("href:", "");
+          const val = lookup[key] || "#";
+          const safeHref = /^javascript:/i.test(val.trim()) ? "#" : val;
+          el.setAttribute("href", safeHref);
+          if (!el.hasAttribute("data-bind-text") && !el.children.length) {
+            el.textContent = lookup[key.replace("-tel", "").replace("phone", "phone")] || val;
+          }
+        } else if (raw === "title") {
+          document.title = lookup.title;
+        } else if (raw === "meta-description") {
+          el.setAttribute("content", lookup["meta-description"]);
+        } else {
+          el.textContent = lookup[raw] || "";
+        }
+      });
+
+      document.querySelectorAll("[data-bind-text]").forEach(el => {
+        const key = el.getAttribute("data-bind-text");
+        el.textContent = lookup[key] || "";
+      });
+
+      const navPhone = document.getElementById("nav-phone");
+      if (navPhone && B.phone) navPhone.textContent = B.phone;
+
+      if (B.heroImage) {
+        const heroImg = document.querySelector(".hero-img");
+        if (heroImg) heroImg.src = B.heroImage;
+      }
+
+      const fShop = document.getElementById("formShop");
+      const fCity = document.getElementById("formCity");
+      const fPhone = document.getElementById("formPhone");
+      if (fShop) fShop.value = B.name || "";
+      if (fCity) fCity.value = B.city || "";
+      if (fPhone) fPhone.value = B.phone || "";
+
+      const grid = document.getElementById("categories-grid");
+      if (grid && Array.isArray(B.categories)) {
+        grid.innerHTML = B.categories.map(c => `<span class="category-pill">${c}</span>`).join("");
+      }
+
+      // Testimonials
+      const tGrid = document.getElementById("testimonials-grid");
+      if (tGrid && Array.isArray(B.testimonials)) {
+        tGrid.innerHTML = B.testimonials.map(t => `
+          <div class="testimonial-card">
+            <div class="stars">${'★'.repeat(t.stars)}${'☆'.repeat(5 - t.stars)}</div>
+            <p class="quote">"${t.quote}"</p>
+            <div class="author">
+              <div class="avatar">${t.name.charAt(0)}</div>
+              <div><strong>${t.name}</strong><br><span class="role">${t.role}</span></div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      const form = document.getElementById("leadForm");
+      if (form) {
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          form.innerHTML = '<div class="text-center" style="padding:2rem"><p class="font-bold" style="color:var(--second); font-size:1.4rem;">Request Received!</p><p style="color:var(--muted)">We will contact you shortly.</p></div>';
+        });
+      }
+
+      document.querySelectorAll("[data-bind='href:instagram']").forEach(el => {
+        if (!el.hasAttribute("data-bind-text") && B.instagram) {
+          el.textContent = B.instagram.replace(/.*instagram\.com\//, "@");
+        }
+      });
+
+    })();
+  </script>
+
+  <script src="animations.js"></script>
+</body>
+
+</html>

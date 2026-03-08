@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Generator Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #09090b;
+      --surface: rgba(255, 255, 255, 0.03);
+      --surface2: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --text: #f0f0f3;
+      --muted: #71717a;
+      --radius: 16px;
+      --glow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 100px;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.12), transparent);
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2), #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      color: var(--muted);
+      margin-top: 10px;
+      font-size: 0.95rem;
+      font-weight: 400;
+    }
+
+    /* ── Layout ── */
+    .container {
+      width: 100%;
+      max-width: 880px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 0 40px -12px rgba(99, 102, 241, 0.08);
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    label span {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="url"],
+    select {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 11px 16px;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      width: 100%;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    input::placeholder {
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    /* Range slider */
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+      transition: box-shadow 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.7);
+    }
+
+    .slider-val {
+      min-width: 48px;
+      text-align: center;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1rem;
+    }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .toggle-label {
+      font-size: 0.875rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .toggle-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-track::before {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toggle input:checked+.toggle-track {
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .toggle input:checked+.toggle-track::before {
+      transform: translateX(20px);
+    }
+
+    /* Sheets field — smooth show/hide */
+    #sheets-field {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin 0.3s ease;
+      margin-top: 0;
+    }
+
+    #sheets-field.visible {
+      max-height: 80px;
+      opacity: 1;
+      margin-top: 14px;
+    }
+
+    /* ── Buttons ── */
+    .btn-run {
+      width: 100%;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-run:hover {
+      opacity: 0.92;
+      box-shadow: 0 4px 24px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-run:active {
+      transform: scale(0.98);
+    }
+
+    .btn-run:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-run .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Progress Card — smooth show/hide ── */
+    #progress-card {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      padding: 0 32px;
+      border: none;
+      margin-top: -24px;
+      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.4s ease,
+                  padding 0.4s ease,
+                  margin 0.4s ease,
+                  border 0.4s ease;
+    }
+
+    #progress-card.visible {
+      max-height: 600px;
+      opacity: 1;
+      padding: 28px 32px;
+      border: 1px solid var(--border);
+      margin-top: 0;
+      overflow: visible;
+    }
+
+    .steps-track {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .steps-track::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.06);
+      z-index: 0;
+    }
+
+    .step-dot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--muted);
+    }
+
+    .dot.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(99, 102, 241, 0.12);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .dot.done {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .step-name {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+    }
+
+    /* ── Log Terminal (macOS style) ── */
+    .terminal-wrap {
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .terminal-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: #ff5f57; }
+    .terminal-dot.yellow { background: #febc2e; }
+    .terminal-dot.green { background: #28c840; }
+
+    .terminal-title-text {
+      flex: 1;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .log-terminal {
+      padding: 16px;
+      height: 280px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.8;
+    }
+
+    .log-terminal::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .log-terminal::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .log-terminal::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+    }
+
+    .log-line {
+      display: flex;
+      gap: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+
+    .log-line:nth-child(even) {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .log-line:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .log-ts {
+      color: rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+      font-size: 0.72rem;
+    }
+
+    .log-msg.log { color: #9ca3af; }
+    .log-msg.step { color: #818cf8; font-weight: 600; }
+    .log-msg.success { color: var(--green); font-weight: 600; }
+    .log-msg.warn { color: var(--yellow); }
+    .log-msg.error { color: var(--red); font-weight: 600; }
+
+    /* ── Results Card — smooth show/hide ── */
+    #results-card {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      padding: 0 32px;
+      border: none;
+      margin-top: -24px;
+      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.4s ease,
+                  padding 0.4s ease,
+                  margin 0.4s ease,
+                  border 0.4s ease;
+    }
+
+    #results-card.visible {
+      max-height: 500px;
+      opacity: 1;
+      padding: 28px 32px;
+      border: 1px solid var(--border);
+      margin-top: 0;
+      overflow: visible;
+    }
+
+    /* Skeleton rows */
+    .skeleton-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .skeleton-row:last-child { border-bottom: none; }
+
+    .skeleton-bar {
+      height: 14px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .result-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeUp 0.35s ease forwards;
+    }
+
+    .result-row:last-child { border-bottom: none; }
+    .result-row:nth-child(1) { animation-delay: 0.05s; }
+    .result-row:nth-child(2) { animation-delay: 0.1s; }
+    .result-row:nth-child(3) { animation-delay: 0.15s; }
+    .result-row:nth-child(4) { animation-delay: 0.2s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .result-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .btn-dl {
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.25s ease;
+      display: inline-block;
+    }
+
+    .btn-dl:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(99, 102, 241, 0.08);
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Status badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: all 0.3s ease;
+    }
+
+    .badge.running {
+      background: rgba(99, 102, 241, 0.12);
+      color: #818cf8;
+    }
+
+    .badge.done {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--green);
+    }
+
+    .badge.failed {
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--red);
+    }
+
+    .dot-blink {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
+
+    /* ── Toast System ── */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transform: translateX(120%);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+      max-width: 380px;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .toast.hide {
+      transform: translateX(120%);
+      opacity: 0;
+    }
+
+    .toast.success {
+      background: rgba(16, 185, 129, 0.12);
+      color: #6ee7b7;
+      border-color: rgba(16, 185, 129, 0.15);
+    }
+
+    .toast.error {
+      background: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.15);
+    }
+
+    .toast.info {
+      background: rgba(99, 102, 241, 0.12);
+      color: #a5b4fc;
+      border-color: rgba(99, 102, 241, 0.15);
+    }
+
+    .toast-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Quick Call ── */
+    .btn-call {
+      width: 100%;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, var(--green), #059669);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-call:hover {
+      opacity: 0.92;
+      box-shadow: 0 4px 24px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-call:active { transform: scale(0.98); }
+    .btn-call:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+    .btn-call .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    #qc-status {
+      transition: opacity 0.3s ease;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      body { padding: 28px 14px 60px; }
+
+      .header h1 { font-size: 1.6rem; }
+
+      .form-grid { grid-template-columns: 1fr; }
+
+      .card { padding: 22px 18px; }
+
+      #progress-card.visible { padding: 22px 18px; }
+      #results-card.visible { padding: 22px 18px; }
+
+      .dot {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+      }
+
+      .step-name { font-size: 0.62rem; }
+
+      .toast-container {
+        top: 12px;
+        right: 12px;
+        left: 12px;
+      }
+
+      .toast { max-width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="header">
+    <h1>Lead Generator</h1>
+    <p>Scrape Google Maps &rarr; Audit websites &rarr; Generate outreach &rarr; Export to Sheets</p>
+  </div>
+
+  <div class="container">
+
+    <!-- ── Search Form ── -->
+    <div class="card">
+      <div class="card-title">Search Settings</div>
+      <form id="pipeline-form">
+        <div class="form-grid">
+
+          <label>
+            <span>City</span>
+            <input type="text" id="city" placeholder="e.g. Houston TX" required />
+          </label>
+
+          <label>
+            <span>Business Type</span>
+            <input type="text" id="bizType" value="smoke shop" placeholder="e.g. vape shop, dispensary" />
+          </label>
+
+          <label class="full">
+            <span>Max Results</span>
+            <div class="slider-wrap">
+              <input type="range" id="maxResults" min="10" max="200" step="10" value="100"
+                oninput="document.getElementById('maxVal').textContent = this.value" />
+              <span class="slider-val" id="maxVal">100</span>
+            </div>
+          </label>
+
+          <!-- Toggles -->
+          <label class="full">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Skip Lighthouse Audit</div>
+                <div class="toggle-desc">Faster — uses basic Axios + Cheerio checks instead</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="skipLighthouse" checked />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+          </label>
+
+          <label class="full" id="demo-toggle">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Generate Demo Videos</div>
+                <div class="toggle-desc">Uses Minimax T2V to create website previews (Requires API Key)</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="generateDemo" checked />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+          </label>
+
+          <label class="full" id="sheets-toggle">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Export to Google Sheets</div>
+                <div class="toggle-desc">Requires credentials.json in project root</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="exportSheets" checked
+                  onchange="document.getElementById('sheets-field').classList.toggle('visible', this.checked)" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+            <div id="sheets-field" class="visible">
+              <input type="text" id="sheetsId" value="18ztIcGEA3u7iF4gKpwq_QVKng6b9HOWSFVGCoBBiDQ8"
+                placeholder="Google Spreadsheet ID (from the URL)" />
+            </div>
+          </label>
+
+        </div>
+
+        <div style="margin-top:24px">
+          <button type="submit" class="btn-run" id="run-btn">
+            <span id="run-btn-text">Run Pipeline</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ── Quick Call Agent ── -->
+    <div class="card">
+      <div class="card-title">Quick Call Agent</div>
+      <form id="quick-call-form">
+        <label>
+          <span>Phone Number</span>
+          <input type="text" id="qc-phone" placeholder="e.g. +1 555 123 4567" required />
+        </label>
+
+        <div class="form-grid" style="margin-top: 16px;">
+          <label>
+            <span>Business Name (Optional)</span>
+            <input type="text" id="qc-biz" placeholder="e.g. Acme Corp" />
+          </label>
+          <label>
+            <span>City (Optional)</span>
+            <input type="text" id="qc-city" placeholder="e.g. Austin TX" />
+          </label>
+        </div>
+
+        <div style="margin-top:24px">
+          <button type="submit" class="btn-call" id="qc-btn">
+            <span id="qc-btn-text">Call Now (ElevenLabs)</span>
+          </button>
+        </div>
+        <div id="qc-status" style="margin-top: 16px; font-size: 0.85rem; color: var(--muted); text-align: center;">
+        </div>
+      </form>
+    </div>
+
+    <!-- ── Progress ── -->
+    <div class="card" id="progress-card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Pipeline Progress</span>
+        <span id="status-badge" class="badge running"><span class="dot-blink"></span> Running</span>
+      </div>
+
+      <div class="steps-track">
+        <div class="step-dot">
+          <div class="dot" id="dot-1">1</div>
+          <div class="step-name">Scrape</div>
+        </div>
+        <div class="step-dot">
+          <div class="dot" id="dot-2">2</div>
+          <div class="step-name">Audit</div>
+        </div>
+        <div class="step-dot">
+          <div class="dot" id="dot-3">3</div>
+          <div class="step-name">Outreach</div>
+        </div>
+        <div class="step-dot">
+          <div class="dot" id="dot-4">4</div>
+          <div class="step-name">Demo</div>
+        </div>
+        <div class="step-dot">
+          <div class="dot" id="dot-5">&#10003;</div>
+          <div class="step-name">Done</div>
+        </div>
+      </div>
+
+      <div class="terminal-wrap">
+        <div class="terminal-titlebar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title-text">pipeline &mdash; live output</div>
+          <div style="width:36px"></div>
+        </div>
+        <div class="log-terminal" id="log-terminal"></div>
+      </div>
+    </div>
+
+    <!-- ── Results ── -->
+    <div class="card" id="results-card">
+      <div class="card-title">Results</div>
+      <div id="result-rows">
+        <!-- skeleton placeholder -->
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:120px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:140px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:150px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:160px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Toast System ──
+    function showToast(message, variant = 'info') {
+      const container = document.getElementById('toast-container');
+      const icons = { success: '\u2713', error: '\u2717', info: '\u24D8' };
+      const toast = document.createElement('div');
+      toast.className = `toast ${variant}`;
+      toast.innerHTML = `<span class="toast-icon">${icons[variant] || icons.info}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => toast.classList.add('show'));
+      });
+      setTimeout(() => {
+        toast.classList.remove('show');
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 400);
+      }, 4000);
+    }
+
+    let currentJobId = null;
+
+    const form = document.getElementById('pipeline-form');
+    const runBtn = document.getElementById('run-btn');
+    const runBtnText = document.getElementById('run-btn-text');
+    const progCard = document.getElementById('progress-card');
+    const resultsCard = document.getElementById('results-card');
+    const terminal = document.getElementById('log-terminal');
+    const badge = document.getElementById('status-badge');
+
+    const dots = [null, ...Array.from({ length: 5 }, (_, i) => document.getElementById(`dot-${i + 1}`))];
+
+    function setStep(step) {
+      dots.forEach((dot, i) => {
+        if (!dot) return;
+        dot.classList.remove('active', 'done');
+        if (i < step) dot.classList.add('done');
+        if (i === step) dot.classList.add('active');
+      });
+    }
+
+    function appendLog({ type, message, ts }) {
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      const d = new Date(ts);
+      const time = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      line.innerHTML = `<span class="log-ts">${time}</span><span class="log-msg ${type}">${escHtml(message)}</span>`;
+      terminal.appendChild(line);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function setRunLoading(loading) {
+      runBtn.disabled = loading;
+      if (loading) {
+        runBtnText.textContent = 'Running\u2026';
+        if (!runBtn.querySelector('.spinner')) {
+          const sp = document.createElement('span');
+          sp.className = 'spinner';
+          runBtn.insertBefore(sp, runBtnText);
+        }
+      } else {
+        runBtnText.textContent = 'Run Pipeline';
+        const sp = runBtn.querySelector('.spinner');
+        if (sp) sp.remove();
+      }
+    }
+
+    function showSkeletonResults() {
+      const rows = document.getElementById('result-rows');
+      rows.innerHTML = `
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:120px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:140px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:150px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:160px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+      `;
+      resultsCard.classList.add('visible');
+    }
+
+    function showResults(files, jobId) {
+      const rows = document.getElementById('result-rows');
+      const items = [
+        { label: 'Raw Leads', key: 'leads', file: 'leads' },
+        { label: 'Audited Leads', key: 'audited', file: 'audited' },
+        { label: 'Outreach Messages', key: 'outreach', file: 'outreach' },
+        { label: 'Demo Videos (Links)', key: 'demo', file: 'demo' },
+      ];
+      rows.innerHTML = items.map(({ label, file }) => `
+      <div class="result-row">
+        <span class="result-label">${label}</span>
+        <a class="btn-dl" href="/api/download/${jobId}/${file}" download>
+          Download CSV
+        </a>
+      </div>
+    `).join('');
+      resultsCard.classList.add('visible');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const city = document.getElementById('city').value.trim();
+      const bizType = document.getElementById('bizType').value.trim() || 'smoke shop';
+      const maxResults = parseInt(document.getElementById('maxResults').value);
+      const skipLighthouse = document.getElementById('skipLighthouse').checked;
+      const generateDemo = document.getElementById('generateDemo').checked;
+      const exportSheets = document.getElementById('exportSheets').checked;
+      const sheetsId = document.getElementById('sheetsId').value.trim();
+
+      // Reset UI
+      terminal.innerHTML = '';
+      resultsCard.classList.remove('visible');
+      progCard.classList.add('visible');
+      setRunLoading(true);
+      badge.className = 'badge running';
+      badge.innerHTML = '<span class="dot-blink"></span> Running';
+      setStep(1);
+      showToast('Pipeline started \u2014 scraping leads\u2026', 'info');
+
+      // Start job
+      let jobId;
+      try {
+        const resp = await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ city, bizType, maxResults, skipLighthouse, generateDemo, exportSheets, sheetsId }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Server error');
+        jobId = data.jobId;
+        currentJobId = jobId;
+      } catch (err) {
+        appendLog({ type: 'error', message: `Failed to start: ${err.message}`, ts: Date.now() });
+        showToast(`Pipeline error: ${err.message}`, 'error');
+        setRunLoading(false);
+        return;
+      }
+
+      // Show skeleton results
+      showSkeletonResults();
+
+      // Stream SSE
+      const es = new EventSource(`/api/status/${jobId}`);
+      es.onmessage = ({ data }) => {
+        const msg = JSON.parse(data);
+
+        if (msg.type === 'done') {
+          es.close();
+          setRunLoading(false);
+
+          if (msg.status === 'done') {
+            badge.className = 'badge done';
+            badge.textContent = '\u2713 Complete';
+            setStep(6);
+            showResults(msg.files, jobId);
+            showToast('Pipeline complete \u2014 results ready!', 'success');
+          } else {
+            badge.className = 'badge failed';
+            badge.textContent = '\u2717 Failed';
+            showToast('Pipeline failed \u2014 check logs for details.', 'error');
+          }
+          return;
+        }
+
+        // Update step dots based on log messages
+        if (msg.type === 'step') {
+          if (msg.message.includes('Step 1')) setStep(1);
+          else if (msg.message.includes('Step 2')) setStep(2);
+          else if (msg.message.includes('Step 3')) setStep(3);
+          else if (msg.message.includes('Step 4')) setStep(4);
+          else if (msg.message.includes('Step 5') || msg.message.includes('Exporting')) setStep(4);
+        }
+
+        appendLog(msg);
+      };
+
+      es.onerror = () => {
+        es.close();
+        appendLog({ type: 'warn', message: 'Connection to server lost.', ts: Date.now() });
+        showToast('Lost connection to server.', 'error');
+        setRunLoading(false);
+      };
+    });
+
+    // ── Quick Call Logic ──
+    const qcForm = document.getElementById('quick-call-form');
+    const qcBtn = document.getElementById('qc-btn');
+    const qcBtnText = document.getElementById('qc-btn-text');
+    const qcStatus = document.getElementById('qc-status');
+
+    qcForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const phone = document.getElementById('qc-phone').value.trim();
+      const business_name = document.getElementById('qc-biz').value.trim();
+      const city = document.getElementById('qc-city').value.trim();
+
+      qcBtn.disabled = true;
+      qcBtnText.textContent = 'Calling\u2026';
+      if (!qcBtn.querySelector('.spinner')) {
+        const sp = document.createElement('span');
+        sp.className = 'spinner';
+        qcBtn.insertBefore(sp, qcBtnText);
+      }
+      qcStatus.textContent = '';
+      qcStatus.style.color = 'var(--muted)';
+
+      try {
+        const resp = await fetch('/webhook/call', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, business_name, city }),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          throw new Error(data.error || 'Server error');
+        }
+
+        qcStatus.textContent = `Call initiated! (Conv ID: ${data.conversation_id})`;
+        qcStatus.style.color = 'var(--green)';
+        showToast('Call initiated successfully!', 'success');
+      } catch (err) {
+        qcStatus.textContent = err.message;
+        qcStatus.style.color = 'var(--red)';
+        showToast(`Call failed: ${err.message}`, 'error');
+      } finally {
+        qcBtn.disabled = false;
+        qcBtnText.textContent = 'Call Now (ElevenLabs)';
+        const sp = qcBtn.querySelector('.spinner');
+        if (sp) sp.remove();
+      }
+    });
+  </script>
+</body>
+
+</html>

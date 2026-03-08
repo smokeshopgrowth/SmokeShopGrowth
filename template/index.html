@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title data-bind="title">Smoke Shop Premium</title>
+  <meta name="description" data-bind="meta-description" content="Premium smoke shop website template." />
+  <meta name="theme-color" content="#a78bfa" />
+  <meta name="format-detection" content="telephone=yes" />
+  
+  <!-- Open Graph Tags -->
+  <meta property="og:type" content="business.business" />
+  <meta property="og:title" data-bind="og-title" content="Premium Smoke Shop" />
+  <meta property="og:description" data-bind="og-description" content="Premium website for your smoke shop" />
+  <meta property="og:site_name" content="Premium Smoke Shop" />
+  
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json" id="schema-data">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": "#business",
+    "name": "Smoke Shop",
+    "description": "Premium smoke shop",
+    "telephone": "(713) 555-0100",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "123 Main St",
+      "addressLocality": "Houston",
+      "addressRegion": "TX",
+      "postalCode": "77001",
+      "addressCountry": "US"
+    },
+    "areaServed": ["Houston", "TX"],
+    "priceRange": "$",
+    "url": "",
+    "image": "https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=1974&auto=format&fit=crop"
+  }
+  </script>
+  
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preload" as="script" href="config.js" />
+  <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" />
+  <!-- Dark mode support -->
+  <script>
+    const isDark = localStorage.getItem('dark-mode') !== 'false';
+    if (isDark) document.documentElement.setAttribute('data-dark', 'true');
+  </script>
+  <script src="config.js"></script>
+</head>
+
+<body>
+
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div id="smoke-canvas"></div>
+  <div class="cursor-glow" id="cursor-glow"></div>
+
+  <!-- ── Nav ───────────────────────────────────────────────────────────────── -->
+  <nav class="nav">
+    <span class="nav-logo" data-bind="name">Smoke Shop</span>
+    <div class="nav-actions">
+      <a data-bind="href:phone-tel" class="btn btn-glass" id="nav-phone" aria-label="Call us">Call Us</a>
+      <a href="#contact" class="btn btn-primary">Get Website</a>
+      <button id="dark-mode-toggle" class="btn btn-glass dark-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span class="dark-icon">🌙</span><span class="light-icon">☀️</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-content gs-reveal">
+      <h1>
+        Dominate Local Search For<br>
+        <span class="text-gradient" data-bind="name">Your Smoke Shop</span>
+      </h1>
+      <p>Premium websites designed to help <strong data-bind="name">your shop</strong> in <strong data-bind="city">your
+          city</strong> rank higher, build trust, and bring in more foot traffic.</p>
+
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">Claim This Design</a>
+        <a data-bind="href:googleMaps" class="btn btn-glass" target="_blank" rel="noopener">Find Us</a>
+      </div>
+    </div>
+    <div class="hero-visual gs-reveal">
+      <img 
+        src="https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=640&auto=format&fit=crop"
+        srcset="https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=640&auto=format&fit=crop 640w, https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=1280&auto=format&fit=crop 1280w, https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=1974&auto=format&fit=crop 1974w"
+        sizes="(max-width: 768px) 100vw, 50vw"
+        class="hero-img" alt="Premium Smoke Shop Interior" 
+        loading="lazy"
+        width="1974" height="1200"
+      />
+    </div>
+  </section>
+
+  <!-- ── Fast Info Strip ────────────────────────────────────────────────────── -->
+  <div class="info-grid gs-reveal">
+    <div class="info-card">
+      <span class="info-label">Location</span>
+      <span class="info-value"><a data-bind="href:googleMaps" target="_blank" data-bind-text="address">123 Main
+          St</a></span>
+    </div>
+    <div class="info-card">
+      <span class="info-label">Contact</span>
+      <span class="info-value"><a data-bind="href:phone-tel" data-bind-text="phone">(713) 555-0100</a></span>
+    </div>
+    <div class="info-card">
+      <span class="info-label">Hours</span>
+      <span class="info-value" data-bind="hours">Open daily</span>
+    </div>
+    <div class="info-card">
+      <span class="info-label">Social</span>
+      <span class="info-value"><a data-bind="href:instagram" target="_blank" rel="noopener">@yourshop</a></span>
+    </div>
+  </div>
+
+  <!-- ── Products ───────────────────────────────────────────────────────────── -->
+  <section class="products-section pt-8rem">
+    <div class="section-inner gs-reveal">
+      <h2 class="section-title">Premium Inventory</h2>
+      <p class="section-subtitle">We stock the highest quality products in <span data-bind="city">your city</span>.</p>
+      <div class="categories-wrapper" id="categories-grid">
+        <!-- Filled by bindBusiness() from BUSINESS.categories -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Features ──────────────────────────────────────────────────────────── -->
+  <section>
+    <div class="section-inner">
+      <h2 class="section-title text-gradient text-center mb-3-5rem">
+        Why <span data-bind="name">Your Shop</span> Needs This
+      </h2>
+      <div class="features-grid">
+        <div class="feature-bento gs-reveal">
+          <span class="feature-icon">📱</span>
+          <h3>Mobile Perfection</h3>
+          <p>Over 80% of smoke shop searches happen on phones. This site feels like a native app.</p>
+        </div>
+        <div class="feature-bento gs-reveal">
+          <span class="feature-icon">📍</span>
+          <h3>Local SEO Boost</h3>
+          <p>Structured perfectly for Google Maps to capture customers right around the corner.</p>
+        </div>
+        <div class="feature-bento gs-reveal">
+          <span class="feature-icon">⚡</span>
+          <h3>Lightning Fast</h3>
+          <p>Built with modern web standards ensuring near-instant load times on any connection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Testimonials ──────────────────────────────────────────────────────── -->
+  <section>
+    <div class="section-inner">
+      <h2 class="section-title neon-text text-center mb-2-5rem">What Shop Owners Say</h2>
+      <div class="testimonials-grid" id="testimonials-grid">
+        <!-- Filled by bindBusiness() from BUSINESS.testimonials -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Pricing ───────────────────────────────────────────────────────────── -->
+  <section id="pricing">
+    <div class="section-inner">
+      <h2 class="section-title text-gradient text-center mb-3-5rem">Flexible Pricing</h2>
+      <div class="pricing-grid">
+
+        <!-- Tier 1 -->
+        <div class="pricing-card gs-reveal">
+          <h3 class="tier-name">Starter</h3>
+          <p class="price-tag neon-text">$199<span class="price-sub"> setup</span></p>
+          <p class="price-monthly">then $19/mo</p>
+          <ul class="checklist">
+            <li>Landing Page Only</li>
+            <li>Custom Domain</li>
+            <li>Google Maps Optimization</li>
+            <li>Directions + Hours Info</li>
+            <li>Click-to-Call Button</li>
+            <li>Mobile-First Design</li>
+          </ul>
+          <a href="https://buy.stripe.com/cNi8wO5Na2DwfSB9WJ1Jm05" class="btn btn-glass btn-block-large" target="_blank"
+            rel="noopener noreferrer">Get Starter</a>
+        </div>
+
+        <!-- Tier 2 -->
+        <div class="pricing-card popular gs-reveal">
+          <span class="popular-badge">Most Popular</span>
+          <h3 class="tier-name">Growth</h3>
+          <p class="price-tag neon-text">$299<span class="price-sub"> setup</span></p>
+          <p class="price-monthly">then $29/mo</p>
+          <ul class="checklist">
+            <li>Landing Page + Inventory</li>
+            <li>Custom Domain</li>
+            <li>Google Maps Optimization</li>
+            <li>Product Category Pages</li>
+            <li>Click-to-Call Button</li>
+            <li>Mobile-First Design</li>
+          </ul>
+          <a href="https://buy.stripe.com/dRmfZgcby1zs9ud2uh1Jm06" class="glow-btn btn-block-large" target="_blank"
+            rel="noopener noreferrer">Get Growth</a>
+        </div>
+
+        <!-- Tier 3 -->
+        <div class="pricing-card gs-reveal">
+          <h3 class="tier-name">Pro</h3>
+          <p class="price-tag neon-text">$499<span class="price-sub"> setup</span></p>
+          <p class="price-monthly">then $49/mo</p>
+          <ul class="checklist">
+            <li>Everything in Growth</li>
+            <li>E-Commerce Capabilities</li>
+            <li>Age Verification Modal</li>
+            <li>Advanced SEO Setup</li>
+            <li>Monthly Analytics Report</li>
+            <li>Priority Support</li>
+          </ul>
+          <a href="https://buy.stripe.com/eVq28qdfC5PI7m57OB1Jm04" class="btn btn-glass btn-block-large" target="_blank"
+            rel="noopener noreferrer">Get Pro</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ─────────────────────────────────────────────────────────────── -->
+  <section id="contact">
+    <div class="contact-container gs-reveal">
+      <h2 class="section-title">Secure Your Site</h2>
+      <p class="section-subtitle">Lock in this premium design for <span data-bind="name">your shop</span> today.
+        <br><span class="text-gradient font-bold">Pick your plan when we talk.</span>
+      </p>
+
+      <form class="premium-form" id="leadForm" novalidate>
+        <div class="form-group">
+          <input id="formShop" placeholder="Shop Name" autocomplete="organization" required aria-required="true" aria-label="Business name" />
+          <span class="error-msg" id="shopError"></span>
+        </div>
+        <div class="form-group">
+          <input id="formCity" placeholder="City" autocomplete="address-level2" required aria-required="true" aria-label="City" />
+          <span class="error-msg" id="cityError"></span>
+        </div>
+        <div class="form-group">
+          <input id="formPhone" placeholder="Your Phone" type="tel" autocomplete="tel" required aria-required="true" aria-label="Phone number" />
+          <span class="error-msg" id="phoneError"></span>
+        </div>
+        <div class="form-group">
+          <input id="formEmail" placeholder="Your Email" type="email" autocomplete="email" required aria-required="true" aria-label="Email address" />
+          <span class="error-msg" id="emailError"></span>
+        </div>
+        <button type="submit" class="btn btn-primary btn-submit-large" id="submitBtn">
+          Launch My Website
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+  <footer>
+    <p>
+      &copy; <span data-bind="name">Your Shop</span> · Demo created by <a href="https://smokeshopgrowth.com"
+        target="_blank" rel="noopener" class="text-accent font-semibold">SmokeShopGrowth</a>
+    </p>
+  </footer>
+
+  <!-- ── Demo Banner ─────────────────────────────────────────────────────────── -->
+  <div class="demo-banner">
+    Demo website generated for <span data-bind="name">this smoke shop</span> in <span data-bind="city">your city</span>
+  </div>
+
+  <!-- ── Scripts ─────────────────────────────────────────────────────────────── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <script>
+    (function bindBusiness() {
+      const B = window.BUSINESS;
+      if (!B) return;
+
+      const phoneDigits = (B.phone || "").replace(/\D/g, "");
+      const phoneTel = "tel:" + (phoneDigits.length === 10 ? "+1" + phoneDigits : phoneDigits.length === 11 && phoneDigits[0] === "1" ? "+" + phoneDigits : "+" + phoneDigits);
+      
+      const lookup = {
+        name: B.name || "",
+        city: B.city || "",
+        state: B.state || "",
+        phone: B.phone || "",
+        address: B.address || "",
+        hours: B.hours || "",
+        price: B.price || "",
+        instagram: B.instagram || "#",
+        googleMaps: B.googleMaps || "#",
+        "phone-tel": phoneTel,
+        title: `${B.name} | Premium Smoke Shop Website`,
+        "meta-description": `Premium website demo for ${B.name} in ${B.city}. Mobile-optimized, SEO-ready smoke shop website.`,
+        "og-title": `${B.name} - Premium Smoke Shop`,
+        "og-description": `Discover ${B.name}, your premium smoke shop in ${B.city}.`,
+      };
+
+      // Update title and meta tags
+      document.title = lookup.title;
+      document.querySelector('meta[name="description"]').setAttribute('content', lookup["meta-description"]);
+      
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', lookup["og-title"]);
+      
+      const ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute('content', lookup["og-description"]);
+
+      // Update Schema.org data
+      const schema = document.getElementById('schema-data');
+      if (schema) {
+        try {
+          const schemaData = JSON.parse(schema.textContent);
+          schemaData.name = B.name || "Smoke Shop";
+          schemaData.description = B.tagline || "Premium smoke shop";
+          schemaData.telephone = B.phone || "";
+          if (B.address) {
+            const parts = B.address.split(',');
+            schemaData.address.streetAddress = parts[0]?.trim() || "";
+            schemaData.address.addressLocality = B.city || "";
+            schemaData.address.addressRegion = B.state || "TX";
+          }
+          schemaData.url = window.location.origin + window.location.pathname;
+          schema.textContent = JSON.stringify(schemaData);
+        } catch (e) {
+          console.log('Schema update skipped:', e.message);
+        }
+      }
+
+      // Bind HTML elements
+      document.querySelectorAll("[data-bind]").forEach(el => {
+        const raw = el.getAttribute("data-bind");
+        if (raw.startsWith("href:")) {
+          const key = raw.replace("href:", "");
+          const val = lookup[key] || "#";
+          const safeHref = /^javascript:/i.test(val.trim()) ? "#" : val;
+          el.setAttribute("href", safeHref);
+          if (!el.hasAttribute("data-bind-text") && !el.children.length) {
+            el.textContent = lookup[key.replace("-tel", "").replace("phone", "phone")] || val;
+          }
+        } else if (raw === "title") {
+          document.title = lookup.title;
+        } else if (raw === "meta-description") {
+          el.setAttribute("content", lookup["meta-description"]);
+        } else {
+          el.textContent = lookup[raw] || "";
+        }
+      });
+
+      document.querySelectorAll("[data-bind-text]").forEach(el => {
+        const key = el.getAttribute("data-bind-text");
+        el.textContent = lookup[key] || "";
+      });
+
+      const navPhone = document.getElementById("nav-phone");
+      if (navPhone && B.phone) navPhone.textContent = B.phone;
+
+      if (B.heroImage) {
+        const heroImg = document.querySelector(".hero-img");
+        if (heroImg) {
+          heroImg.src = B.heroImage;
+          heroImg.loading = "lazy";
+        }
+      }
+
+      // Pre-fill form
+      const fShop = document.getElementById("formShop");
+      const fCity = document.getElementById("formCity");
+      const fPhone = document.getElementById("formPhone");
+      if (fShop) fShop.value = B.name || "";
+      if (fCity) fCity.value = B.city || "";
+      if (fPhone) fPhone.value = B.phone || "";
+
+      // Render categories
+      const grid = document.getElementById("categories-grid");
+      if (grid && Array.isArray(B.categories)) {
+        grid.innerHTML = B.categories.map(c => `<span class="category-pill">${c}</span>`).join("");
+      }
+
+      // Render testimonials
+      const tGrid = document.getElementById("testimonials-grid");
+      if (tGrid && Array.isArray(B.testimonials)) {
+        tGrid.innerHTML = B.testimonials.map(t => `
+          <div class="testimonial-card">
+            <div class="stars">${'★'.repeat(t.stars)}${'☆'.repeat(5 - t.stars)}</div>
+            <p class="quote">"${t.quote}"</p>
+            <div class="author">
+              <div class="avatar">${t.name.charAt(0)}</div>
+              <div><strong>${t.name}</strong><br><span class="role">${t.role}</span></div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      // Form submission with analytics and validation
+      const form = document.getElementById("leadForm");
+      if (form) {
+        // Add real-time validation
+        const validateForm = (e) => {
+          const shop = document.getElementById("formShop");
+          const city = document.getElementById("formCity");
+          const phone = document.getElementById("formPhone");
+          const email = document.getElementById("formEmail");
+          
+          let isValid = true;
+          
+          // Validate shop name
+          if (!shop.value.trim()) {
+            document.getElementById("shopError").textContent = "Shop name is required";
+            isValid = false;
+          } else if (shop.value.trim().length < 2) {
+            document.getElementById("shopError").textContent = "Shop name must be at least 2 characters";
+            isValid = false;
+          } else {
+            document.getElementById("shopError").textContent = "";
+          }
+          
+          // Validate city
+          if (!city.value.trim()) {
+            document.getElementById("cityError").textContent = "City is required";
+            isValid = false;
+          } else {
+            document.getElementById("cityError").textContent = "";
+          }
+          
+          // Validate phone
+          const phoneRegex = /^[\d\s()+-]{10,}$/;
+          if (!phone.value.trim()) {
+            document.getElementById("phoneError").textContent = "Phone number is required";
+            isValid = false;
+          } else if (!phoneRegex.test(phone.value.trim())) {
+            document.getElementById("phoneError").textContent = "Please enter a valid phone number";
+            isValid = false;
+          } else {
+            document.getElementById("phoneError").textContent = "";
+          }
+          
+          // Validate email
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!email.value.trim()) {
+            document.getElementById("emailError").textContent = "Email is required";
+            isValid = false;
+          } else if (!emailRegex.test(email.value.trim())) {
+            document.getElementById("emailError").textContent = "Please enter a valid email";
+            isValid = false;
+          } else {
+            document.getElementById("emailError").textContent = "";
+          }
+          
+          return isValid;
+        };
+        
+        // Real-time validation on input
+        document.getElementById("formShop").addEventListener("blur", validateForm);
+        document.getElementById("formCity").addEventListener("blur", validateForm);
+        document.getElementById("formPhone").addEventListener("blur", validateForm);
+        document.getElementById("formEmail").addEventListener("blur", validateForm);
+        
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          
+          if (!validateForm(e)) return;
+          
+          const formData = {
+            shopName: document.getElementById("formShop").value,
+            city: document.getElementById("formCity").value,
+            phone: document.getElementById("formPhone").value,
+            email: document.getElementById("formEmail").value
+          };
+          
+          const submitBtn = document.getElementById("submitBtn");
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Submitting...";
+          
+          fetch('/api/template-submission', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              // Track conversion if GA available
+              if (window.gtag) {
+                gtag('event', 'form_submit', {
+                  'event_category': 'engagement',
+                  'event_label': 'website_inquiry'
+                });
+              }
+              
+              form.innerHTML = '<div class="text-center" style="padding:2rem"><p class="font-bold" style="color:var(--second); font-size:1.4rem;">✓ Request Received!</p><p style="color:var(--muted)">We will contact you shortly to discuss your new website.</p></div>';
+            } else {
+              alert('Error: ' + (data.error || 'Unknown error'));
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Launch My Website';
+            }
+          })
+          .catch(err => {
+            console.error('Form submission error:', err);
+            alert('Failed to submit form. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Launch My Website';
+          });
+        });
+      }
+
+      document.querySelectorAll("[data-bind='href:instagram']").forEach(el => {
+        if (!el.hasAttribute("data-bind-text") && B.instagram) {
+          el.textContent = B.instagram.replace(/.*instagram\.com\//, "@");
+        }
+      });
+
+    })();
+    
+    // Dark mode toggle
+    (function darkModeToggle() {
+      const toggle = document.getElementById('dark-mode-toggle');
+      if (!toggle) return;
+      
+      const isDarkMode = () => document.documentElement.getAttribute('data-dark') === 'true';
+      
+      const updateToggle = () => {
+        const dark = isDarkMode();
+        toggle.style.opacity = dark ? '1' : '0.7';
+        toggle.setAttribute('aria-pressed', dark);
+      };
+      
+      toggle.addEventListener('click', () => {
+        const currentDark = isDarkMode();
+        const newDark = !currentDark;
+        
+        if (newDark) {
+          document.documentElement.setAttribute('data-dark', 'true');
+          localStorage.setItem('dark-mode', 'true');
+        } else {
+          document.documentElement.removeAttribute('data-dark');
+          localStorage.setItem('dark-mode', 'false');
+        }
+        
+        updateToggle();
+      });
+      
+      updateToggle();
+    })();
+  </script>
+
+  <script src="animations.js"></script>
+</body>
+
+</html>

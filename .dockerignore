@@ -1,0 +1,8 @@
+.env
+deployments/
+__pycache__/
+*.pyc
+node_modules/
+.vercel/
+.git/
+test_leads.csv

@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rock N Roll Smoke Shop — Vapes, CBD, and More</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <style>
+    :root {
+      --purple: #7b2fbf;
+      --purple-d: #5a1a8a;
+      --purple-l: #a050e0;
+      --green: #4caf2a;
+      --green-d: #2e7a10;
+      --green-l: #6fd43e;
+      --gold: #d4a520;
+      --gold-l: #f5c842;
+      --bg: #0e0812;
+      --bg2: #160d1e;
+      --bg3: #1d1028;
+      --text: #f0ebf8;
+      --text-dim: rgba(240, 235, 248, 0.55);
+      --border: rgba(123, 47, 191, 0.2);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--purple);
+      border-radius: 2px;
+    }
+
+    /* AGE GATE */
+    #age-gate {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 2rem;
+    }
+
+    .ag-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 12vw, 8rem);
+      line-height: .88;
+      text-align: center;
+      margin-bottom: .5rem;
+    }
+
+    .ag-flava {
+      color: var(--purple-l);
+      -webkit-text-stroke: 2px var(--purple-d);
+    }
+
+    .ag-depot {
+      color: var(--green-l);
+      -webkit-text-stroke: 2px var(--green-d);
+    }
+
+    .ag-sub {
+      font-family: 'Oswald', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .ag-divider {
+      width: 100px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--purple), transparent);
+      margin: 0 auto 2.5rem;
+    }
+
+    .ag-q {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: .06em;
+      margin-bottom: .6rem;
+      text-align: center;
+    }
+
+    .ag-note {
+      font-size: .72rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .ag-btns {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .ag-btn {
+      padding: .85rem 2.8rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: .85rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all .3s;
+    }
+
+    .ag-yes {
+      background: linear-gradient(135deg, var(--purple-d), var(--purple-l));
+      color: #fff;
+      box-shadow: 0 0 30px rgba(123, 47, 191, .4);
+    }
+
+    .ag-yes:hover {
+      box-shadow: 0 0 50px rgba(160, 80, 224, .6);
+      transform: translateY(-2px);
+    }
+
+    .ag-no {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid rgba(240, 235, 248, .15);
+    }
+
+    .ag-no:hover {
+      border-color: rgba(240, 235, 248, .4);
+      color: var(--text);
+    }
+
+    .ag-disc {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: .6rem;
+      letter-spacing: .06em;
+      color: rgba(240, 235, 248, .2);
+      text-align: center;
+      width: 90%;
+      max-width: 480px;
+      line-height: 1.8;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.5rem 5vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all .4s;
+    }
+
+    nav.scrolled {
+      background: rgba(14, 8, 18, .95);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      padding: 1rem 5vw;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-brand {
+      display: flex;
+      flex-direction: column;
+      line-height: .85;
+      text-decoration: none;
+    }
+
+    .nf {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      color: var(--purple-l);
+    }
+
+    .nd {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      color: var(--green-l);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Oswald', sans-serif;
+      font-size: .78rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color .3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--purple-l);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-links a:hover::after {
+      transform: scaleX(1);
+    }
+
+    .nav-ig {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .15em;
+      color: var(--purple-l);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: .5rem 1.2rem;
+      transition: all .3s;
+    }
+
+    .nav-ig:hover {
+      background: rgba(123, 47, 191, .15);
+      border-color: var(--purple-l);
+    }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 10rem 5vw 6rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 30%, rgba(123, 47, 191, .2) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 20% 80%, rgba(76, 175, 42, .1) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 40% at 80% 70%, rgba(76, 175, 42, .08) 0%, transparent 60%);
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(123, 47, 191, .04) 1px, transparent 1px), linear-gradient(90deg, rgba(123, 47, 191, .04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: .7rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--green-l);
+      background: rgba(76, 175, 42, .1);
+      border: 1px solid rgba(76, 175, 42, .25);
+      padding: .4rem 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+    }
+
+    .blink {
+      width: 6px;
+      height: 6px;
+      background: var(--green-l);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .2
+      }
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 16vw, 15rem);
+      line-height: .88;
+      letter-spacing: .02em;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .ht-f {
+      display: block;
+      color: var(--purple-l);
+      -webkit-text-stroke: 2px var(--purple-d);
+      text-shadow: 0 0 100px rgba(160, 80, 224, .3);
+      opacity: 0;
+      transform: translateY(60px);
+    }
+
+    .ht-d {
+      display: block;
+      color: var(--green-l);
+      -webkit-text-stroke: 2px var(--green-d);
+      text-shadow: 0 0 100px rgba(76, 175, 42, .2);
+      opacity: 0;
+      transform: translateY(60px);
+    }
+
+    .hero-tag {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(.8rem, 1.5vw, 1rem);
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 3rem;
+      opacity: 0;
+    }
+
+    .hero-tag span {
+      color: var(--gold);
+    }
+
+    .hero-acts {
+      display: flex;
+      gap: 1rem;
+      opacity: 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-pu {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, var(--purple-d), var(--purple-l));
+      color: #fff;
+      font-family: 'Oswald', sans-serif;
+      font-size: .85rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      font-weight: 500;
+      box-shadow: 0 4px 30px rgba(123, 47, 191, .35);
+      transition: all .3s;
+    }
+
+    .btn-pu:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 40px rgba(160, 80, 224, .5);
+    }
+
+    .btn-gr {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, var(--green-d), var(--green));
+      color: #fff;
+      font-family: 'Oswald', sans-serif;
+      font-size: .85rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      font-weight: 500;
+      box-shadow: 0 4px 30px rgba(76, 175, 42, .25);
+      transition: all .3s;
+    }
+
+    .btn-gr:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 40px rgba(76, 175, 42, .4);
+    }
+
+    .btn-ol {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: 'Oswald', sans-serif;
+      font-size: .85rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all .3s;
+    }
+
+    .btn-ol:hover {
+      border-color: var(--purple-l);
+      color: var(--text);
+    }
+
+    .scroll-ind {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .6rem;
+      opacity: 0;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--purple-l), transparent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: .4;
+        transform: scaleY(1);
+        transform-origin: top
+      }
+
+      50% {
+        opacity: 1;
+        transform: scaleY(.5);
+        transform-origin: top
+      }
+    }
+
+    .scroll-ind span {
+      font-size: .58rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* HOURS BAR */
+    .hours-bar {
+      background: linear-gradient(135deg, rgba(90, 26, 138, .5), rgba(29, 16, 40, .8));
+      border-top: 1px solid rgba(123, 47, 191, .3);
+      border-bottom: 1px solid rgba(76, 175, 42, .2);
+      padding: 1rem 5vw;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hb-label {
+      font-family: 'Oswald', sans-serif;
+      font-size: .7rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--green-l);
+      white-space: nowrap;
+    }
+
+    .hb-div {
+      width: 1px;
+      height: 20px;
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .hb-times {
+      font-family: 'Oswald', sans-serif;
+      font-size: .82rem;
+      letter-spacing: .08em;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .hb-right {
+      margin-left: auto;
+      font-family: 'Oswald', sans-serif;
+      font-size: .72rem;
+      letter-spacing: .18em;
+      color: var(--purple-l);
+    }
+
+    /* MARQUEE */
+    .mqw {
+      overflow: hidden;
+      padding: .9rem 0;
+      background: rgba(76, 175, 42, .05);
+      border-bottom: 1px solid rgba(76, 175, 42, .15);
+    }
+
+    .mq-track {
+      display: flex;
+      animation: mq 18s linear infinite;
+      white-space: nowrap;
+    }
+
+    .mq-item {
+      font-family: 'Oswald', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: rgba(111, 212, 62, .5);
+      padding: 0 2rem;
+      flex-shrink: 0;
+    }
+
+    .mq-gem {
+      color: var(--green-l);
+    }
+
+    @keyframes mq {
+      from {
+        transform: translateX(0)
+      }
+
+      to {
+        transform: translateX(-50%)
+      }
+    }
+
+    /* SHARED */
+    section {
+      padding: 8vh 5vw;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--green-l);
+      margin-bottom: 1rem;
+    }
+
+    .ey-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green-l);
+      border-radius: 50%;
+    }
+
+    /* MENU SECTION */
+    #featured {
+      background: var(--bg2);
+    }
+
+    .menu-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 3rem;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .menu-h {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      line-height: .88;
+      letter-spacing: .03em;
+    }
+
+    .menu-h .hp {
+      color: var(--purple-l);
+    }
+
+    .menu-h .hg {
+      color: var(--green-l);
+    }
+
+    .filter-row {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+    }
+
+    .fbtn {
+      font-family: 'Oswald', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      padding: .45rem 1.2rem;
+      background: transparent;
+      cursor: pointer;
+      border: 1px solid rgba(240, 235, 248, .1);
+      color: var(--text-dim);
+      transition: all .3s;
+    }
+
+    .fbtn.active {
+      border-color: var(--purple-l);
+      color: var(--purple-l);
+      background: rgba(123, 47, 191, .1);
+    }
+
+    .fbtn:hover {
+      border-color: var(--purple-l);
+      color: var(--text);
+    }
+
+    /* Budget card */
+    .budget-card {
+      background: linear-gradient(135deg, rgba(123, 47, 191, .12) 0%, rgba(76, 175, 42, .04) 100%);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--purple-l);
+      padding: 2.5rem;
+      margin-bottom: 1.5px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2.5rem;
+      align-items: start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .budget-card::before {
+      content: 'BUDGET PICK';
+      position: absolute;
+      top: 1.2rem;
+      right: 1.5rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .3em;
+      color: var(--gold);
+      border: 1px solid rgba(212, 165, 32, .3);
+      padding: .25rem .8rem;
+      background: rgba(212, 165, 32, .08);
+    }
+
+    .bud-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, rgba(123, 47, 191, .3), rgba(22, 13, 30, .8));
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+
+    .bud-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--purple-l);
+      margin-bottom: .25rem;
+    }
+
+    .bud-type {
+      font-size: .7rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+
+    .bud-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      color: var(--gold);
+      letter-spacing: .05em;
+      margin-bottom: 1rem;
+    }
+
+    .bud-details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+
+    .d-label {
+      font-size: .6rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: .4rem;
+      font-weight: 500;
+    }
+
+    .d-list {
+      list-style: none;
+      font-size: .8rem;
+      line-height: 1.9;
+    }
+
+    .d-list li::before {
+      content: '• ';
+      color: var(--green-l);
+    }
+
+    .d-neg li::before {
+      color: var(--purple-l);
+      content: '✕ ';
+    }
+
+    /* Sig section header */
+    .sig-bar {
+      background: linear-gradient(135deg, rgba(76, 175, 42, .1), rgba(76, 175, 42, .02));
+      border: 1px solid rgba(76, 175, 42, .2);
+      border-left: 3px solid var(--green-l);
+      padding: .9rem 1.8rem;
+      margin-bottom: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .sig-bar-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--green-l);
+      font-weight: 600;
+    }
+
+    .sig-bar-sub {
+      font-size: .7rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* Products grid */
+    .pgrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      background: rgba(123, 47, 191, .05);
+    }
+
+    .pcard {
+      background: var(--bg);
+      padding: 2rem 1.8rem;
+      position: relative;
+      overflow: hidden;
+      transition: background .35s;
+      cursor: pointer;
+    }
+
+    .pcard::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--purple), var(--green));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s;
+    }
+
+    .pcard:hover {
+      background: var(--bg2);
+    }
+
+    .pcard:hover::after {
+      transform: scaleX(1);
+    }
+
+    .ptier {
+      display: inline-block;
+      font-family: 'Oswald', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      padding: .2rem .7rem;
+    }
+
+    .ts {
+      color: var(--green-l);
+      border: 1px solid rgba(76, 175, 42, .3);
+    }
+
+    .tp {
+      color: var(--gold);
+      border: 1px solid rgba(212, 165, 32, .3);
+    }
+
+    .tt {
+      color: var(--purple-l);
+      border: 1px solid rgba(160, 80, 224, .3);
+    }
+
+    .pname {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: .2rem;
+      line-height: 1.2;
+    }
+
+    .psub {
+      font-size: .68rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 1.2rem;
+    }
+
+    .pprice {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      color: var(--gold);
+      letter-spacing: .04em;
+    }
+
+    .punit {
+      font-size: .62rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: .1rem;
+    }
+
+    .peffects {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(240, 235, 248, .05);
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+    }
+
+    .etag {
+      font-size: .58rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .2rem .6rem;
+      background: rgba(76, 175, 42, .1);
+      color: var(--green-l);
+      border: 1px solid rgba(76, 175, 42, .2);
+    }
+
+    .eneg {
+      background: rgba(123, 47, 191, .1);
+      color: var(--purple-l);
+      border-color: rgba(123, 47, 191, .2);
+    }
+
+    /* EXPERIENCE */
+    #experience {
+      background: var(--bg);
+      text-align: center;
+      padding: 10vh 5vw;
+    }
+
+    .exph {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: .9;
+      letter-spacing: .03em;
+      margin-bottom: 1rem;
+    }
+
+    .expsub {
+      font-size: .88rem;
+      color: var(--text-dim);
+      max-width: 480px;
+      margin: 0 auto 4rem;
+      line-height: 1.8;
+    }
+
+    .expgrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(123, 47, 191, .1);
+    }
+
+    .expc {
+      background: var(--bg2);
+      padding: 2.5rem 2rem;
+      text-align: left;
+      transition: background .3s;
+    }
+
+    .expc:hover {
+      background: var(--bg3);
+    }
+
+    .expicon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(123, 47, 191, .2), rgba(76, 175, 42, .1));
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.8rem;
+      color: var(--purple-l);
+    }
+
+    .exptitle {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: .6rem;
+    }
+
+    .expdesc {
+      font-size: .8rem;
+      line-height: 1.9;
+      color: var(--text-dim);
+    }
+
+    /* VISIT */
+    #visit {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 0;
+      gap: 0;
+      min-height: 560px;
+    }
+
+    .vl {
+      background: var(--bg2);
+      padding: 7vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .vh {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 5vw, 5rem);
+      line-height: .9;
+      margin-bottom: 2.5rem;
+    }
+
+    .vh .hg {
+      color: var(--green-l);
+    }
+
+    .vib {
+      margin-bottom: 1.8rem;
+    }
+
+    .vib-l {
+      font-family: 'Oswald', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--purple-l);
+      margin-bottom: .35rem;
+    }
+
+    .vib-v {
+      font-size: .95rem;
+      line-height: 1.7;
+    }
+
+    .ig-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: .95rem;
+      letter-spacing: .15em;
+      color: var(--purple-l);
+      text-decoration: none;
+      margin-top: 2rem;
+      border: 1px solid var(--border);
+      padding: .7rem 1.5rem;
+      transition: all .3s;
+    }
+
+    .ig-link:hover {
+      background: rgba(123, 47, 191, .15);
+      border-color: var(--purple-l);
+    }
+
+    .vr {
+      background: var(--bg3);
+      padding: 7vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vr::before {
+      content: 'FD';
+      position: absolute;
+      right: -2vw;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20vw;
+      color: transparent;
+      -webkit-text-stroke: 2px rgba(123, 47, 191, .05);
+      pointer-events: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .hd-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--green-l);
+      margin-bottom: 1.8rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(76, 175, 42, .15);
+    }
+
+    .hrow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .8rem 0;
+      border-bottom: 1px solid rgba(240, 235, 248, .04);
+      font-size: .88rem;
+    }
+
+    .hday {
+      color: var(--text-dim);
+    }
+
+    .htime {
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .hrow.today .hday,
+    .hrow.today .htime {
+      color: var(--green-l);
+      font-weight: 500;
+    }
+
+    .tbadge {
+      font-size: .52rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      background: rgba(76, 175, 42, .15);
+      color: var(--green-l);
+      border: 1px solid rgba(76, 175, 42, .3);
+      padding: .12rem .45rem;
+      margin-left: .5rem;
+    }
+
+    .menu-top-desc {
+      font-size: .8rem;
+      color: var(--text-dim);
+      margin-top: .5rem;
+      font-style: italic;
+    }
+
+    .sig-bar.sig-bar-wrap {
+      margin-top: 3px;
+    }
+
+    .menu-bottom-btn {
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .eyebrow.exp-eyebrow {
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .exph-p {
+      color: var(--purple-l);
+    }
+
+    .exph-g {
+      color: var(--green-l);
+    }
+
+    .store-hours-wrap {
+      width: 100%;
+      max-width: 360px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3.5rem 5vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .fbrand-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+
+    .fbrand-name .fp {
+      color: var(--purple-l);
+    }
+
+    .fbrand-name .fg {
+      color: var(--green-l);
+    }
+
+    .fbrand-sub {
+      font-size: .58rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: .25rem;
+    }
+
+    .fdisc {
+      font-size: .6rem;
+      letter-spacing: .04em;
+      color: rgba(240, 235, 248, .18);
+      max-width: 380px;
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    .fright {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: .75rem;
+    }
+
+    .fig {
+      font-family: 'Oswald', sans-serif;
+      font-size: .8rem;
+      letter-spacing: .18em;
+      color: var(--purple-l);
+      text-decoration: none;
+      transition: color .3s;
+    }
+
+    .fig:hover {
+      color: var(--green-l);
+    }
+
+    .fcopy {
+      font-size: .6rem;
+      letter-spacing: .1em;
+      color: rgba(240, 235, 248, .2);
+    }
+
+    /* RESPONSIVE */
+    @media(max-width:900px) {
+      .pgrid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .expgrid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      #visit {
+        grid-template-columns: 1fr;
+      }
+
+      .budget-card {
+        grid-template-columns: 1fr;
+      }
+
+      .bud-details {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media(max-width:600px) {
+      .nav-links {
+        display: none;
+      }
+
+      .pgrid {
+        grid-template-columns: 1fr;
+      }
+
+      .expgrid {
+        grid-template-columns: 1fr;
+      }
+
+      .bud-details {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+      }
+
+      .fright {
+        align-items: flex-start;
+      }
+
+      .fdisc {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- AGE GATE -->
+  <div id="age-gate">
+    <div class="ag-name">
+      <div class="ag-flava">Rock N Roll Smoke Shop</div>
+    </div>
+    <div class="ag-sub">Vapes, CBD, and More</div>
+    <div class="ag-divider"></div>
+    <div class="ag-q">Are you 21 or older?</div>
+    <div class="ag-note">You must be of legal age to enter this site</div>
+    <div class="ag-btns">
+      <button class="ag-btn ag-yes" onclick="enterSite()">Yes, Enter</button>
+      <button class="ag-btn ag-no" onclick="window.location.href='https://www.google.com'">No, Exit</button>
+    </div>
+    <p class="ag-disc">By entering you agree to our Terms of Service. Cannabis products have not been evaluated by the
+      FDA. For use by adults 21+ only where legal. Do not drive or operate machinery while under the influence.</p>
+  </div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a class="nav-brand" href="#">
+      <span class="nf">Rock N Roll Smoke Shop</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#featured">Menu</a></li>
+      <li><a href="#experience">About</a></li>
+      <li><a href="#visit">Visit</a></li>
+    </ul>
+    <a class="nav-ig" href="https://instagram.com/rocknrollsmoke" target="_blank" rel="noopener noreferrer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="2" width="20" height="20" rx="5" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+      </svg>
+      @rocknrollsmoke
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-badge">
+      <div class="blink"></div>Live Inventory · Open Today
+    </div>
+    <h1 class="hero-title">
+      <span class="ht-f">Rock N Roll Smoke Shop</span>
+    </h1>
+    <p class="hero-tag">Vapes, CBD, and More &nbsp;·&nbsp; <span>Lab-Tested Quality</span></p>
+    <div class="hero-acts">
+      <a href="#featured" class="btn-pu">View Menu</a>
+      <a href="#visit" class="btn-gr">Find Us</a>
+      <a href="https://instagram.com/rocknrollsmoke" class="btn-ol" target="_blank"
+        rel="noopener noreferrer">@rocknrollsmoke</a>
+    </div>
+    <div class="scroll-ind">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- HOURS BAR -->
+  <div class="hours-bar">
+    <div class="hb-label">Store Hours</div>
+    <div class="hb-div"></div>
+    <div class="hb-times">Mon-Sun 11AM-10PM
+    </div>
+    <div class="hb-right">📍 Vapes, CBD, and More</div>
+  </div>
+
+  <!-- MARQUEE -->
+  <div class="mqw">
+    <div class="mq-track">
+      <span class="mq-item">Flower</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Indica</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Sativa</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Hybrid</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Concentrates</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Vapes</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Edibles</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Pre-Rolls</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Lab-Tested</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Flower</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Indica</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Sativa</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Hybrid</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Concentrates</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Vapes</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Edibles</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Pre-Rolls</span><span class="mq-item mq-gem">✦</span>
+      <span class="mq-item">Lab-Tested</span><span class="mq-item mq-gem">✦</span>
+    </div>
+  </div>
+
+  <!-- MENU -->
+  <section id="featured">
+    <div class="menu-top">
+      <div>
+        <div class="eyebrow">
+          <div class="ey-dot"></div>Live Inventory
+        </div>
+        <div class="menu-h">
+          <div class="hp">Flower</div>
+          <div class="hg">Menu</div>
+        </div>
+        <div class="menu-top-desc">Fresh, lab-tested cannabis flower. All prices per gram.</div>
+      </div>
+      <div class="filter-row">
+        <button class="fbtn active">All</button>
+        <button class="fbtn">Indica</button>
+        <button class="fbtn">Sativa</button>
+        <button class="fbtn">Hybrid</button>
+      </div>
+    </div>
+
+    <!-- Budget Pick -->
+    <div class="budget-card">
+      <div class="bud-img">🌿</div>
+      <div>
+        <div class="bud-name">King Louis OG</div>
+        <div class="bud-type">Indica · Premium Flower</div>
+        <div class="bud-price">$3.00 / gram</div>
+        <div class="bud-details">
+          <div>
+            <div class="d-label">Positive Effects</div>
+            <ul class="d-list">
+              <li>Sleepy</li>
+              <li>Relaxed</li>
+              <li>Hungry</li>
+            </ul>
+          </div>
+          <div>
+            <div class="d-label">Helps With</div>
+            <ul class="d-list">
+              <li>Anxiety</li>
+              <li>Insomnia</li>
+              <li>Stress</li>
+            </ul>
+          </div>
+          <div>
+            <div class="d-label">Side Effects</div>
+            <ul class="d-list d-neg">
+              <li>Dry mouth</li>
+              <li>Dry eyes</li>
+              <li>Dizzy</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signature Bar -->
+    <div class="sig-bar sig-bar-wrap">
+      <span class="sig-bar-title">Signature $5 Strains</span>
+      <span class="sig-bar-sub">— All $5.00 / gram</span>
+    </div>
+
+    <div class="pgrid">
+      <div class="pcard">
+        <div class="ptier ts">Signature</div>
+        <div class="pname">Hard Candy</div>
+        <div class="psub">Indica · High THC</div>
+        <div class="pprice">$5.00</div>
+        <div class="punit">per gram</div>
+        <div class="peffects">
+          <span class="etag">Energetic</span>
+          <span class="etag">Euphoric</span>
+          <span class="etag">Vanilla</span>
+          <span class="etag">Honey</span>
+          <span class="etag eneg">Dry mouth</span>
+          <span class="etag eneg">Dizzy</span>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="ptier ts">Signature</div>
+        <div class="pname">Blue Nerds</div>
+        <div class="psub">Hybrid (50/50)</div>
+        <div class="pprice">$5.00</div>
+        <div class="punit">per gram</div>
+        <div class="peffects">
+          <span class="etag">Focused</span>
+          <span class="etag">Relaxed</span>
+          <span class="etag">Euphoric</span>
+          <span class="etag">Helps: Pain</span>
+          <span class="etag eneg">Dry mouth</span>
+          <span class="etag eneg">Headache</span>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="ptier ts">Signature</div>
+        <div class="pname">Obama Runtz</div>
+        <div class="psub">Hybrid · THC &lt;29%</div>
+        <div class="pprice">$5.00</div>
+        <div class="punit">per gram</div>
+        <div class="peffects">
+          <span class="etag">Relaxed</span>
+          <span class="etag">Relizel</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-bottom-btn">
+      <a href="https://www.instagram.com/rocknrollsmoke" class="btn-pu" target="_blank" rel="noopener noreferrer">Full Menu on
+        Instagram</a>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="eyebrow exp-eyebrow">
+      <div class="ey-dot"></div>Why Rock N Roll Smoke Shop
+    </div>
+    <h2 class="exph"><span class="exph-p">Premium</span> <span class="exph-g">Quality.</span><br>Every Time.</h2>
+    <p class="expsub">We curate only the finest strains from trusted cultivators. Walk in knowing exactly what you're
+      getting.</p>
+    <div class="expgrid">
+      <div class="expc">
+        <div class="expicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5">
+            <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg></div>
+        <div class="exptitle">Lab-Tested Quality</div>
+        <div class="expdesc">Every product verified. Know exactly what you're getting every single time.</div>
+      </div>
+      <div class="expc">
+        <div class="expicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5">
+            <path
+              d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+          </svg></div>
+        <div class="exptitle">Knowledgeable Staff</div>
+        <div class="expdesc">First-timer or daily driver — our team helps you find the perfect strain for your needs.
+        </div>
+      </div>
+      <div class="expc">
+        <div class="expicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5">
+            <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg></div>
+        <div class="exptitle">Always Fresh Stock</div>
+        <div class="expdesc">Menu rotating regularly. Budget picks to top-shelf — always something new to discover.
+        </div>
+      </div>
+      <div class="expc">
+        <div class="expicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg></div>
+        <div class="exptitle">Private & Discreet</div>
+        <div class="expdesc">Your visit stays your business. We respect your privacy, always.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISIT -->
+  <section id="visit">
+    <div class="vl">
+      <div class="eyebrow">
+        <div class="ey-dot"></div>Find Us
+      </div>
+      <div class="vh">Come <span class="hg">Visit</span><br>In Store.</div>
+      <div class="vib">
+        <div class="vib-l">Address</div>
+        <div class="vib-v">456 Rocker Ave<br>Houston, TX</div>
+      </div>
+      <div class="vib">
+        <div class="vib-l">Phone</div>
+        <div class="vib-v">832-555-1234</div>
+      </div>
+      <div class="vib">
+        <div class="vib-l">Instagram</div>
+        <div class="vib-v">@rocknrollsmoke</div>
+      </div>
+      <a href="https://instagram.com/rocknrollsmoke" class="ig-link" target="_blank" rel="noopener noreferrer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="2" width="20" height="20" rx="5" />
+          <circle cx="12" cy="12" r="5" />
+          <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none" />
+        </svg>
+        @rocknrollsmoke on Instagram
+      </a>
+    </div>
+    <div class="vr">
+      <div class="store-hours-wrap">
+        <div class="hd-title">Store Hours</div>
+        <div class="hrow" id="h-mon"><span class="hday">Monday</span><span class="htime">Mon-Sun 11AM-10PM</span></div>
+        <div class="hrow" id="h-tue"><span class="hday">Tuesday</span><span class="htime">Mon-Sun 11AM-10PM</span>
+        </div>
+        <div class="hrow" id="h-wed"><span class="hday">Wednesday</span><span class="htime">Mon-Sun 11AM-10PM</span>
+        </div>
+        <div class="hrow" id="h-thu"><span class="hday">Thursday</span><span class="htime">Mon-Sun 11AM-10PM</span>
+        </div>
+        <div class="hrow" id="h-fri"><span class="hday">Friday</span><span class="htime">Mon-Sun 11AM-10PM</span></div>
+        <div class="hrow" id="h-sat"><span class="hday">Saturday</span><span class="htime">Mon-Sun 11AM-10PM</span>
+        </div>
+        <div class="hrow" id="h-sun"><span class="hday">Sunday</span><span class="htime">Mon-Sun 11AM-10PM</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="fbrand">
+      <div class="fbrand-name"><span class="fp">Rock N Roll Smoke Shop</span> </div>
+      <div class="fbrand-sub">Vapes, CBD, and More</div>
+    </div>
+    <div class="fdisc">Must be 21+ to purchase cannabis products. Please consume responsibly. Keep out of reach of
+      children and animals. Cannabis has intoxicating effects. Do not drive under the influence. For adult use only
+      where legally permitted.</div>
+    <div class="fright">
+      <a href="https://instagram.com/rocknrollsmoke" class="fig" target="_blank" rel="noopener noreferrer">📸
+        @rocknrollsmoke</a>
+      <div class="fcopy">© 2025 Rock N Roll Smoke Shop · All Rights Reserved</div>
+    </div>
+  </footer>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    function enterSite() {
+      const ag = document.getElementById('age-gate');
+      gsap.to(ag, {
+        opacity: 0, y: -40, duration: .9, ease: 'power3.inOut',
+        onComplete: () => { ag.style.display = 'none'; introAnims(); }
+      });
+    }
+
+    function introAnims() {
+      gsap.to('.hero-badge', { opacity: 1, duration: .8, delay: .2 });
+      gsap.to('.ht-f', { opacity: 1, y: 0, duration: 1, delay: .4, ease: 'power4.out' });
+      gsap.to('.ht-d', { opacity: 1, y: 0, duration: 1, delay: .6, ease: 'power4.out' });
+      gsap.to('.hero-tag', { opacity: 1, duration: .8, delay: .9 });
+      gsap.to('.hero-acts', { opacity: 1, duration: .8, delay: 1.1 });
+      gsap.to('.scroll-ind', { opacity: 1, duration: .8, delay: 1.6 });
+
+      window.addEventListener('scroll', () => {
+        document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 80);
+      });
+
+      gsap.utils.toArray('.pcard, .budget-card').forEach((el, i) => {
+        gsap.from(el, {
+          scrollTrigger: { trigger: el, start: 'top 88%' },
+          opacity: 0, y: 30, duration: .7,
+          delay: (i % 3) * .08, ease: 'power3.out'
+        });
+      });
+
+      gsap.utils.toArray('.expc').forEach((el, i) => {
+        gsap.from(el, {
+          scrollTrigger: { trigger: el, start: 'top 88%' },
+          opacity: 0, y: 25, duration: .6, delay: i * .1, ease: 'power3.out'
+        });
+      });
+
+      gsap.from('.vl', { scrollTrigger: { trigger: '#visit', start: 'top 75%' }, opacity: 0, x: -40, duration: .9 });
+      gsap.from('.vr', { scrollTrigger: { trigger: '#visit', start: 'top 75%' }, opacity: 0, x: 40, duration: .9, delay: .15 });
+    }
+
+    // Today's hours highlight
+    const dayIds = ['h-sun', 'h-mon', 'h-tue', 'h-wed', 'h-thu', 'h-fri', 'h-sat'];
+    const todayRow = document.getElementById(dayIds[new Date().getDay()]);
+    if (todayRow) {
+      todayRow.classList.add('today');
+      const b = document.createElement('span');
+      b.className = 'tbadge'; b.textContent = 'Today';
+      todayRow.querySelector('.hday').appendChild(b);
+    }
+
+    // Filter buttons
+    document.querySelectorAll('.fbtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  </script>
+</body>
+
+</html>

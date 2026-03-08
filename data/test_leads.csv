@@ -1,0 +1,6 @@
+business_name,address,city,state,phone,website,rating,review_count
+"Smoke Therapy","123 Main St","Houston","TX","713-555-8899","https://smoketherapy.com","4.8","156"
+"Rock N Roll Smoke","456 Rocker Ave","Houston","TX","832-555-1234","https://rocknroll.com","4.5","98"
+"Vape City","789 Vapor Ln","Houston","TX","713-555-5678","https://vapecity.com","4.2","67"
+"business_name","address","city","state","phone"
+"Test Smoke Shop","123 Main","Houston","TX","713-555-1234"
