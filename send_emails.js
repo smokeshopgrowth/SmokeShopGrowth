@@ -91,7 +91,7 @@ function buildSubject(businessName) {
 // ──────────────────────────────────────────────
 function readCsv(filePath) {
     return new Promise((resolve, reject) => {
-        if (!existsSync(filePath)) reject(new Error(`File not found: ${filePath}`));
+        if (!existsSync(filePath)) return reject(new Error(`File not found: ${filePath}`));
         const rows = [];
         createReadStream(filePath)
             .pipe(csv())

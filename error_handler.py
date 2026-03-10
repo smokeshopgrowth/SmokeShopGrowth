@@ -1,8 +1,6 @@
 import os
 import json
 import time
-from deploy_agent import deploy_shop_website
-from delivery_agent import trigger_delivery_flow
 
 QUEUE_FILE = "failed_jobs_queue.json"
 
@@ -79,16 +77,19 @@ def process_retry_queue():
         try:
             if job_type == 'deploy':
                 # Re-attempt deployment
+                from deploy_agent import deploy_shop_website
                 url = deploy_shop_website(payload)
                 if url:
                     # If it deployed successfully, we must now trigger delivery!
                     # Next time it will fall into 'delivery' if delivery fails, 
                     # but for now we try to complete the chain inline.
+                    from delivery_agent import trigger_delivery_flow
                     trigger_delivery_flow(payload, url)
                     success = True
             
             elif job_type == 'delivery':
                 # Payload requires lead_data and live_url
+                from delivery_agent import trigger_delivery_flow
                 lead_data = payload.get('lead_data')
                 live_url = payload.get('live_url')
                 trigger_delivery_flow(lead_data, live_url)

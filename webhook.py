@@ -117,7 +117,7 @@ def webhook():
     except ValueError as e:
         print("Webhook error: Invalid payload")
         return 'Invalid payload', 400
-    except stripe.error.SignatureVerificationError as e:
+    except stripe.SignatureVerificationError as e:
         print("Webhook error: Invalid signature")
         return 'Invalid signature', 400
 

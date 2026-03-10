@@ -90,7 +90,7 @@ app.post('/api/run', (req, res) => {
         status: 'running',
         step: 0,
         logs: [],
-        city, bizType, maxResults, citySlug, dataDir, files,
+        city, bizType, maxResults, skipLighthouse, citySlug, dataDir, files,
         exportSheets, sheetsId, generateDemo,
         clients: [], // SSE subscribers
     });

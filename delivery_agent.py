@@ -2,7 +2,7 @@ import os
 import json
 import smtplib
 from email.message import EmailMessage
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -105,7 +105,7 @@ def enroll_in_upsell_drip(client_name, client_email):
     new_entry = {
         "client_name": client_name,
         "email": client_email,
-        "enrolled_at": datetime.utcnow().isoformat(),
+        "enrolled_at": datetime.now(timezone.utc).isoformat(),
         "day_3_sent": False,
         "day_7_sent": False
     }

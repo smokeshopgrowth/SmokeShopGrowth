@@ -2,7 +2,7 @@ import os
 import json
 import smtplib
 from email.message import EmailMessage
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -79,7 +79,7 @@ def process_upsell_queue():
     with open(UPSELL_QUEUE_FILE, 'r') as f:
         queue_data = json.load(f)
 
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     modified = False
 
     for entry in queue_data:

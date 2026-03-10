@@ -66,7 +66,6 @@ const requiredFiles = [
   'requirements.txt',
   'config.py',
   '.env.example',
-  '.env.local',
   '.gitignore',
   'README.md',
   'SECURITY.md'
@@ -93,16 +92,17 @@ check('.env is NOT tracked in git', () => {
   }
 });
 
-const envLocal = fs.readFileSync('.env.local', 'utf-8');
-check('.env.local has OPENAI_API_KEY template', () => {
-  if (!envLocal.includes('OPENAI_API_KEY')) {
-    throw new Error('Missing OPENAI_API_KEY in .env.local');
+check('.env.example has OPENAI_API_KEY template', () => {
+  const envExample = fs.readFileSync('.env.example', 'utf-8');
+  if (!envExample.includes('OPENAI_API_KEY')) {
+    throw new Error('Missing OPENAI_API_KEY in .env.example');
   }
 });
 
-check('.env.local has TWILIO_ACCOUNT_SID template', () => {
-  if (!envLocal.includes('TWILIO_ACCOUNT_SID')) {
-    throw new Error('Missing TWILIO_ACCOUNT_SID in .env.local');
+check('.env.example has TWILIO_ACCOUNT_SID template', () => {
+  const envExample = fs.readFileSync('.env.example', 'utf-8');
+  if (!envExample.includes('TWILIO_ACCOUNT_SID')) {
+    throw new Error('Missing TWILIO_ACCOUNT_SID in .env.example');
   }
 });
 
@@ -133,7 +133,7 @@ check('Python dependencies installed (twilio)', () => {
 // 5. Check syntax
 console.log(`\n${colors.blue}Code Quality:${colors.reset}`);
 check('Python files compile', () => {
-  execSync('python -m py_compile scraper.py outreach_agent.py delivery_agent.py', { stdio: 'pipe' });
+  execSync('python -m py_compile scraper.py delivery_agent.py', { stdio: 'pipe' });
 });
 
 check('Node.js files have valid syntax', () => {
@@ -148,7 +148,7 @@ const total = checks.length;
 if (passed === total) {
   console.log(`${colors.green}✓ All checks passed (${passed}/${total})${colors.reset}`);
   console.log(`\n${colors.yellow}Next steps:${colors.reset}`);
-  console.log('  1. Edit .env.local with your API credentials');
+  console.log('  1. Copy .env.example to .env and fill in your API credentials');
   console.log('  2. Run: npm start');
   console.log('  3. Open: http://localhost:3000\n');
 } else {

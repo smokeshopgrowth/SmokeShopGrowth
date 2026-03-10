@@ -54,7 +54,7 @@ def sync_to_crm(csv_path, sheet_url):
     
     # Write Headers if the sheet is empty
     existing_data = sheet.get_all_records()
-    if not existing_data and len(sheet.range('A1:Z1')) == 0 or len(existing_data) == 0 and not sheet.row_values(1):
+    if not existing_data and not sheet.row_values(1):
         print("Sheet is empty. Writing headers first...")
         sheet.insert_row(headers, 1)
         

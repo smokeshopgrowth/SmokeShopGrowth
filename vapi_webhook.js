@@ -96,6 +96,9 @@ async function appendToSheet(payload) {
 
 const CALLS_LOG = path.join(__dirname, "logs", "calls.jsonl");
 
+// Ensure logs directory exists
+fs.mkdirSync(path.join(__dirname, "logs"), { recursive: true });
+
 function logCall(data) {
     const line = JSON.stringify({ ...data, logged_at: new Date().toISOString() });
     fs.appendFileSync(CALLS_LOG, line + "\n");
@@ -233,13 +236,12 @@ app.post("/vapi/webhook", webhookLimiter, async (req, res) => {
 // Access: /demo?shop=Shop+Name&city=Houston
 // ─────────────────────────────────────────────────────────────────────────────
 
-const path2 = path; // alias (path already required above)
 app.get("/demo", (req, res) => {
-    const templatePath = path2.join(__dirname, "template", "index.html");
-    if (!require("fs").existsSync(templatePath)) {
+    const templatePath = path.join(__dirname, "template", "index.html");
+    if (!fs.existsSync(templatePath)) {
         return res.status(404).send("Template not found. Make sure /template/index.html exists.");
     }
-    let html = require("fs").readFileSync(templatePath, "utf-8");
+    let html = fs.readFileSync(templatePath, "utf-8");
 
     // Inject the shop + city from query params into the config
     const shop = req.query.shop || "";
@@ -264,7 +266,7 @@ app.get("/demo", (req, res) => {
 });
 
 // Serve template static assets (CSS, JS, images)
-app.use("/template", require("express").static(path2.join(__dirname, "template")));
+app.use("/template", express.static(path.join(__dirname, "template")));
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HEALTH CHECK

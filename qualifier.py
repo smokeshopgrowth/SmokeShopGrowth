@@ -1,10 +1,13 @@
 import csv
-import time
-import requests
-from urllib.parse import urlparse
+import os
+import re
 import socket
 import ssl
-import re
+import sys
+import time
+
+import requests
+from urllib.parse import urlparse
 
 def clean_business_name(name):
     """
@@ -132,9 +135,6 @@ def qualify_lead(lead):
         tag = "LOW"
 
     return score, tag, " | ".join(reason)
-
-import sys
-import os
 
 def main():
     if len(sys.argv) < 2:
