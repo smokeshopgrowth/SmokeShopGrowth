@@ -1,23 +1,55 @@
+# Dependencies
 node_modules/
 .venv/
 venv/
+
+# Python cache
 __pycache__/
 *.pyc
-.DS_Store
+*.pyo
+
+# Environment / Secrets
 .env
 .env.local
 .env.*.local
+credentials.json
+*.pem
+*.key
+
+# Logs
 *.log
 logs/
+
+# Build output
 dist/
 build/
-.idea/
-.vscode/
 .next/
 out/
 .cache/
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
+
+# Test / Coverage
 .pytest_cache/
 .coverage
+coverage/
+htmlcov/
+
+# Data (may contain PII)
+data/*.csv
+data/*.json
+data/videos/
+*.mp3
+
+# Screenshots (use cloud storage)
+screenshots/
+
+# Misc
+push_error.txt
+*.bak
 htmlcov/
 credentials.json
 *.key

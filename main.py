@@ -13,6 +13,10 @@ Usage:
 import sys
 import os
 
+# Add source directories to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src', 'python'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src', 'agents'))
+
 def main():
     args = sys.argv[1:]
 
