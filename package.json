@@ -19,6 +19,8 @@
         "vapi:call": "node src/node/vapi_call.js",
         "vapi:batch": "node src/node/vapi_call.js --batch",
         "vapi:batch:preview": "node src/node/vapi_call.js --batch --dry-run",
+        "demos": "node src/node/generate-from-templates.js",
+        "demos:preview": "node src/node/generate-from-templates.js --input data/test_leads.csv",
         "test": "node --test tests/",
         "lint": "eslint src/node/ && python -m ruff check src/python/ src/agents/"
     },
