@@ -10,6 +10,11 @@ from google.oauth2.service_account import Credentials
 from deploy_agent import deploy_shop_website
 from delivery_agent import trigger_delivery_flow
 from error_handler import log_failed_job
+import subprocess
+import threading
+import uuid
+from datetime import datetime
+
 
 # Load environment variables
 load_dotenv()
@@ -436,6 +441,154 @@ def vapi_webhook():
             print("[Webhook] No email collected during the call.", flush=True)
 
     return jsonify({"status": "received"}), 200
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IN-MEMORY STORES (add these near the top of webhook.py, after app = Flask(__name__))
+# ─────────────────────────────────────────────────────────────────────────────
+
+import subprocess
+import threading
+import uuid
+from datetime import datetime
+
+# In-memory job store for pipeline runs
+pipeline_jobs = {}  # job_id → { status, city, bizType, started_at, finished_at, error }
+
+# In-memory store for template/form submissions
+template_submissions = []
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ROUTE: Start Pipeline Job (for n8n Workflow 1)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def run_pipeline_async(job_id, city, biz_type, max_results):
+    """Run the scraper pipeline in a background thread."""
+    try:
+        pipeline_jobs[job_id]['status'] = 'running'
+
+        # Run scraper.py as a subprocess
+        result = subprocess.run(
+            ['python', 'src/python/scraper.py',
+             '--city', city,
+             '--type', biz_type,
+             '--max-results', str(max_results),
+             '--headless'],
+            capture_output=True, text=True, timeout=600
+        )
+
+        if result.returncode == 0:
+            pipeline_jobs[job_id]['status'] = 'done'
+            pipeline_jobs[job_id]['output'] = result.stdout[-2000:]  # Last 2KB
+        else:
+            pipeline_jobs[job_id]['status'] = 'failed'
+            pipeline_jobs[job_id]['error'] = result.stderr[-1000:]
+
+    except subprocess.TimeoutExpired:
+        pipeline_jobs[job_id]['status'] = 'failed'
+        pipeline_jobs[job_id]['error'] = 'Pipeline timed out after 10 minutes'
+    except Exception as e:
+        pipeline_jobs[job_id]['status'] = 'failed'
+        pipeline_jobs[job_id]['error'] = str(e)
+    finally:
+        pipeline_jobs[job_id]['finished_at'] = datetime.utcnow().isoformat()
+
+
+@app.route('/api/run', methods=['POST'])
+def api_run_pipeline():
+    """Trigger the lead generation pipeline. Called by n8n Workflow 1."""
+    data = request.json or {}
+    city = data.get('city', '').strip()
+    biz_type = data.get('bizType', 'smoke shop').strip()
+    max_results = min(int(data.get('maxResults', 100)), 500)
+
+    if not city:
+        return jsonify(error='city is required'), 400
+
+    job_id = str(uuid.uuid4())[:8]
+    pipeline_jobs[job_id] = {
+        'status': 'queued',
+        'city': city,
+        'bizType': biz_type,
+        'started_at': datetime.utcnow().isoformat(),
+        'finished_at': None,
+        'error': None,
+        'output': None,
+    }
+
+    # Run in background thread
+    thread = threading.Thread(
+        target=run_pipeline_async,
+        args=(job_id, city, biz_type, max_results),
+        daemon=True
+    )
+    thread.start()
+
+    print(f"[PIPELINE] Started job {job_id}: {city} / {biz_type}")
+    return jsonify(status='started', jobId=job_id, message='Pipeline triggered'), 200
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ROUTE: List Pipeline Jobs (for n8n Workflow 1 status checking)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.route('/api/jobs', methods=['GET'])
+def api_list_jobs():
+    """List all pipeline jobs and their status."""
+    jobs_list = []
+    for job_id, job in pipeline_jobs.items():
+        jobs_list.append({
+            'id': job_id,
+            'status': job['status'],
+            'city': job['city'],
+            'bizType': job['bizType'],
+            'started_at': job['started_at'],
+            'finished_at': job['finished_at'],
+            'error': job.get('error'),
+        })
+    return jsonify(jobs_list), 200
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ROUTE: Store Template Submission (for n8n Workflow 4)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.route('/api/template-submission', methods=['POST'])
+def api_template_submission():
+    """Store an inbound lead/form submission. Called by n8n Workflow 4."""
+    data = request.json or {}
+    shop_name = data.get('shopName', '').strip()
+    city = data.get('city', '').strip()
+    phone = data.get('phone', '').strip()
+    email = data.get('email', '').strip()
+
+    if not shop_name or not city or not phone or not email:
+        return jsonify(error='Missing required fields: shopName, city, phone, email'), 400
+
+    submission = {
+        'id': str(uuid.uuid4())[:8],
+        'shopName': shop_name,
+        'city': city,
+        'phone': phone,
+        'email': email,
+        'source': data.get('source', 'n8n'),
+        'timestamp': datetime.utcnow().isoformat(),
+    }
+    template_submissions.append(submission)
+    print(f"[FORM] New submission: {shop_name} ({city}) — {email}")
+    return jsonify(success=True, message='Submission received', submissionId=submission['id']), 200
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ROUTE: List Template Submissions (for n8n Workflow 5 - Upsell Drip)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.route('/api/template-submissions', methods=['GET'])
+def api_list_template_submissions():
+    """List all stored form submissions. Called by n8n Workflow 5."""
+    return jsonify(count=len(template_submissions), submissions=template_submissions), 200
 
 
 if __name__ == '__main__':
