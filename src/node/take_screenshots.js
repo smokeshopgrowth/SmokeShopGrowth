@@ -2,7 +2,10 @@ const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
 const csv = require('fast-csv');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+
+puppeteer.use(StealthPlugin());
 
 const inputFile = path.resolve(__dirname, 'data', 'houston-texas', 'leads_with_demo_links.csv');
 const outputDir = path.resolve(__dirname, 'screenshots');

@@ -5,6 +5,10 @@
     "scripts": {
         "start": "node server.js",
         "verify": "node src/node/verify.js",
+        "scrape": "node src/node/places_scraper.js",
+        "scrape:headless": "node src/node/places_scraper.js --headless",
+        "scrape:batch": "node src/node/batch_scrape.js",
+        "scrape:batch:headless": "node src/node/batch_scrape.js --headless",
         "pipeline": "node scripts/run_pipeline.js",
         "audit": "node src/node/auditor.js",
         "audit:fast": "node src/node/auditor.js --concurrency 10 --skip-lighthouse",
@@ -41,6 +45,8 @@
         "nodemailer": "^6.10.1",
         "openai": "^4.104.0",
         "p-limit": "^3.1.0",
-        "puppeteer": "^24.38.0"
+        "puppeteer": "^24.38.0",
+        "puppeteer-extra": "^3.3.6",
+        "puppeteer-extra-plugin-stealth": "^2.11.2"
     }
 }

@@ -13,7 +13,7 @@ function slugify(text) {
 async function generateSites() {
   try {
     const template = await fs.readFile('template.html', 'utf8');
-    const shopsData = await fs.readFile('shops.json', 'utf8');
+    const shopsData = await fs.readFile(path.join(__dirname, '..', '..', 'tests', 'fixtures', 'shops.json'), 'utf8');
     const shops = JSON.parse(shopsData);
 
     const outputDir = path.join(__dirname, 'public', 'demos');

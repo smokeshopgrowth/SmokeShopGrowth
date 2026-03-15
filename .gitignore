@@ -15,6 +15,7 @@ __pycache__/
 credentials.json
 *.pem
 *.key
+.secrets/
 
 # Logs
 *.log
@@ -39,19 +40,31 @@ coverage/
 htmlcov/
 
 # Data (may contain PII)
-data/*.csv
-data/*.json
+data/**/*.csv
+data/**/*.json
 data/videos/
 *.mp3
+
+# Generated demo sites
+demo/output/
+
+# Deployment artifacts
+deployments/
+.netlify/
+
+# QA reports (screenshots)
+qa_reports/
 
 # Screenshots (use cloud storage)
 screenshots/
 
+# Windows artifacts
+nul
+
+# Root-level one-off HTML files
+flava-depot.html
+demo.html
+
 # Misc
 push_error.txt
 *.bak
-htmlcov/
-credentials.json
-*.key
-*.pem
-.secrets/

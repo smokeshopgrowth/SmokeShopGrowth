@@ -8,7 +8,18 @@
       "Bash(ls -la /mnt/c/Users/roryu/Build\\\\ Google\\\\ Maps\\\\ Lead\\\\ Scraper/src/python/ | grep -E \"\\\\.py$\")",
       "Bash(cd \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper\" && node -c server.js && echo \"server.js: OK\" && node -c src/node/follow_up.js && echo \"follow_up.js: OK\" && node -c src/node/vapi_webhook.js && echo \"vapi_webhook.js: OK\" && node -c src/node/vapi_call.js && echo \"vapi_call.js: OK\" && node -c src/node/vapi_agent_setup.js && echo \"vapi_agent_setup.js: OK\" && python -c \"import py_compile; py_compile.compile\\('src/python/webhook.py', doraise=True\\)\" && echo \"webhook.py: OK\")",
       "Bash(cd \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper\" && node -c src/node/vapi_agent_setup.js && echo \"OK\")",
-      "Bash(cd \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper\" && node src/node/vapi_agent_setup.js --update 2>&1)"
+      "Bash(cd \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper\" && node src/node/vapi_agent_setup.js --update 2>&1)",
+      "Bash(grep -r \"nodemailer\\\\|sendMail\\\\|email\" /mnt/c/Users/roryu/Build\\\\ Google\\\\ Maps\\\\ Lead\\\\ Scraper/src/node --include=\"*.js\" 2>/dev/null | grep -E \"^[^:]+:\" | cut -d: -f1 | sort -u)",
+      "Bash(cd \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper\" && echo \"=== Today's 20 calls initiated ===\" && cat logs/call_attempts.jsonl | python3 -c \"\nimport json, sys\nfor i, line in enumerate\\(sys.stdin, 1\\):\n    line = line.strip\\(\\)\n    if not line: continue\n    d = json.loads\\(line\\)\n    call_id = d.get\\('call_id','?'\\)\n    print\\(f'{i:2d}. {d.get\\(\\\\\"name\\\\\",\\\\\"?\\\\\"\\):45s} | call_id={call_id}'\\)\n\" && echo \"\" && echo \"=== Matching call_ids from call_attempts against calls.jsonl ===\" && python3 -c \"\nimport json\nattempts = []\nwith open\\('logs/call_attempts.jsonl'\\) as f:\n    for line in f:\n        if line.strip\\(\\): attempts.append\\(json.loads\\(line.strip\\(\\)\\)\\)\nreports = []\nwith open\\('logs/calls.jsonl'\\) as f:\n    for line in f:\n        if line.strip\\(\\): reports.append\\(json.loads\\(line.strip\\(\\)\\)\\)\nreport_ids = {r.get\\('call_id'\\) for r in reports}\nprint\\(f'Calls initiated: {len\\(attempts\\)}'\\)\nprint\\(f'End-of-call reports received: {len\\(reports\\)}'\\)\nmatched = [a for a in attempts if a.get\\('call_id'\\) in report_ids]\nunmatched = [a for a in attempts if a.get\\('call_id'\\) not in report_ids]\nprint\\(f'Matched \\(got webhook back\\): {len\\(matched\\)}'\\)\nprint\\(f'MISSING reports \\(no webhook received\\): {len\\(unmatched\\)}'\\)\nif unmatched:\n    print\\(\\)\n    print\\('=== Calls with NO end-of-call report ==='\\)\n    for a in unmatched:\n        print\\(f'  - {a.get\\(\\\\\"name\\\\\",\\\\\"?\\\\\"\\):45s} | {a.get\\(\\\\\"phone\\\\\",\\\\\"?\\\\\"\\)} | call_id={a.get\\(\\\\\"call_id\\\\\",\\\\\"?\\\\\"\\)}'\\)\n\")",
+      "Bash(curl -sv https://e52a-2606-a300-900e-9b2a-b555-e1f0-e928-1160.ngrok-free.app/ 2>&1 | head -30)",
+      "Bash(curl -s https://e52a-2606-a300-900e-9b2a-b555-e1f0-e928-1160.ngrok-free.app/ 2>&1 | tail -20)",
+      "Bash(wc -l \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper/src/python\"/*.py 2>&1 | tail -1)",
+      "Bash(wc -l \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper/src/node\"/*.js 2>&1 | tail -1)",
+      "Bash(wc -l \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper/src/agents\"/*.py 2>&1 | tail -1)",
+      "Bash(find /mnt/c/Users/roryu/Build\\\\ Google\\\\ Maps\\\\ Lead\\\\ Scraper -name \".env*\" -o -name \"credentials*\" -o -name \"*secret*\" -o -name \"*token*\" 2>/dev/null | grep -v node_modules | grep -v .git)",
+      "Bash(ls \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper\"/src/node/*.js | head -10)",
+      "Bash(ls -la \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper/\"*.csv 2>&1)",
+      "Bash(ls -d \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper/demo/output/\"*/ 2>&1 | wc -l)"
     ]
   }
 }
