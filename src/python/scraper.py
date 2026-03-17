@@ -61,6 +61,7 @@ class Business:
     business_name: str = ""
     address: str = ""
     phone: str = ""
+    email: str = ""
     website: str = ""
     rating: str = ""
     review_count: str = ""
@@ -230,10 +231,10 @@ class GoogleMapsScraper:
 
         return biz
 
-    async def _extract_social_links(self, page: Page, website_url: str) -> tuple[str, str]:
-        """Visit the business website and extract Instagram and Facebook handles."""
+    async def _extract_social_links(self, page: Page, website_url: str) -> tuple[str, str, str]:
+        """Visit the business website and extract Instagram, Facebook, and email."""
         if not website_url or not website_url.startswith("http"):
-            return "", ""
+            return "", "", ""
         try:
             await page.goto(website_url, wait_until="domcontentloaded", timeout=8000)
             await asyncio.sleep(0.5)
@@ -259,10 +260,31 @@ class GoogleMapsScraper:
             if facebook.lower() in ('sharer', 'share', 'dialog', 'plugins', 'tr', 'login', ''):
                 facebook = ""
 
-            return instagram, facebook
+            # Email — check mailto: links first, then scan page text
+            email = ""
+            mailto_match = re.search(r'mailto:([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})', html, re.IGNORECASE)
+            if mailto_match:
+                email = mailto_match.group(1).strip().lower()
+            else:
+                # Scan visible text for email patterns
+                email_matches = re.findall(
+                    r'[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}',
+                    html
+                )
+                # Filter out common false positives
+                ignore = {'wixpress.com', 'sentry.io', 'w3.org', 'schema.org', 'example.com',
+                          'googleapis.com', 'googleusercontent.com', 'gstatic.com', 'wordpress.org'}
+                for candidate in email_matches:
+                    candidate = candidate.lower()
+                    domain = candidate.split('@')[1] if '@' in candidate else ''
+                    if domain and not any(fp in domain for fp in ignore):
+                        email = candidate
+                        break
+
+            return instagram, facebook, email
         except Exception as exc:
             log.debug("Social link extraction failed for %s: %s", website_url, exc)
-            return "", ""
+            return "", "", ""
 
     # ── Scroll loop ─────────────────────────────
     async def _scroll_and_collect_urls(self, page: Page) -> list[str]:
@@ -392,7 +414,7 @@ class GoogleMapsScraper:
 
                         # Extract social media handles from the business website
                         if biz.website:
-                            biz.instagram, biz.facebook = await self._extract_social_links(page, biz.website)
+                            biz.instagram, biz.facebook, biz.email = await self._extract_social_links(page, biz.website)
                             if biz.instagram:
                                 log.debug("[%d] 📸 Instagram: @%s", idx, biz.instagram)
                             if biz.facebook:

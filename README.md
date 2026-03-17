@@ -1,118 +1,61 @@
-# SmokeShopGrowth — Lead Generation & Outreach Pipeline
 
-A complete lead generation and outreach system that scrapes Google Maps, audits websites, and delivers personalized multi-channel outreach.
+# Google Maps Lead Scraper
 
-## Architecture
+This project is a comprehensive tool for scraping business leads from Google Maps, with a focus on automation and monetization. It includes a web server for handling webhooks, a suite of Node.js scripts for scraping and outreach, and a Python-based backend for processing data and sending emails.
 
-```
-┌─────────────┐    ┌──────────────┐    ┌────────────────┐    ┌───────────────┐
-│   Scraper    │───▶│  Qualifier   │───▶│  Outreach Gen  │───▶│   Delivery    │
-│ (Playwright) │    │ (Lighthouse) │    │   (OpenAI)     │    │ Email/SMS/Call│
-└─────────────┘    └──────────────┘    └────────────────┘    └───────────────┘
-                                                                     │
-                                                              ┌──────▼──────┐
-                                                              │  Site Deploy │
-                                                              │  (Netlify)   │
-                                                              └─────────────┘
-```
+## Tech Stack
+
+*   **Backend:** Python (Flask), Node.js
+*   **Frontend:** (Not yet implemented, but intended to be vanilla HTML/JS/CSS)
+*   **Scraper:** Node.js (likely using a library like Playwright or Puppeteer)
+*   **Deployment:** Docker, Railway, Render
 
 ## Project Structure
 
-```
-├── server.js              # Dashboard web server (Express)
-├── main.py                # Python entry point (webhook server)
-├── src/
-│   ├── python/            # Core Python modules (scraper, qualifier, webhook)
-│   ├── node/              # Core Node modules (auditor, outreach, email, vapi)
-│   └── agents/            # Python agents (delivery, deploy, domain, QA)
-├── scripts/               # Pipeline runners and setup scripts
-├── template/              # Website template for lead sites
-├── public/                # Static dashboard assets
-├── demo/                  # Demo site assets
-├── docs/                  # Guides, reports, and documentation
-├── tests/                 # Python and Node test suites
-└── .github/workflows/     # CI pipeline
-```
+*   `.github/workflows/`: Contains CI/CD pipeline configurations.
+*   `data/`: For storing data such as scraped leads.
+*   `src/`: Contains the main source code, divided into `node` and `python`.
+*   `src/agents/`: Contains the core business logic for agents (e.g., `deploy_agent.py`).
+*   `src/node/`: Contains all Node.js scripts for scraping, outreach, and other tasks.
+*   `src/python/`: Contains the Python backend, including the Flask web server for handling webhooks.
 
-## Quick Start
+## Setup and Installation
 
-### Prerequisites
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    ```
 
-- Node.js 18+ and Python 3.10+
-- Playwright: `pip install playwright && playwright install chromium`
+2.  **Install dependencies:**
+    *   **Node.js:**
+        ```bash
+        npm install
+        ```
+    *   **Python:**
+        ```bash
+        pip install -r requirements.txt
+        ```
 
-### Setup
+3.  **Set up environment variables:**
+    *   Copy the `.env.example` file to a new file named `.env.local`.
+    *   Fill in the required API keys and credentials in `.env.local`. This includes keys for Vapi, Stripe, OpenAI, and your SMTP server for sending emails.
 
-```bash
-# Install dependencies
-npm install
-pip install -r requirements.txt
+## Running the Application
 
-# Configure environment
-cp .env.example .env.local
-# Edit .env.local with your API keys (see table below)
-```
+*   **To run the main webhook server:**
+    ```bash
+    python src/python/webhook.py
+    ```
+    *Note: There is a known issue with the Flask environment that may cause "404 Not Found" errors. This is likely due to a misconfiguration in the system's PATH.* 
 
-### Run
+*   **To run other scripts:**
+    *   Individual Node.js and Python scripts can be run directly from the command line. For example:
+        ```bash
+        node src/node/places_scraper.js
+        ```
 
-```bash
-# Start dashboard
-npm start                    # http://localhost:3000
+## Known Issues
 
-# Run full pipeline
-npm run pipeline -- --city "Houston" --type "smoke shop"
+*   **Flask Server "404 Not Found" Errors:** There is a persistent issue with the Flask server not correctly routing requests, even for simple test cases. This is likely due to an environment-specific problem with the Python or Flask installation. The warning `The script flask.exe is installed in ... which is not on PATH` is a strong indicator of the root cause.
+*   **`@bonsai-ai/cli` Crash:** The `@bonsai-ai/cli` tool is crashing with an `Assertion failed` error. This appears to be a bug in the CLI itself.
 
-# Individual steps
-python src/python/scraper.py --city "Houston" --type "smoke shop"
-npm run audit
-npm run outreach
-npm run email
-```
-
-### Docker
-
-```bash
-docker-compose up
-```
-
-## Environment Variables
-
-| Variable | Service | Required |
-|----------|---------|----------|
-| `OPENAI_API_KEY` | OpenAI (outreach generation) | ✅ |
-| `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` | Email delivery | ✅ |
-| `VAPI_API_KEY`, `VAPI_ASSISTANT_ID` | AI phone calls | Optional |
-| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | SMS follow-ups | Optional |
-| `ELEVENLABS_API_KEY` | Voice cloning | Optional |
-| `STRIPE_API_KEY` | Payments | Optional |
-| `SPREADSHEET_ID` | Google Sheets export | Optional |
-
-See `.env.example` for the full list.
-
-## npm Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm start` | Start dashboard server |
-| `npm run pipeline` | Run full scrape → audit → outreach pipeline |
-| `npm run audit` | Audit lead websites with Lighthouse |
-| `npm run outreach` | Generate personalized outreach messages |
-| `npm run email` | Send outreach emails |
-| `npm run vapi:call` | Make AI phone calls |
-| `npm test` | Run test suite |
-| `npm run lint` | Lint JS + Python |
-
-## Troubleshooting
-
-| Issue | Fix |
-|-------|-----|
-| Playwright not found | `pip install playwright && playwright install chromium` |
-| SMTP auth fails | Use Gmail App Password (not regular password) |
-| Lighthouse timeout | Use `npm run audit:fast` to skip Lighthouse |
-| Port 3000 in use | Set `PORT=3001` in `.env.local` |
-
-## Security
-
-- Never commit `.env`, `.env.local`, or `credentials.json`
-- All secrets should be in `.env.local` (gitignored)
-- See `docs/SECURITY.md` for full security guidelines

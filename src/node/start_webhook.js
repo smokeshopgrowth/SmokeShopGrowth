@@ -2,7 +2,7 @@ const { exec, spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
-const envPath = path.join(process.cwd(),'.env');
+const envPath = path.join(process.cwd(), '.env');
 
 async function checkNgrok() {
     try {
@@ -33,6 +33,19 @@ async function updateEnv(url) {
     console.log(`✅ Updated .env with WEBHOOK_URL=${vapiUrl}`);
 }
 
+async function pollForUrl(retries = 5, delay = 2000) {
+    for (let i = 0; i < retries; i++) {
+        const url = await checkNgrok();
+        if (url) {
+            return url;
+        }
+        console.log(`  ngrok not ready, waiting ${delay / 1000}s... (${i + 1}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    return null;
+}
+
+
 async function start() {
     console.log("🔍 Checking for existing ngrok tunnel...");
     let url = await checkNgrok();
@@ -45,9 +58,7 @@ async function start() {
         const ngrokProcess = spawn(npx, ["ngrok", "http", "3001"], options);
         ngrokProcess.unref();
 
-        // Wait to allow ngrok to start
-        await new Promise(r => setTimeout(r, 3000));
-        url = await checkNgrok();
+        url = await pollForUrl();
     }
 
     if (!url) {

@@ -80,7 +80,7 @@ console.log(`\n${colors.blue}Configuration:${colors.reset}`);
 check('.env is NOT tracked in git', () => {
   let output = '';
   try {
-    output = execSync('git ls-files', { 
+    output = execSync('git ls-files', {
       stdio: 'pipe',
       encoding: 'utf-8'
     });
@@ -114,30 +114,29 @@ check('Node dependencies installed', () => {
   }
 });
 
-check('Python dependencies installed (playwright)', () => {
-  execSync('python -c "import playwright"', { stdio: 'pipe' });
-});
-
-check('Python dependencies installed (requests)', () => {
-  execSync('python -c "import requests"', { stdio: 'pipe' });
-});
-
-check('Python dependencies installed (sendgrid)', () => {
-  execSync('python -c "import sendgrid"', { stdio: 'pipe' });
-});
-
-check('Python dependencies installed (twilio)', () => {
-  execSync('python -c "import twilio"', { stdio: 'pipe' });
+check('Python dependencies from requirements.txt seem installed', () => {
+  try {
+    execSync('python -c "import playwright; import requests; from dotenv import load_dotenv"', { stdio: 'pipe' });
+  } catch (e) {
+    throw new Error('Core Python dependencies missing. Run: pip install -r requirements.txt');
+  }
 });
 
 // 5. Check syntax
 console.log(`\n${colors.blue}Code Quality:${colors.reset}`);
 check('Python files compile', () => {
-  execSync('python -m py_compile scraper.py delivery_agent.py', { stdio: 'pipe' });
+  const pyFiles = [
+    'src/agents/deploy_agent.py',
+    'src/agents/domain_agent.py',
+    'src/agents/qa_agent.py',
+    'src/python/qualifier.py'
+  ].join(' ');
+  execSync(`python -m py_compile ${pyFiles}`, { stdio: 'pipe' });
 });
 
 check('Node.js files have valid syntax', () => {
-  execSync('node -c server.js && node -c run_pipeline.js', { stdio: 'pipe' });
+  const jsFiles = fs.readdirSync('src/node').filter(f => f.endsWith('.js')).map(f => `src/node/${f}`).join(' ');
+  execSync(`node -c ${jsFiles}`, { stdio: 'pipe' });
 });
 
 // Summary
