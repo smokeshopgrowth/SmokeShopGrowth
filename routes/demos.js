@@ -195,7 +195,8 @@ router.post('/api/deploy-site', async (req, res) => {
         const projectPath = path.join(deployRoot, projectFolderName);
         fs.mkdirSync(projectPath);
 
-        const { previewUrl } = await require('../src/node/generate-from-templates.js').generateForOne({
+        const { generateForOne } = await import('../src/node/generate-from-templates.mjs');
+        const { previewUrl } = await generateForOne({
             TargetBusiness: business,
             TargetOutput: path.join(projectPath, 'index.html'),
             isProduction: true

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloudz Smoke shop | Premium Smoke Shop in Denver, CO</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            stone: {
+              950: '#0c0a09',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       CLOUD NINE SMOKE SHOP — THEME CONFIGURATION
+       To change the brand color, edit --primary-color below.
+       Current: #16a34a (violet/purple — premium smoky feel)
+       ============================================ */
+    :root {
+      --primary-color: #16a34a;
+      --primary-hover: #15803d;
+      --primary-light: #16a34a26;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0c0a09;
+      color: #fafaf9;
+    }
+
+    /* Primary color utilities */
+    .btn-primary {
+      background-color: var(--primary-color) !important;
+      color: #fff !important;
+      transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35);
+    }
+
+    .btn-outline {
+      border: 1.5px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+      background: transparent !important;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    }
+    .btn-outline:hover {
+      background-color: var(--primary-light) !important;
+      transform: translateY(-1px);
+    }
+
+    .text-primary { color: var(--primary-color) !important; }
+    .border-primary { border-color: var(--primary-color) !important; }
+    .bg-primary-light { background-color: var(--primary-light) !important; }
+
+    /* Backdrop blur for header */
+    .backdrop-blur-header {
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    /* Star rating */
+    .stars { color: #f59e0b; letter-spacing: 2px; }
+
+    /* Service card hover */
+    .service-card {
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .service-card:hover {
+      border-color: var(--primary-color) !important;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(124, 58, 237, 0.2);
+    }
+
+    /* Review card hover */
+    .review-card {
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+    .review-card:hover {
+      border-color: var(--primary-color) !important;
+      transform: translateY(-3px);
+    }
+
+    /* Mobile nav toggle */
+    .mobile-menu { display: none; }
+    .mobile-menu.open { display: flex; }
+  </style>
+</head>
+<body class="bg-stone-950 text-stone-50 min-h-screen flex flex-col">
+
+  <!-- ============================================================
+       STICKY HEADER
+       ============================================================ -->
+  <header class="sticky top-0 z-50 w-full border-b border-stone-800 backdrop-blur-header" style="background-color: rgba(12,10,9,0.85);">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+      <!-- Brand -->
+      <a href="#" class="flex items-center gap-2 text-white font-bold text-xl tracking-tight">
+        <!-- Cloud icon SVG -->
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--primary-color);">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" fill="currentColor" opacity="0.9"/>
+        </svg>
+        Cloudz Smoke
+        <span class="hidden sm:inline text-stone-400 font-normal text-base">Smoke Shop</span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-stone-300">
+        <a href="#services" class="hover:text-white transition-colors">Services</a>
+        <a href="#about" class="hover:text-white transition-colors">About</a>
+        <a href="#about" class="hover:text-white transition-colors">Hours</a>
+        <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+      </nav>
+
+      <!-- CTA Button -->
+      <div class="hidden md:flex items-center gap-3">
+        <a href="tel:" class="btn-primary px-5 py-2 rounded-full text-sm font-semibold">
+          📞 Call Us
+        </a>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button
+        id="mobile-menu-btn"
+        class="md:hidden p-2 rounded-lg text-stone-300 hover:text-white hover:bg-stone-800 transition-colors"
+        aria-label="Open menu"
+        onclick="document.getElementById('mobile-nav').classList.toggle('open')"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Nav Dropdown -->
+    <div id="mobile-nav" class="mobile-menu md:hidden flex-col gap-1 px-6 pb-4 border-t border-stone-800 bg-stone-950 text-stone-300 text-sm font-medium">
+      <a href="#services" class="block py-2 hover:text-white" onclick="this.closest('#mobile-nav').classList.remove('open')">Services</a>
+      <a href="#about" class="block py-2 hover:text-white" onclick="this.closest('#mobile-nav').classList.remove('open')">About</a>
+      <a href="#about" class="block py-2 hover:text-white" onclick="this.closest('#mobile-nav').classList.remove('open')">Hours</a>
+      <a href="#contact" class="block py-2 hover:text-white" onclick="this.closest('#mobile-nav').classList.remove('open')">Contact</a>
+      <a href="tel:" class="block mt-2 btn-primary text-center px-5 py-2 rounded-full font-semibold">📞 Call Us</a>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full">
+
+    <!-- ============================================================
+         HERO SECTION
+         ============================================================ -->
+    <section class="relative overflow-hidden w-full bg-stone-950 py-32 sm:py-44">
+      <!-- Radial gradient background -->
+      <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 60% at 80% 10%, rgba(124,58,237,0.18) 0%, rgba(28,25,23,0.5) 50%, #0c0a09 80%);"></div>
+      <!-- Subtle grid overlay -->
+      <div class="absolute inset-0 pointer-events-none opacity-5" style="background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+      <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        <!-- Location badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-stone-700 bg-stone-900/60 text-stone-400 text-xs font-semibold uppercase tracking-widest mb-8">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-color);">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          Denver, Colorado
+        </div>
+
+        <!-- Headline -->
+        <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.08] mb-6">
+          Denver's Premium
+          <span class="block mt-1" style="color: var(--primary-color);">Smoke Shop</span>
+        </h1>
+
+        <!-- Subheadline -->
+        <p class="text-lg sm:text-xl text-stone-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Cloudz Smoke carries the finest glass, vaporizers, CBD, and accessories in Denver. 
+          Knowledgeable staff. Fair prices. A welcoming vibe for everyone.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#contact" class="btn-primary px-8 py-4 rounded-full text-base font-semibold inline-flex items-center justify-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            Visit Us Today
+          </a>
+          <a href="#services" class="btn-outline px-8 py-4 rounded-full text-base font-semibold inline-flex items-center justify-center gap-2">
+            Explore Products
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Trust badges -->
+        <div class="flex flex-wrap justify-center gap-6 mt-14 text-stone-500 text-xs font-medium uppercase tracking-widest">
+          <span class="flex items-center gap-1.5">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20" style="color: var(--primary-color);"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Expert Staff
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20" style="color: var(--primary-color);"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Top Brands
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20" style="color: var(--primary-color);"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Fair Prices
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20" style="color: var(--primary-color);"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Denver Locals
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SERVICES SECTION
+         ============================================================ -->
+    <section id="services" class="py-24 w-full bg-stone-900 border-t border-stone-800">
+      <div class="max-w-7xl mx-auto px-6">
+
+        <!-- Section header -->
+        <div class="text-center mb-14">
+          <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color: var(--primary-color);">What We Carry</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-white">Everything You Need</h2>
+          <p class="text-stone-400 mt-3 max-w-xl mx-auto text-base">From premium glass to everyday accessories — we stock the best and our staff knows it all.</p>
+        </div>
+
+        <!-- 4-card grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <!-- Card 1: Premium Glass -->
+          <div class="service-card rounded-2xl border border-stone-800 bg-stone-950/50 p-6 flex flex-col gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-primary-light flex-shrink-0">
+              <!-- Bubble/glass SVG icon -->
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--primary-color);">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+                <circle cx="9" cy="9" r="2" fill="currentColor" opacity="0.4"/>
+                <circle cx="14" cy="14" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <circle cx="8" cy="14" r="1.2" fill="currentColor" opacity="0.6"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-white font-bold text-lg mb-2">Premium Glass</h3>
+              <p class="text-stone-400 text-sm leading-relaxed">Hand-blown pipes, water pipes, and rigs from top artists. Every piece is selected for quality and craftsmanship.</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Vaporizers -->
+          <div class="service-card rounded-2xl border border-stone-800 bg-stone-950/50 p-6 flex flex-col gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-primary-light flex-shrink-0">
+              <!-- Vaporizer/wind SVG icon -->
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--primary-color);">
+                <rect x="9" y="3" width="6" height="13" rx="3" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M12 16v5M9 20h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M7 8c-2 0-3 1-3 2s1 2 3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+                <path d="M17 7c2 0 3 1 3 2s-1 2-3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-white font-bold text-lg mb-2">Vaporizers</h3>
+              <p class="text-stone-400 text-sm leading-relaxed">The latest dry herb and concentrate vaporizers from trusted brands. Portable and desktop options available.</p>
+            </div>
+          </div>
+
+          <!-- Card 3: CBD & Hemp -->
+          <div class="service-card rounded-2xl border border-stone-800 bg-stone-950/50 p-6 flex flex-col gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-primary-light flex-shrink-0">
+              <!-- Leaf SVG icon -->
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--primary-color);">
+                <path d="M12 22c0-6-4-10-9-10 0 5 4 9 9 10z" fill="currentColor" opacity="0.3"/>
+                <path d="M12 22c0-6 4-10 9-10-1 5-4 9-9 10z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M12 22V10M12 16c-2-1-4-3-4-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M3 12c0-5 4-9 9-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-white font-bold text-lg mb-2">CBD &amp; Hemp</h3>
+              <p class="text-stone-400 text-sm leading-relaxed">High-quality CBD flower, tinctures, gummies, and topicals. Third-party tested, lab-verified products only.</p>
+            </div>
+          </div>
+
+          <!-- Card 4: Accessories -->
+          <div class="service-card rounded-2xl border border-stone-800 bg-stone-950/50 p-6 flex flex-col gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-primary-light flex-shrink-0">
+              <!-- Tools/accessories SVG icon -->
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--primary-color);">
+                <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.4"/>
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-white font-bold text-lg mb-2">Accessories</h3>
+              <p class="text-stone-400 text-sm leading-relaxed">Grinders, papers, rolling trays, torches, and cleaning supplies. Everything to complete your setup.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         ABOUT & HOURS SECTION
+         ============================================================ -->
+    <section id="about" class="py-24 w-full bg-stone-950">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+
+          <!-- Left: About text -->
+          <div>
+            <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color: var(--primary-color);">Our Story</p>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">Denver's Friendliest Smoke Shop</h2>
+            <p class="text-stone-400 text-base leading-relaxed mb-5">
+              Cloudz Smoke shop has been serving the Denver community with passion and professionalism. We believe that shopping for smoking accessories should be a welcoming, informed experience — not an awkward one.
+            </p>
+            <p class="text-stone-400 text-base leading-relaxed mb-8">
+              Our hand-picked inventory covers everything from artisan glass pieces to the latest vaporizer technology. We work directly with manufacturers and local glass artists to bring you the best selection at fair prices. Our staff are enthusiasts first, and they're always happy to answer your questions.
+            </p>
+
+            <!-- Feature list -->
+            <ul class="space-y-3 mb-10">
+              <li class="flex items-start gap-3 text-stone-300 text-sm">
+                <svg class="flex-shrink-0 mt-0.5" width="18" height="18" fill="currentColor" viewBox="0 0 20 20" style="color: var(--primary-color);"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Locally owned and operated since 2018
+              </li>
+              <li class="flex items-start gap-3 text-stone-300 text-sm">
+                <svg class="flex-shrink-0 mt-0.5" width="18" height="18" fill="currentColor" viewBox="0 0 20 20" style="color: var(--primary-color);"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Staff trained on every product we carry
+              </li>
+              <li class="flex items-start gap-3 text-stone-300 text-sm">
+                <svg class="flex-shrink-0 mt-0.5" width="18" height="18" fill="currentColor" viewBox="0 0 20 20" style="color: var(--primary-color);"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Satisfaction guaranteed on all purchases
+              </li>
+              <li class="flex items-start gap-3 text-stone-300 text-sm">
+                <svg class="flex-shrink-0 mt-0.5" width="18" height="18" fill="currentColor" viewBox="0 0 20 20" style="color: var(--primary-color);"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Always updating our inventory with the latest products
+              </li>
+            </ul>
+
+            <a href="tel:" class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+              Call nan
+            </a>
+          </div>
+
+          <!-- Right: Hours + Info card -->
+          <div class="flex flex-col gap-6">
+
+            <!-- Hours card -->
+            <div class="rounded-2xl border border-stone-800 bg-stone-900/60 p-8">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-primary-light">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="color: var(--primary-color);">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <h3 class="text-white font-bold text-lg">Store Hours</h3>
+              </div>
+              <div class="space-y-3">
+                <div class="flex justify-between items-center py-2 border-b border-stone-800">
+                  <span class="text-stone-400 text-sm">Monday – Saturday</span>
+                  <span class="text-white font-semibold text-sm">10:00 AM – 9:00 PM</span>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                  <span class="text-stone-400 text-sm">Sunday</span>
+                  <span class="text-white font-semibold text-sm">11:00 AM – 7:00 PM</span>
+                </div>
+              </div>
+              <div class="mt-5 pt-4 border-t border-stone-800 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-green-400 text-xs font-semibold">Open Today</span>
+              </div>
+            </div>
+
+            <!-- Location card -->
+            <div class="rounded-2xl border border-stone-800 bg-stone-900/60 p-8">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-primary-light">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-color);">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                </div>
+                <h3 class="text-white font-bold text-lg">Find Us</h3>
+              </div>
+              <p class="text-stone-300 font-medium mb-1">9443 S Texas 6, Houston, TX 77083</p>
+              <p class="text-stone-400 text-sm mb-6">Your City</p>
+              <a
+                href="https://maps.google.com/?q=9443%20S%20Texas%206%2C%20Houston%2C%20TX%2077083"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-primary w-full text-center px-5 py-3 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                Get Directions
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         REVIEWS SECTION
+         ============================================================ -->
+    <section class="py-24 w-full bg-stone-900 border-t border-stone-800">
+      <div class="max-w-7xl mx-auto px-6">
+
+        <!-- Section header -->
+        <div class="text-center mb-14">
+          <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color: var(--primary-color);">Customer Reviews</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-white">What People Are Saying</h2>
+          <p class="text-stone-400 mt-3 max-w-xl mx-auto text-base">Don't take our word for it — here's what our customers have to say.</p>
+        </div>
+
+        <!-- 3-column review grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <!-- Review 1 -->
+          <div class="review-card rounded-2xl bg-stone-950 border border-stone-800 p-7 flex flex-col gap-4">
+            <div class="stars text-lg">★★★★★</div>
+            <p class="text-stone-300 text-sm leading-relaxed flex-1">
+              "Best smoke shop in Denver! Super knowledgeable staff and amazing glass selection. Prices are very fair."
+            </p>
+            <div class="pt-4 border-t border-stone-800 flex items-center justify-between">
+              <div>
+                <p class="text-white font-semibold text-sm">Marcus T.</p>
+                <p class="text-stone-500 text-xs mt-0.5">Verified Customer</p>
+              </div>
+              <span class="text-stone-500 text-xs">1 week ago</span>
+            </div>
+          </div>
+
+          <!-- Review 2 -->
+          <div class="review-card rounded-2xl bg-stone-950 border border-stone-800 p-7 flex flex-col gap-4">
+            <div class="stars text-lg">★★★★★</div>
+            <p class="text-stone-300 text-sm leading-relaxed flex-1">
+              "Clean, professional, and always stocked. I drive past 3 other shops just to come here. Wouldn't go anywhere else."
+            </p>
+            <div class="pt-4 border-t border-stone-800 flex items-center justify-between">
+              <div>
+                <p class="text-white font-semibold text-sm">Jasmine L.</p>
+                <p class="text-stone-500 text-xs mt-0.5">Verified Customer</p>
+              </div>
+              <span class="text-stone-500 text-xs">3 weeks ago</span>
+            </div>
+          </div>
+
+          <!-- Review 3 -->
+          <div class="review-card rounded-2xl bg-stone-950 border border-stone-800 p-7 flex flex-col gap-4">
+            <div class="stars text-lg">★★★★★</div>
+            <p class="text-stone-300 text-sm leading-relaxed flex-1">
+              "Found my new go-to spot. They carry everything I need and the vibe is totally welcoming. Staff really knows their stuff."
+            </p>
+            <div class="pt-4 border-t border-stone-800 flex items-center justify-between">
+              <div>
+                <p class="text-white font-semibold text-sm">Devon R.</p>
+                <p class="text-stone-500 text-xs mt-0.5">Verified Customer</p>
+              </div>
+              <span class="text-stone-500 text-xs">1 month ago</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Overall rating bar -->
+        <div class="mt-12 text-center">
+          <div class="inline-flex items-center gap-3 bg-stone-950 border border-stone-800 rounded-2xl px-8 py-4">
+            <span class="text-4xl font-extrabold text-white">5.0</span>
+            <div class="text-left">
+              <div class="stars text-xl">★★★★★</div>
+              <p class="text-stone-500 text-xs mt-1">Based on Google Reviews</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CONTACT / CTA SECTION
+         ============================================================ -->
+    <section id="contact" class="py-24 w-full bg-stone-950 relative overflow-hidden">
+      <!-- Gradient overlay -->
+      <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(124,58,237,0.12) 0%, transparent 70%);"></div>
+
+      <div class="relative z-10 max-w-4xl mx-auto px-6">
+
+        <div class="rounded-3xl border border-stone-800 bg-stone-900/50 p-10 sm:p-14 text-center">
+          <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color: var(--primary-color);">Come See Us</p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Visit Cloudz Smoke?</h2>
+          <p class="text-stone-400 text-base leading-relaxed max-w-xl mx-auto mb-10">
+            Stop by our Denver location and let our team help you find exactly what you're looking for. We're open 7 days a week.
+          </p>
+
+          <!-- Contact info -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+            <div class="flex flex-col items-center gap-2 p-5 rounded-xl bg-stone-950/60 border border-stone-800">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-color);">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <p class="text-stone-400 text-xs uppercase tracking-widest font-semibold">Address</p>
+              <p class="text-white text-sm font-medium text-center">9443 S Texas 6, Houston, TX 77083<br>Your City</p>
+            </div>
+            <div class="flex flex-col items-center gap-2 p-5 rounded-xl bg-stone-950/60 border border-stone-800">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-color);">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+              <p class="text-stone-400 text-xs uppercase tracking-widest font-semibold">Phone</p>
+              <a href="tel:" class="text-white text-sm font-medium hover:text-primary transition-colors">nan</a>
+            </div>
+            <div class="flex flex-col items-center gap-2 p-5 rounded-xl bg-stone-950/60 border border-stone-800">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="color: var(--primary-color);">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="text-stone-400 text-xs uppercase tracking-widest font-semibold">Hours</p>
+              <p class="text-white text-sm font-medium text-center">Mon–Sat: 10am–9pm<br>Sun: 11am–7pm</p>
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="https://maps.google.com/?q=9443%20S%20Texas%206%2C%20Houston%2C%20TX%2077083"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-primary px-8 py-4 rounded-full text-base font-semibold inline-flex items-center justify-center gap-2"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              Get Directions
+            </a>
+            <a href="tel:" class="btn-outline px-8 py-4 rounded-full text-base font-semibold inline-flex items-center justify-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+              Call Us Now
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="border-t border-stone-800 bg-stone-950 text-stone-400 py-14">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+
+        <!-- Column 1: Brand + tagline -->
+        <div>
+          <div class="flex items-center gap-2 text-white font-bold text-lg mb-3">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-color);">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+            </svg>
+            Cloudz Smoke shop
+          </div>
+          <p class="text-stone-500 text-sm leading-relaxed">
+            Denver's premium smoke shop. Knowledgeable staff, top brands, fair prices — and a vibe that keeps customers coming back.
+          </p>
+        </div>
+
+        <!-- Column 2: Quick links -->
+        <div>
+          <h4 class="text-white font-semibold text-sm uppercase tracking-widest mb-4">Quick Links</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#services" class="hover:text-white transition-colors">Our Products</a></li>
+            <li><a href="#about" class="hover:text-white transition-colors">About Us</a></li>
+            <li><a href="#about" class="hover:text-white transition-colors">Store Hours</a></li>
+            <li><a href="#contact" class="hover:text-white transition-colors">Contact &amp; Location</a></li>
+            <li><a href="tel:" class="hover:text-white transition-colors">nan</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Hours + Location -->
+        <div>
+          <h4 class="text-white font-semibold text-sm uppercase tracking-widest mb-4">Hours &amp; Location</h4>
+          <div class="space-y-2 text-sm">
+            <p class="flex justify-between"><span class="text-stone-500">Mon – Sat</span><span class="text-stone-300">10:00 AM – 9:00 PM</span></p>
+            <p class="flex justify-between"><span class="text-stone-500">Sunday</span><span class="text-stone-300">11:00 AM – 7:00 PM</span></p>
+          </div>
+          <div class="mt-5 pt-5 border-t border-stone-800 text-sm">
+            <p class="text-stone-300 font-medium">9443 S Texas 6, Houston, TX 77083</p>
+            <p class="text-stone-500">Your City</p>
+            <a
+              href="https://maps.google.com/?q=9443%20S%20Texas%206%2C%20Houston%2C%20TX%2077083"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold uppercase tracking-widest hover:text-white transition-colors"
+              style="color: var(--primary-color);"
+            >
+              View on Maps →
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Copyright bar -->
+      <div class="pt-8 border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-600">
+        <p>&copy; 2026 Cloudz Smoke shop. All rights reserved.</p>
+        <p>Denver, Colorado · <a href="tel:" class="hover:text-stone-400 transition-colors">nan</a></p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -91,10 +91,10 @@ describe('Server Routes', () => {
 });
 
 describe('Pipeline', () => {
-    it('should have run_pipeline.js loadable', () => {
+    it('should have run_pipeline.mjs loadable', () => {
         assert.ok(
-            require('fs').existsSync('scripts/run_pipeline.js'),
-            'scripts/run_pipeline.js should exist'
+            require('fs').existsSync('scripts/run_pipeline.mjs'),
+            'scripts/run_pipeline.mjs should exist'
         );
     });
 });

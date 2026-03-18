@@ -33,7 +33,7 @@ async function runPipeline(jobId) {
     pushLog(jobId, '🌐 Step 2/3 — Auditing websites…', 'step');
     job.step = 2;
     const auditorArgs = [
-        path.join(__dirname, '..', 'src', 'node', 'auditor.js'),
+        path.join(__dirname, '..', 'src', 'node', 'auditor.mjs'),
         '--input', job.files.leads,
         '--output', job.files.audited,
         '--concurrency', '8',
@@ -47,7 +47,7 @@ async function runPipeline(jobId) {
     // Step 2.5: Social Audit
     pushLog(jobId, '📱 Step 2.5 — Social Audit…', 'step');
     await runChild(jobId, 'node', [
-        path.join(__dirname, '..', 'src', 'node', 'social_audit.js'),
+        path.join(__dirname, '..', 'src', 'node', 'social_audit.mjs'),
         '--input', job.files.audited,
         '--output', job.files.socialAudited
     ]);
@@ -59,7 +59,7 @@ async function runPipeline(jobId) {
         pushLog(jobId, '✍️  Step 3/3 — Generating outreach messages…', 'step');
         job.step = 3;
         await runChild(jobId, 'node', [
-            path.join(__dirname, '..', 'src', 'node', 'generate_outreach.js'),
+            path.join(__dirname, '..', 'src', 'node', 'generate_outreach.mjs'),
             '--input', job.files.socialAudited,
             '--output', job.files.outreach,
             '--base-url', job.baseUrl,
@@ -77,7 +77,7 @@ async function runPipeline(jobId) {
         job.step = 4;
         const demoInput = fs.existsSync(job.files.outreach) ? job.files.outreach : job.files.socialAudited;
         await runChild(jobId, 'node', [
-            path.join(__dirname, '..', 'src', 'node', 'generate-from-templates.js'),
+            path.join(__dirname, '..', 'src', 'node', 'generate-from-templates.mjs'),
             '--input', demoInput,
             '--output', job.files.demos || path.join('public', 'demos'),
         ]);
@@ -109,7 +109,7 @@ async function runPipeline(jobId) {
         pushLog(jobId, '📧 Step 5 — Sending outreach emails…', 'step');
         job.step = 5;
         await runChild(jobId, 'node', [
-            path.join(__dirname, '..', 'src', 'node', 'send_emails.js'),
+            path.join(__dirname, '..', 'src', 'node', 'send_emails.mjs'),
             '--input', emailInput,
             '--log', job.files.emailLog,
         ]);

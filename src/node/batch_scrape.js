@@ -32,7 +32,7 @@ for (let i = 0; i < args.length; i++) {
 }
 
 // ─── Run ─────────────────────────────────────────────────
-const scraperPath = path.join(__dirname, 'places_scraper.js');
+const scraperPath = path.join(__dirname, 'places_scraper.mjs');
 const startTime = Date.now();
 
 console.log('═'.repeat(60));
