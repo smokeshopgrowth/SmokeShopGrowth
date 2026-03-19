@@ -54,7 +54,30 @@ app.use(require('./routes/webhooks'));
 
 // Start server
 if (require.main === module) {
-    app.listen(PORT, () => {
+    
+// ── Demo Sites ────────────────────────────────────────────────────────────────
+app.get('/demo/:slug', (req, res) => {
+  const slug = req.params.slug.replace(/[^a-z0-9-]/g, '');
+  const filePath = path.join(__dirname, 'data', 'demos', `${slug}.html`);
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send('<h1>Demo not found</h1><p>This demo may not have been generated yet.</p>');
+  }
+});
+
+app.get('/demo', (req, res) => {
+  const demosDir = path.join(__dirname, 'data', 'demos');
+  if (!fs.existsSync(demosDir)) return res.json({ demos: [] });
+  const files = fs.readdirSync(demosDir).filter(f => f.endsWith('.html'));
+  const demos = files.map(f => ({
+    slug: f.replace('.html', ''),
+    url: `${process.env.DEMO_BASE_URL || ''}/demo/${f.replace('.html', '')}`
+  }));
+  res.json({ count: demos.length, demos });
+});
+
+app.listen(PORT, () => {
         console.log(`\n🚀 Dashboard running at http://localhost:${PORT}\n`);
     });
 }
