@@ -137,8 +137,31 @@ async function runPipeline(jobId) {
         }
     }
 
+    // Step 7: Make AI Calls via Vapi
+    const vapiConfigured = process.env.VAPI_API_KEY && process.env.VAPI_ASSISTANT_ID && process.env.VAPI_PHONE_NUMBER_ID;
+    const callInput = fs.existsSync(job.files.outreach) ? job.files.outreach
+                    : fs.existsSync(job.files.socialAudited) ? job.files.socialAudited
+                    : fs.existsSync(job.files.audited) ? job.files.audited
+                    : job.files.leads;
+    if (vapiConfigured && fs.existsSync(callInput)) {
+        pushLog(jobId, '📞 Step 7 — Making AI outbound calls via Vapi…', 'step');
+        job.step = 7;
+        await runChild(jobId, 'node', [
+            path.join(__dirname, '..', 'src', 'node', 'make_calls.js'),
+            '--input', callInput,
+            '--log', job.files.callLog,
+            '--limit', String(Math.min(job.maxResults, 50)),
+            '--delay', '30',
+        ]);
+        pushLog(jobId, '✅ AI calls completed.', 'success');
+    } else if (!vapiConfigured) {
+        pushLog(jobId, '⚠️  Step 7 skipped — VAPI env vars not configured.', 'warn');
+    } else {
+        pushLog(jobId, '⚠️  Step 7 skipped — No lead CSV available for calls.', 'warn');
+    }
+
     job.status = 'done';
-    job.step = 7;
+    job.step = 8;
     pushLog(jobId, '🎉 Pipeline complete!', 'success');
     broadcast(jobId, { type: 'done', status: 'done', files: job.files });
 

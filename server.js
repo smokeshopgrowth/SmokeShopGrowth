@@ -2,13 +2,7 @@
  * Dashboard Server
  * ================
  * Express web server that powers the lead generation dashboard.
- * Provides a form UI, runs the pipeline steps as child processes,
- * streams real-time progress via SSE, and exports to Google Sheets.
- *
- * Start:  node server.js
- * Open:   http://localhost:3000
  */
-
 'use strict';
 require('dotenv').config();
 
@@ -19,8 +13,7 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Fix #4: Stripe webhook needs raw body for signature verification.
-// Apply express.json() to all routes EXCEPT /webhook/stripe.
+// Fix: Stripe webhook needs raw body
 app.use((req, res, next) => {
     if (req.originalUrl === '/webhook/stripe') return next();
     express.json()(req, res, next);
@@ -33,7 +26,7 @@ const deployPath = path.join(__dirname, 'deployments');
 if (!fs.existsSync(deployPath)) fs.mkdirSync(deployPath);
 app.use('/deployments', express.static(deployPath));
 
-// Serve assets for the premium template (styles.css, animations.js, etc.)
+// Serve assets for the premium template
 app.use(express.static(path.join(__dirname, 'template')));
 
 // Root route
