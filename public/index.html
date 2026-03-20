@@ -1,551 +1,789 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lead Generator Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <title>SmokeShopGrowth Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     :root {
-      --bg: #09090b;
-      --surface: rgba(255, 255, 255, 0.03);
-      --surface2: rgba(255, 255, 255, 0.06);
-      --border: rgba(255, 255, 255, 0.06);
-      --border-hover: rgba(255, 255, 255, 0.12);
-      --accent: #6366f1;
-      --accent2: #8b5cf6;
-      --green: #10b981;
-      --yellow: #f59e0b;
-      --red: #ef4444;
-      --text: #f0f0f3;
-      --muted: #71717a;
-      --radius: 16px;
-      --glow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+      --bg-primary: #0f1117;
+      --bg-secondary: #1a1d26;
+      --bg-tertiary: #252935;
+      --border-color: #2e3345;
+      --text-primary: #f0f2f5;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent-primary: #10b981;
+      --accent-secondary: #3b82f6;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+      --accent-purple: #8b5cf6;
+      --shadow: 0 4px 24px rgba(0,0,0,0.3);
+      --radius: 8px;
     }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 48px 20px 100px;
-      background-image:
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.12), transparent);
     }
 
-    /* ── Header ── */
-    .header {
-      text-align: center;
-      margin-bottom: 48px;
-    }
-
-    .header h1 {
-      font-size: 2.25rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), var(--accent2), #c084fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.02em;
-    }
-
-    .header p {
-      color: var(--muted);
-      margin-top: 10px;
-      font-size: 0.95rem;
-      font-weight: 400;
-    }
-
-    /* ── Layout ── */
-    .container {
-      width: 100%;
-      max-width: 880px;
+    /* ═══════════════════════════════════════════════════════════════════════
+       SIDEBAR
+       ═══════════════════════════════════════════════════════════════════════ */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      transition: transform 0.3s ease;
     }
 
-    /* ── Card ── */
-    .card {
-      background: var(--surface);
-      -webkit-backdrop-filter: blur(16px);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 32px;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
     }
 
-    .card:hover {
-      border-color: var(--border-hover);
-      box-shadow: 0 0 40px -12px rgba(99, 102, 241, 0.08);
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
     }
 
-    .card-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .sidebar-logo svg {
+      width: 32px;
+      height: 32px;
+      color: var(--accent-primary);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+
+    .nav-section {
       margin-bottom: 24px;
     }
 
-    /* ── Form ── */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      padding: 0 12px;
+      margin-bottom: 8px;
     }
 
-    .form-grid .full {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--muted);
-    }
-
-    label span {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="url"],
-    select {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.95rem;
-      padding: 11px 16px;
-      outline: none;
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-      width: 100%;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: var(--glow);
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    input::placeholder {
-      color: var(--muted);
-      opacity: 0.6;
-    }
-
-    /* Range slider */
-    .slider-wrap {
+    .nav-item {
       display: flex;
       align-items: center;
-      gap: 14px;
-    }
-
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      flex: 1;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
-      outline: none;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      color: var(--text-secondary);
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.15s ease;
+      font-size: 14px;
+      font-weight: 500;
     }
 
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
+    .nav-item:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .nav-item svg {
       width: 20px;
       height: 20px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      cursor: pointer;
-      box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
-      transition: box-shadow 0.2s;
-    }
-
-    input[type="range"]::-webkit-slider-thumb:hover {
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.7);
-    }
-
-    .slider-val {
-      min-width: 48px;
-      text-align: center;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-size: 1rem;
-    }
-
-    /* Toggle */
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .toggle-label {
-      font-size: 0.875rem;
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .toggle-desc {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
-    .toggle {
-      position: relative;
-      width: 44px;
-      height: 24px;
       flex-shrink: 0;
     }
 
-    .toggle input {
-      opacity: 0;
-      width: 0;
-      height: 0;
+    .nav-item .badge {
+      margin-left: auto;
+      background: var(--accent-danger);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
     }
 
-    .toggle-track {
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
+    /* ═══════════════════════════════════════════════════════════════════════
+       MAIN CONTENT
+       ═══════════════════════════════════════════════════════════════════════ */
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
       cursor: pointer;
-      transition: background 0.3s ease;
+      padding: 8px;
     }
 
-    .toggle-track::before {
-      content: '';
-      position: absolute;
-      left: 3px;
-      top: 3px;
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      gap: 8px;
+    }
+
+    .search-box input {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 14px;
+      width: 200px;
+      outline: none;
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-box svg {
       width: 18px;
       height: 18px;
-      background: white;
-      border-radius: 50%;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--text-muted);
     }
 
-    .toggle input:checked+.toggle-track {
-      background: var(--accent);
-      box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+    .content-area {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
     }
 
-    .toggle input:checked+.toggle-track::before {
-      transform: translateX(20px);
+    /* ═══════════════════════════════════════════════════════════════════════
+       PAGE SECTIONS (hidden by default)
+       ═══════════════════════════════════════════════════════════════════════ */
+    .page-section {
+      display: none;
     }
 
-    /* Sheets field — smooth show/hide */
-    #sheets-field {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin 0.3s ease;
-      margin-top: 0;
+    .page-section.active {
+      display: block;
     }
 
-    #sheets-field.visible {
-      max-height: 80px;
-      opacity: 1;
-      margin-top: 14px;
+    /* ═══════════════════════════════════════════════════════════════════════
+       DASHBOARD STATS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
     }
 
-    /* ── Buttons ── */
-    .btn-run {
-      width: 100%;
-      padding: 14px;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 600;
-      color: white;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: opacity 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
-      letter-spacing: 0.02em;
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      flex-shrink: 0;
     }
 
-    .btn-run:hover {
-      opacity: 0.92;
-      box-shadow: 0 4px 24px rgba(99, 102, 241, 0.3);
+    .stat-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--accent-primary); }
+    .stat-icon.blue { background: rgba(59, 130, 246, 0.15); color: var(--accent-secondary); }
+    .stat-icon.orange { background: rgba(245, 158, 11, 0.15); color: var(--accent-warning); }
+    .stat-icon.purple { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+
+    .stat-icon svg {
+      width: 24px;
+      height: 24px;
     }
 
-    .btn-run:active {
-      transform: scale(0.98);
+    .stat-content {
+      flex: 1;
     }
 
-    .btn-run:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      box-shadow: none;
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
     }
 
-    .btn-run .spinner {
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .stat-change {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .stat-change.positive { color: var(--accent-primary); }
+    .stat-change.negative { color: var(--accent-danger); }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       CARDS & PANELS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .card-body.no-padding {
+      padding: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       TABLES
+       ═══════════════════════════════════════════════════════════════════════ */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      position: sticky;
+      top: 0;
+    }
+
+    td {
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: var(--bg-tertiary);
+    }
+
+    .table-checkbox {
+      width: 40px;
+    }
+
+    .table-checkbox input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--accent-primary);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       BADGES & STATUS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-new { background: rgba(59, 130, 246, 0.15); color: var(--accent-secondary); }
+    .badge-contacted { background: rgba(245, 158, 11, 0.15); color: var(--accent-warning); }
+    .badge-qualified { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+    .badge-won { background: rgba(16, 185, 129, 0.15); color: var(--accent-primary); }
+    .badge-lost { background: rgba(239, 68, 68, 0.15); color: var(--accent-danger); }
+    .badge-draft { background: rgba(107, 114, 128, 0.2); color: var(--text-secondary); }
+    .badge-scheduled { background: rgba(59, 130, 246, 0.15); color: var(--accent-secondary); }
+    .badge-sent { background: rgba(16, 185, 129, 0.15); color: var(--accent-primary); }
+    .badge-sending { background: rgba(245, 158, 11, 0.15); color: var(--accent-warning); }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 24px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .score-high { background: rgba(16, 185, 129, 0.2); color: var(--accent-primary); }
+    .score-medium { background: rgba(245, 158, 11, 0.2); color: var(--accent-warning); }
+    .score-low { background: rgba(239, 68, 68, 0.2); color: var(--accent-danger); }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       BUTTONS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn svg {
       width: 18px;
       height: 18px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0d9f6e;
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border-color);
+    }
+
+    .btn-danger {
+      background: var(--accent-danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .btn-sm svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-icon {
+      padding: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-icon:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       FORMS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       PAGINATION
+       ═══════════════════════════════════════════════════════════════════════ */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .pagination-info {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pagination-btn {
+      padding: 6px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: var(--border-color);
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       MODALS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       FILTERS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .bulk-actions {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+    }
+
+    .bulk-actions.active {
+      display: flex;
+    }
+
+    .bulk-count {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       EMPTY STATES
+       ═══════════════════════════════════════════════════════════════════════ */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       TOAST NOTIFICATIONS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast-success { border-left: 4px solid var(--accent-primary); }
+    .toast-error { border-left: 4px solid var(--accent-danger); }
+    .toast-info { border-left: 4px solid var(--accent-secondary); }
+
+    .toast-message {
+      font-size: 14px;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       LOADING STATES
+       ═══════════════════════════════════════════════════════════════════════ */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-color);
+      border-top-color: var(--accent-primary);
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+      animation: spin 0.8s linear infinite;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    /* ── Progress Card — smooth show/hide ── */
-    #progress-card {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      padding: 0 32px;
-      border: none;
-      margin-top: -24px;
-      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.4s ease,
-                  padding 0.4s ease,
-                  margin 0.4s ease,
-                  border 0.4s ease;
-    }
-
-    #progress-card.visible {
-      max-height: 600px;
-      opacity: 1;
-      padding: 28px 32px;
-      border: 1px solid var(--border);
-      margin-top: 0;
-      overflow: visible;
-    }
-
-    .steps-track {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      position: relative;
-    }
-
-    .steps-track::before {
-      content: '';
-      position: absolute;
-      top: 15px;
-      left: 20px;
-      right: 20px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.06);
-      z-index: 0;
-    }
-
-    .step-dot {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      z-index: 1;
-    }
-
-    .dot {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 2px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      color: var(--muted);
-    }
-
-    .dot.active {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(99, 102, 241, 0.12);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    .dot.done {
-      background: var(--green);
-      border-color: var(--green);
-      color: white;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
-    }
-
-    .step-name {
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-align: center;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-    }
-
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
-    }
-
-    /* ── Log Terminal (macOS style) ── */
-    .terminal-wrap {
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      overflow: hidden;
-      background: rgba(0, 0, 0, 0.4);
-    }
-
-    .terminal-titlebar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    .terminal-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .terminal-dot.red { background: #ff5f57; }
-    .terminal-dot.yellow { background: #febc2e; }
-    .terminal-dot.green { background: #28c840; }
-
-    .terminal-title-text {
-      flex: 1;
-      text-align: center;
-      font-size: 0.72rem;
-      color: var(--muted);
-      font-weight: 500;
-      letter-spacing: 0.04em;
-    }
-
-    .log-terminal {
-      padding: 16px;
-      height: 280px;
-      overflow-y: auto;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
-      line-height: 1.8;
-    }
-
-    .log-terminal::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    .log-terminal::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .log-terminal::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
-    }
-
-    .log-line {
-      display: flex;
-      gap: 12px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      transition: background 0.15s;
-    }
-
-    .log-line:nth-child(even) {
-      background: rgba(255, 255, 255, 0.015);
-    }
-
-    .log-line:hover {
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .log-ts {
-      color: rgba(255, 255, 255, 0.2);
-      flex-shrink: 0;
-      font-size: 0.72rem;
-    }
-
-    .log-msg.log { color: #9ca3af; }
-    .log-msg.step { color: #818cf8; font-weight: 600; }
-    .log-msg.success { color: var(--green); font-weight: 600; }
-    .log-msg.warn { color: var(--yellow); }
-    .log-msg.error { color: var(--red); font-weight: 600; }
-
-    /* ── Results Card — smooth show/hide ── */
-    #results-card {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      padding: 0 32px;
-      border: none;
-      margin-top: -24px;
-      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.4s ease,
-                  padding 0.4s ease,
-                  margin 0.4s ease,
-                  border 0.4s ease;
-    }
-
-    #results-card.visible {
-      max-height: 500px;
-      opacity: 1;
-      padding: 28px 32px;
-      border: 1px solid var(--border);
-      margin-top: 0;
-      overflow: visible;
-    }
-
-    /* Skeleton rows */
-    .skeleton-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    .skeleton-row:last-child { border-bottom: none; }
-
-    .skeleton-bar {
-      height: 14px;
-      border-radius: 6px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--border-color) 50%, var(--bg-tertiary) 75%);
       background-size: 200% 100%;
-      animation: shimmer 1.5s ease-in-out infinite;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
     }
 
     @keyframes shimmer {
@@ -553,978 +791,1600 @@
       100% { background-position: -200% 0; }
     }
 
-    .result-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      opacity: 0;
-      transform: translateY(8px);
-      animation: fadeUp 0.35s ease forwards;
+    /* ═══════════════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .search-box input {
+        width: 140px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
 
-    .result-row:last-child { border-bottom: none; }
-    .result-row:nth-child(1) { animation-delay: 0.05s; }
-    .result-row:nth-child(2) { animation-delay: 0.1s; }
-    .result-row:nth-child(3) { animation-delay: 0.15s; }
-    .result-row:nth-child(4) { animation-delay: 0.2s; }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .result-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-      font-weight: 400;
-    }
-
-    .result-value {
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .btn-dl {
-      padding: 8px 18px;
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text);
-      text-decoration: none;
-      transition: all 0.25s ease;
-      display: inline-block;
-    }
-
-    .btn-dl:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(99, 102, 241, 0.08);
-      box-shadow: 0 0 16px rgba(99, 102, 241, 0.1);
-    }
-
-    /* Status badge */
-    .badge {
+    /* ═══════════════════════════════════════════════════════════════════════
+       CALL LOG SPECIFIC
+       ═══════════════════════════════════════════════════════════════════════ */
+    .call-outcome {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      transition: all 0.3s ease;
     }
 
-    .badge.running {
-      background: rgba(99, 102, 241, 0.12);
-      color: #818cf8;
-    }
-
-    .badge.done {
-      background: rgba(16, 185, 129, 0.12);
-      color: var(--green);
-    }
-
-    .badge.failed {
-      background: rgba(239, 68, 68, 0.12);
-      color: var(--red);
-    }
-
-    .dot-blink {
-      width: 7px;
-      height: 7px;
+    .call-outcome-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: currentColor;
-      animation: blink 1s ease-in-out infinite;
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.25; }
-    }
+    .call-outcome-dot.interested { background: var(--accent-primary); }
+    .call-outcome-dot.not_interested { background: var(--accent-danger); }
+    .call-outcome-dot.callback { background: var(--accent-warning); }
+    .call-outcome-dot.voicemail { background: var(--accent-purple); }
+    .call-outcome-dot.no_answer { background: var(--text-muted); }
 
-    /* ── Toast System ── */
-    .toast-container {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      z-index: 9999;
+    /* ═══════════════════════════════════════════════════════════════════════
+       PAYMENT CHARTS
+       ═══════════════════════════════════════════════════════════════════════ */
+    .chart-container {
+      height: 200px;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: none;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 20px 0;
     }
 
-    .toast {
-      pointer-events: auto;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 20px;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      -webkit-backdrop-filter: blur(16px);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      transform: translateX(120%);
-      opacity: 0;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-      max-width: 380px;
+    .chart-bar {
+      flex: 1;
+      background: var(--accent-primary);
+      border-radius: 4px 4px 0 0;
+      min-height: 20px;
+      position: relative;
+      transition: background 0.15s ease;
     }
 
-    .toast.show {
-      transform: translateX(0);
-      opacity: 1;
+    .chart-bar:hover {
+      background: var(--accent-secondary);
     }
 
-    .toast.hide {
-      transform: translateX(120%);
-      opacity: 0;
+    .chart-bar-label {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
     }
 
-    .toast.success {
-      background: rgba(16, 185, 129, 0.12);
-      color: #6ee7b7;
-      border-color: rgba(16, 185, 129, 0.15);
-    }
-
-    .toast.error {
-      background: rgba(239, 68, 68, 0.12);
-      color: #fca5a5;
-      border-color: rgba(239, 68, 68, 0.15);
-    }
-
-    .toast.info {
-      background: rgba(99, 102, 241, 0.12);
-      color: #a5b4fc;
-      border-color: rgba(99, 102, 241, 0.15);
-    }
-
-    .toast-icon {
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    /* ── Quick Call ── */
-    .btn-call {
-      width: 100%;
-      padding: 14px;
-      font-family: inherit;
-      font-size: 1rem;
+    .chart-bar-value {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
       font-weight: 600;
-      color: white;
-      background: linear-gradient(135deg, var(--green), #059669);
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: opacity 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
-      letter-spacing: 0.02em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      color: var(--text-secondary);
     }
 
-    .btn-call:hover {
-      opacity: 0.92;
-      box-shadow: 0 4px 24px rgba(16, 185, 129, 0.3);
+    /* ═══════════════════════════════════════════════════════════════════════
+       PIPELINE RUNNER (Legacy)
+       ═══════════════════════════════════════════════════════════════════════ */
+    .pipeline-section {
+      margin-top: 24px;
     }
 
-    .btn-call:active { transform: scale(0.98); }
-    .btn-call:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
-
-    .btn-call .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+    .pipeline-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
     }
 
-    #qc-status {
-      transition: opacity 0.3s ease;
+    .pipeline-log {
+      background: var(--bg-tertiary);
+      border-radius: var(--radius);
+      padding: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 13px;
+      line-height: 1.6;
     }
 
-    /* ── Utility classes (replaces inline styles) ── */
-    .mt-16 { margin-top: 16px; }
-    .mt-24 { margin-top: 24px; }
-    .qc-status-bar { margin-top: 16px; font-size: 0.85rem; color: var(--muted); text-align: center; }
-    .card-title--row { display: flex; justify-content: space-between; align-items: center; }
-    .terminal-spacer { width: 36px; }
-    .sk-100 { width: 100px; }
-    .sk-120 { width: 120px; }
-    .sk-140 { width: 140px; }
-    .sk-150 { width: 150px; }
-    .sk-160 { width: 160px; }
-
-    /* ── Responsive ── */
-    @media (max-width: 640px) {
-      body { padding: 28px 14px 60px; }
-
-      .header h1 { font-size: 1.6rem; }
-
-      .form-grid { grid-template-columns: 1fr; }
-
-      .card { padding: 22px 18px; }
-
-      #progress-card.visible { padding: 22px 18px; }
-      #results-card.visible { padding: 22px 18px; }
-
-      .dot {
-        width: 24px;
-        height: 24px;
-        font-size: 0.65rem;
-      }
-
-      .step-name { font-size: 0.62rem; }
-
-      .toast-container {
-        top: 12px;
-        right: 12px;
-        left: 12px;
-      }
-
-      .toast { max-width: 100%; }
+    .pipeline-log-entry {
+      color: var(--text-secondary);
     }
+
+    .pipeline-log-entry.step { color: var(--accent-secondary); }
+    .pipeline-log-entry.success { color: var(--accent-primary); }
+    .pipeline-log-entry.error { color: var(--accent-danger); }
   </style>
 </head>
-
 <body>
-
-  <!-- Toast container -->
-  <div class="toast-container" id="toast-container"></div>
-
-  <div class="header">
-    <h1>Lead Generator</h1>
-    <p>Scrape Google Maps &rarr; Audit websites &rarr; Generate outreach &rarr; Export to Sheets</p>
-  </div>
-
-  <div class="container">
-
-    <!-- ── Leads & Conversions Card ── -->
-    <div class="card mt-16" id="leads-section">
-      <div class="card-title--row">
-        <div class="card-title" style="margin-bottom:0">Recent Leads & Conversions</div>
-        <button class="btn-dl" onclick="refreshLeads()" style="padding: 6px 14px">Refresh</button>
-      </div>
-      <div id="leads-container" class="mt-24">
-        <div class="skeleton-row"><div class="skeleton-bar sk-150"></div><div class="skeleton-bar sk-100"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar sk-150"></div><div class="skeleton-bar sk-100"></div></div>
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       SIDEBAR
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+        <span>SmokeShopGrowth</span>
       </div>
     </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <div class="nav-item active" data-page="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="leads">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Leads CRM</span>
+          <span class="badge" id="leads-count-badge">0</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Outreach</div>
+        <div class="nav-item" data-page="campaigns">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <span>Email Campaigns</span>
+        </div>
+        <div class="nav-item" data-page="calls">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          <span>Call Center</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Revenue</div>
+        <div class="nav-item" data-page="payments">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          <span>Payments</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Tools</div>
+        <div class="nav-item" data-page="pipeline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+          <span>Pipeline Runner</span>
+        </div>
+      </div>
+    </nav>
+  </aside>
 
-    <!-- ── Search Form ── -->
-    <div class="card">
-      <div class="card-title">Search Settings</div>
-      <form id="pipeline-form">
-        <div class="form-grid">
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MAIN CONTENT
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+      </div>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" placeholder="Search leads..." id="global-search" onkeyup="handleGlobalSearch(event)">
+        </div>
+        <button class="btn btn-primary" onclick="openNewCampaignModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          New Campaign
+        </button>
+      </div>
+    </header>
 
-          <label>
-            <span>City</span>
-            <input type="text" id="city" placeholder="e.g. Houston TX" required />
-          </label>
-
-          <label>
-            <span>Business Type</span>
-            <input type="text" id="bizType" value="smoke shop" placeholder="e.g. vape shop, dispensary" />
-          </label>
-
-          <!-- Toggles -->
-          <label class="full">
-            <div class="toggle-row">
-              <div>
-                <div class="toggle-label">Skip Lighthouse Audit</div>
-                <div class="toggle-desc">Faster — uses basic Axios + Cheerio checks instead</div>
-              </div>
-              <label class="toggle">
-                <input type="checkbox" id="skipLighthouse" checked aria-label="Skip Lighthouse Audit" />
-                <div class="toggle-track"></div>
-              </label>
+    <div class="content-area">
+      <!-- ═══════════════════════════════════════════════════════════════════
+           DASHBOARD PAGE
+           ═══════════════════════════════════════════════════════════════════ -->
+      <section class="page-section active" id="page-dashboard">
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
             </div>
-          </label>
-
-          <label class="full" id="demo-toggle">
-            <div class="toggle-row">
-              <div>
-                <div class="toggle-label">Generate Demo Videos</div>
-                <div class="toggle-desc">Uses Minimax T2V to create website previews (Requires API Key)</div>
-              </div>
-              <label class="toggle">
-                <input type="checkbox" id="generateDemo" checked aria-label="Generate Demo Videos" />
-                <div class="toggle-track"></div>
-              </label>
+            <div class="stat-content">
+              <div class="stat-label">Total Leads</div>
+              <div class="stat-value" id="stat-total-leads">-</div>
+              <div class="stat-change positive" id="stat-leads-week">+0 this week</div>
             </div>
-          </label>
-
-          <label class="full" id="sheets-toggle">
-            <div class="toggle-row">
-              <div>
-                <div class="toggle-label">Export to Google Sheets</div>
-                <div class="toggle-desc">Requires credentials.json in project root</div>
-              </div>
-              <label class="toggle">
-                <input type="checkbox" id="exportSheets" checked aria-label="Export to Google Sheets"
-                  onchange="document.getElementById('sheets-field').classList.toggle('visible', this.checked)" />
-                <div class="toggle-track"></div>
-              </label>
-            </div>
-            <div id="sheets-field" class="visible">
-              <input type="text" id="sheetsId" value="1cCWHElqtVl8sE7lIfOxoGqfkmr8aE5tkcsyoF8RGmTU"
-                placeholder="Google Spreadsheet ID (from the URL)" />
-            </div>
-          </label>
-
-        </div>
-
-        <div class="mt-24">
-          <button type="submit" class="btn-run" id="run-btn">
-            <span id="run-btn-text">Run Pipeline</span>
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <!-- ── Quick Call Agent ── -->
-    <div class="card">
-      <div class="card-title">Quick Call Agent</div>
-      <form id="quick-call-form">
-        <label>
-          <span>Phone Number</span>
-          <input type="text" id="qc-phone" placeholder="e.g. +1 555 123 4567" required />
-        </label>
-
-        <div class="form-grid mt-16">
-          <label>
-            <span>Business Name (Optional)</span>
-            <input type="text" id="qc-biz" placeholder="e.g. Acme Corp" />
-          </label>
-          <label>
-            <span>City (Optional)</span>
-            <input type="text" id="qc-city" placeholder="e.g. Austin TX" />
-          </label>
-        </div>
-
-        <div class="mt-24">
-          <button type="submit" class="btn-call" id="qc-btn">
-            <span id="qc-btn-text">Call Now (ElevenLabs)</span>
-          </button>
-        </div>
-        <div id="qc-status" class="qc-status-bar">
-        </div>
-      </form>
-    </div>
-
-    <!-- ── Progress ── -->
-    <div class="card" id="progress-card">
-      <div class="card-title card-title--row">
-        <span>Pipeline Progress</span>
-        <span id="status-badge" class="badge running"><span class="dot-blink"></span> Running</span>
-      </div>
-
-      <div class="steps-track">
-        <div class="step-dot">
-          <div class="dot" id="dot-1">1</div>
-          <div class="step-name">Scrape</div>
-        </div>
-        <div class="step-dot">
-          <div class="dot" id="dot-2">2</div>
-          <div class="step-name">Audit</div>
-        </div>
-        <div class="step-dot">
-          <div class="dot" id="dot-3">3</div>
-          <div class="step-name">Outreach</div>
-        </div>
-        <div class="step-dot">
-          <div class="dot" id="dot-4">4</div>
-          <div class="step-name">Demo</div>
-        </div>
-        <div class="step-dot">
-          <div class="dot" id="dot-5">&#10003;</div>
-          <div class="step-name">Done</div>
-        </div>
-      </div>
-
-      <div class="terminal-wrap">
-        <div class="terminal-titlebar">
-          <div class="terminal-dot red"></div>
-          <div class="terminal-dot yellow"></div>
-          <div class="terminal-dot green"></div>
-          <div class="terminal-title-text">pipeline &mdash; live output</div>
-          <div class="terminal-spacer"></div>
-        </div>
-        <div class="log-terminal" id="log-terminal"></div>
-      </div>
-    </div>
-
-    <!-- ── Results ── -->
-    <div class="card" id="results-card">
-      <div class="card-title">Results</div>
-      <div id="result-rows">
-        <!-- skeleton placeholder -->
-        <div class="skeleton-row"><div class="skeleton-bar sk-120"></div><div class="skeleton-bar sk-100"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar sk-140"></div><div class="skeleton-bar sk-100"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar sk-150"></div><div class="skeleton-bar sk-100"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar sk-160"></div><div class="skeleton-bar sk-100"></div></div>
-      </div>
-    </div>
-
-    <!-- ── Social Media Manager ── -->
-    <div class="card" id="social-card">
-      <div class="card-title card-title--row">
-        <div class="card-title" style="margin-bottom:0">📱 Social Media Manager</div>
-        <span class="badge" style="background:rgba(139,92,246,0.12);color:#a78bfa">Buffer + Instagram</span>
-      </div>
-
-      <!-- Step 1: Generate Content Calendar -->
-      <div style="margin-top:20px">
-        <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Step 1 — Generate Content Calendar</div>
-        <div class="form-grid">
-          <label>
-            <span>Business Name</span>
-            <input type="text" id="soc-biz" placeholder="e.g. Cloud 9 Smoke Shop" />
-          </label>
-          <label>
-            <span>City</span>
-            <input type="text" id="soc-city" placeholder="e.g. Houston TX" />
-          </label>
-          <label>
-            <span>Instagram Handle (optional)</span>
-            <input type="text" id="soc-ig" placeholder="e.g. cloud9smokeshop" />
-          </label>
-          <label>
-            <span>Specialty</span>
-            <input type="text" id="soc-specialty" value="smoke shop products" placeholder="smoke shop products, vapes" />
-          </label>
-        </div>
-        <div class="mt-16">
-          <button class="btn-run" id="soc-gen-btn" onclick="generateCalendar()" type="button" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">
-            <span id="soc-gen-text">✨ Generate 30-Day Calendar (GPT-4o)</span>
-          </button>
-        </div>
-        <div id="soc-calendar-preview" style="margin-top:14px;display:none">
-          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px">Preview (first 3 posts):</div>
-          <div id="soc-preview-rows" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.8;background:rgba(0,0,0,0.3);border-radius:8px;padding:12px 16px;color:#9ca3af;white-space:pre-wrap"></div>
-        </div>
-      </div>
-
-      <!-- Step 2: Schedule to Buffer -->
-      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
-        <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Step 2 — Schedule to Buffer</div>
-        <div class="form-grid">
-          <label>
-            <span>Buffer Profile ID</span>
-            <input type="text" id="soc-profile" placeholder="Run --list-profiles to find yours" />
-          </label>
-          <label style="align-self:end">
-            <button class="btn-dl" onclick="listBufferProfiles()" type="button" style="width:100%;padding:11px 16px;text-align:center">📋 List My Profiles</button>
-          </label>
-        </div>
-        <div class="mt-16">
-          <button class="btn-run" id="soc-sched-btn" onclick="scheduleCalendar()" type="button" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)" disabled>
-            <span id="soc-sched-text">📅 Schedule All 30 Posts to Buffer</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 3: DM Outreach -->
-      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
-        <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Step 3 — Instagram DM Outreach</div>
-        <div class="form-grid">
-          <label>
-            <span>Input CSV (with instagram column)</span>
-            <input type="text" id="soc-outreach-file" value="social_audited.csv" placeholder="social_audited.csv" />
-          </label>
-          <label>
-            <span>Max DMs per Day</span>
-            <input type="number" id="soc-dm-limit" value="20" min="5" max="50" />
-          </label>
-        </div>
-        <div class="mt-16" style="display:flex;gap:12px">
-          <button class="btn-dl" onclick="dryRunOutreach()" type="button" style="flex:1;padding:12px;text-align:center;font-weight:600">
-            🔍 Dry Run (Preview)
-          </button>
-          <button class="btn-run" onclick="runOutreach()" type="button" style="flex:2;background:linear-gradient(135deg,#059669,#10b981)">
-            <span>📨 Start DM Outreach</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Social Status log -->
-      <div id="soc-log" style="margin-top:16px;display:none">
-        <div class="terminal-wrap">
-          <div class="terminal-titlebar">
-            <div class="terminal-dot red"></div>
-            <div class="terminal-dot yellow"></div>
-            <div class="terminal-dot green"></div>
-            <div class="terminal-title-text">social manager — output</div>
-            <div class="terminal-spacer"></div>
           </div>
-          <div class="log-terminal" id="soc-terminal" style="height:160px"></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    // ── Toast System ──
-    function showToast(message, variant = 'info') {
-      const container = document.getElementById('toast-container');
-      const icons = { success: '\u2713', error: '\u2717', info: '\u24D8' };
-      const toast = document.createElement('div');
-      toast.className = `toast ${variant}`;
-      toast.innerHTML = `<span class="toast-icon">${icons[variant] || icons.info}</span><span>${message}</span>`;
-      container.appendChild(toast);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => toast.classList.add('show'));
-      });
-      setTimeout(() => {
-        toast.classList.remove('show');
-        toast.classList.add('hide');
-        setTimeout(() => toast.remove(), 400);
-      }, 4000);
-    }
-
-    let currentJobId = null;
-
-    const form = document.getElementById('pipeline-form');
-    const runBtn = document.getElementById('run-btn');
-    const runBtnText = document.getElementById('run-btn-text');
-    const progCard = document.getElementById('progress-card');
-    const resultsCard = document.getElementById('results-card');
-    const terminal = document.getElementById('log-terminal');
-    const badge = document.getElementById('status-badge');
-
-    const dots = [null, ...Array.from({ length: 5 }, (_, i) => document.getElementById(`dot-${i + 1}`))];
-
-    function setStep(step) {
-      dots.forEach((dot, i) => {
-        if (!dot) return;
-        dot.classList.remove('active', 'done');
-        if (i < step) dot.classList.add('done');
-        if (i === step) dot.classList.add('active');
-      });
-    }
-
-    function appendLog({ type, message, ts }) {
-      const line = document.createElement('div');
-      line.className = 'log-line';
-      const d = new Date(ts);
-      const time = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      line.innerHTML = `<span class="log-ts">${time}</span><span class="log-msg ${type}">${escHtml(message)}</span>`;
-      terminal.appendChild(line);
-      terminal.scrollTop = terminal.scrollHeight;
-    }
-
-    function escHtml(str) {
-      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    function setRunLoading(loading) {
-      runBtn.disabled = loading;
-      if (loading) {
-        runBtnText.textContent = 'Running\u2026';
-        if (!runBtn.querySelector('.spinner')) {
-          const sp = document.createElement('span');
-          sp.className = 'spinner';
-          runBtn.insertBefore(sp, runBtnText);
-        }
-      } else {
-        runBtnText.textContent = 'Run Pipeline';
-        const sp = runBtn.querySelector('.spinner');
-        if (sp) sp.remove();
-      }
-    }
-
-    function showSkeletonResults() {
-      const rows = document.getElementById('result-rows');
-      rows.innerHTML = `
-        <div class="skeleton-row"><div class="skeleton-bar" style="width:120px"></div><div class="skeleton-bar" style="width:100px"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar" style="width:140px"></div><div class="skeleton-bar" style="width:100px"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar" style="width:150px"></div><div class="skeleton-bar" style="width:100px"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar" style="width:160px"></div><div class="skeleton-bar" style="width:100px"></div></div>
-      `;
-      resultsCard.classList.add('visible');
-    }
-
-    function showResults(files, jobId) {
-      const rows = document.getElementById('result-rows');
-      const items = [
-        { label: 'Raw Leads', key: 'leads', file: 'leads' },
-        { label: 'Audited Leads', key: 'audited', file: 'audited' },
-        { label: 'Outreach Messages', key: 'outreach', file: 'outreach' },
-        { label: 'Demo Videos (Links)', key: 'demo', file: 'demo' },
-      ];
-      rows.innerHTML = items.map(({ label, file }) => `
-      <div class="result-row">
-        <span class="result-label">${label}</span>
-        <a class="btn-dl" href="/api/download/${jobId}/${file}" download>
-          Download CSV
-        </a>
-      </div>
-    `).join('');
-      resultsCard.classList.add('visible');
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const city = document.getElementById('city').value.trim();
-      const bizType = document.getElementById('bizType').value.trim() || 'smoke shop';
-      const maxResults = parseInt(document.getElementById('maxResults').value);
-      const skipLighthouse = document.getElementById('skipLighthouse').checked;
-      const generateDemo = document.getElementById('generateDemo').checked;
-      const exportSheets = document.getElementById('exportSheets').checked;
-      const sheetsId = document.getElementById('sheetsId').value.trim();
-
-      // Reset UI
-      terminal.innerHTML = '';
-      resultsCard.classList.remove('visible');
-      progCard.classList.add('visible');
-      setRunLoading(true);
-      badge.className = 'badge running';
-      badge.innerHTML = '<span class="dot-blink"></span> Running';
-      setStep(1);
-      showToast('Pipeline started \u2014 scraping leads\u2026', 'info');
-
-      // Start job
-      let jobId;
-      try {
-        const resp = await fetch('/api/run', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ city, bizType, maxResults, skipLighthouse, generateDemo, exportSheets, sheetsId }),
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || 'Server error');
-        jobId = data.jobId;
-        currentJobId = jobId;
-      } catch (err) {
-        appendLog({ type: 'error', message: `Failed to start: ${err.message}`, ts: Date.now() });
-        showToast(`Pipeline error: ${err.message}`, 'error');
-        setRunLoading(false);
-        return;
-      }
-
-      // Show skeleton results
-      showSkeletonResults();
-
-      // Stream SSE
-      const es = new EventSource(`/api/status/${jobId}`);
-      es.onmessage = ({ data }) => {
-        const msg = JSON.parse(data);
-
-        if (msg.type === 'done') {
-          es.close();
-          setRunLoading(false);
-
-          if (msg.status === 'done') {
-            badge.className = 'badge done';
-            badge.textContent = '\u2713 Complete';
-            setStep(6);
-            showResults(msg.files, jobId);
-            showToast('Pipeline complete \u2014 results ready!', 'success');
-            refreshLeads(); // Refresh leads after pipeline completion
-          } else {
-            badge.className = 'badge failed';
-            badge.textContent = '\u2717 Failed';
-            showToast('Pipeline failed \u2014 check logs for details.', 'error');
-          }
-          return;
-        }
-
-        // Update step dots based on log messages
-        if (msg.type === 'step') {
-          if (msg.message.includes('Step 1')) setStep(1);
-          else if (msg.message.includes('Step 2')) setStep(2);
-          else if (msg.message.includes('Step 3')) setStep(3);
-          else if (msg.message.includes('Step 4')) setStep(4);
-          else if (msg.message.includes('Step 5') || msg.message.includes('Exporting')) setStep(4);
-        }
-
-        appendLog(msg);
-      };
-
-      es.onerror = () => {
-        es.close();
-        appendLog({ type: 'warn', message: 'Connection to server lost.', ts: Date.now() });
-        showToast('Lost connection to server.', 'error');
-        setRunLoading(false);
-      };
-    });
-
-    // ── Quick Call Logic ──
-    const qcForm = document.getElementById('quick-call-form');
-    const qcBtn = document.getElementById('qc-btn');
-    const qcBtnText = document.getElementById('qc-btn-text');
-    const qcStatus = document.getElementById('qc-status');
-
-    qcForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const phone = document.getElementById('qc-phone').value.trim();
-      const business_name = document.getElementById('qc-biz').value.trim();
-      const city = document.getElementById('qc-city').value.trim();
-
-      qcBtn.disabled = true;
-      qcBtnText.textContent = 'Calling\u2026';
-      if (!qcBtn.querySelector('.spinner')) {
-        const sp = document.createElement('span');
-        sp.className = 'spinner';
-        qcBtn.insertBefore(sp, qcBtnText);
-      }
-      qcStatus.textContent = '';
-      qcStatus.style.color = 'var(--muted)';
-
-      try {
-        const resp = await fetch('/webhook/call', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, business_name, city }),
-        });
-
-        const data = await resp.json();
-
-        if (!resp.ok) {
-          throw new Error(data.error || 'Server error');
-        }
-
-        qcStatus.textContent = `Call initiated! (Conv ID: ${data.conversation_id})`;
-        qcStatus.style.color = 'var(--green)';
-        showToast('Call initiated successfully!', 'success');
-      } catch (err) {
-        qcStatus.textContent = err.message;
-        qcStatus.style.color = 'var(--red)';
-        showToast(`Call failed: ${err.message}`, 'error');
-      } finally {
-        qcBtn.disabled = false;
-        qcBtnText.textContent = 'Call Now (ElevenLabs)';
-        const sp = qcBtn.querySelector('.spinner');
-        if (sp) sp.remove();
-      }
-    });
-    // ── Lead Management Logic ──
-    async function refreshLeads() {
-      const container = document.getElementById('leads-container');
-      try {
-        const res = await fetch('/api/leads');
-        const data = await res.json();
-        
-        if (!data.leads || data.leads.length === 0) {
-          container.innerHTML = '<p style="color:var(--muted); text-align:center; padding: 20px;">No leads captured yet.</p>';
-          return;
-        }
-
-        container.innerHTML = data.leads.reverse().map(lead => `
-          <div class="result-row">
-            <div>
-              <div style="font-weight:600; color:var(--text)">${lead.business || lead.business_name || 'Prospect'}</div>
-              <div style="font-size:0.75rem; color:var(--muted)">${lead.contact_name} | ${lead.email} | ${lead.tier || 'Starter'}</div>
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
             </div>
-            <div style="display:flex; gap:10px; align-items:center">
-              <span style="font-size:0.7rem; color:var(--muted)">${new Date(lead.date).toLocaleDateString()}</span>
-              <button class="btn-dl" onclick="deploySite('${lead.business || lead.business_name}', '${lead.email}', '${lead.tier}')">
-                Deliver Site
+            <div class="stat-content">
+              <div class="stat-label">Active Campaigns</div>
+              <div class="stat-value" id="stat-campaigns">-</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Calls Today</div>
+              <div class="stat-value" id="stat-calls">-</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Revenue (This Month)</div>
+              <div class="stat-value" id="stat-revenue">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Recent Leads</h3>
+              <button class="btn btn-sm btn-secondary" onclick="navigateTo('leads')">View All</button>
+            </div>
+            <div class="card-body no-padding">
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Business</th>
+                      <th>City</th>
+                      <th>Score</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-leads-table">
+                    <tr><td colspan="4" style="text-align:center;padding:40px;">Loading...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Recent Payments</h3>
+            </div>
+            <div class="card-body no-padding">
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Business</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-payments-table">
+                    <tr><td colspan="2" style="text-align:center;padding:40px;">Loading...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════
+           LEADS CRM PAGE
+           ═══════════════════════════════════════════════════════════════════ -->
+      <section class="page-section" id="page-leads">
+        <div class="filters-bar">
+          <div class="filter-group">
+            <span class="filter-label">Status:</span>
+            <select class="filter-select" id="filter-status" onchange="loadLeads()">
+              <option value="">All</option>
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="qualified">Qualified</option>
+              <option value="won">Won</option>
+              <option value="lost">Lost</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">City:</span>
+            <select class="filter-select" id="filter-city" onchange="loadLeads()">
+              <option value="">All Cities</option>
+            </select>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" onclick="exportLeadsCSV()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="bulk-actions" id="bulk-actions">
+          <span class="bulk-count"><span id="selected-count">0</span> selected</span>
+          <select class="filter-select" id="bulk-status">
+            <option value="">Change Status...</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="qualified">Qualified</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+          </select>
+          <button class="btn btn-sm btn-primary" onclick="bulkUpdateStatus()">Apply</button>
+          <button class="btn btn-sm btn-danger" onclick="bulkDeleteLeads()">Delete</button>
+        </div>
+
+        <div class="card">
+          <div class="card-body no-padding">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="table-checkbox">
+                      <input type="checkbox" id="select-all-leads" onchange="toggleSelectAllLeads()">
+                    </th>
+                    <th>Business Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>City</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="leads-table">
+                  <tr><td colspan="8" style="text-align:center;padding:40px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <div class="pagination-info" id="leads-pagination-info">Showing 0-0 of 0</div>
+              <div class="pagination-controls">
+                <button class="pagination-btn" id="leads-prev-btn" onclick="leadsChangePage(-1)" disabled>Previous</button>
+                <button class="pagination-btn" id="leads-next-btn" onclick="leadsChangePage(1)" disabled>Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════
+           EMAIL CAMPAIGNS PAGE
+           ═══════════════════════════════════════════════════════════════════ -->
+      <section class="page-section" id="page-campaigns">
+        <div class="filters-bar">
+          <button class="btn btn-primary" onclick="openNewCampaignModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Create Campaign
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-body no-padding">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Campaign Name</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Recipients</th>
+                    <th>Sent</th>
+                    <th>Opened</th>
+                    <th>Clicked</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="campaigns-table">
+                  <tr><td colspan="8" style="text-align:center;padding:40px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════
+           CALL CENTER PAGE
+           ═══════════════════════════════════════════════════════════════════ -->
+      <section class="page-section" id="page-calls">
+        <div class="filters-bar">
+          <div class="filter-group">
+            <span class="filter-label">Outcome:</span>
+            <select class="filter-select" id="filter-outcome" onchange="loadCalls()">
+              <option value="">All</option>
+              <option value="interested">Interested</option>
+              <option value="not_interested">Not Interested</option>
+              <option value="callback">Callback</option>
+              <option value="voicemail">Voicemail</option>
+              <option value="no_answer">No Answer</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body no-padding">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Business</th>
+                    <th>Phone</th>
+                    <th>City</th>
+                    <th>Duration</th>
+                    <th>Outcome</th>
+                    <th>Summary</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="calls-table">
+                  <tr><td colspan="8" style="text-align:center;padding:40px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <div class="pagination-info" id="calls-pagination-info">Showing 0-0 of 0</div>
+              <div class="pagination-controls">
+                <button class="pagination-btn" id="calls-prev-btn" onclick="callsChangePage(-1)" disabled>Previous</button>
+                <button class="pagination-btn" id="calls-next-btn" onclick="callsChangePage(1)" disabled>Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════
+           PAYMENTS PAGE
+           ═══════════════════════════════════════════════════════════════════ -->
+      <section class="page-section" id="page-payments">
+        <div class="stats-grid" id="payment-stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Total Revenue</div>
+              <div class="stat-value" id="payment-stat-total">$0</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                <line x1="1" y1="10" x2="23" y2="10"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Total Orders</div>
+              <div class="stat-value" id="payment-stat-orders">0</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-label">Avg Order Value</div>
+              <div class="stat-value" id="payment-stat-aov">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Revenue by City</h3>
+            </div>
+            <div class="card-body">
+              <div id="chart-by-city" class="chart-container"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Revenue by Tier</h3>
+            </div>
+            <div class="card-body">
+              <div id="chart-by-tier" class="chart-container"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Payment History</h3>
+          </div>
+          <div class="card-body no-padding">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Business</th>
+                    <th>Email</th>
+                    <th>City</th>
+                    <th>Tier</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="payments-table">
+                  <tr><td colspan="6" style="text-align:center;padding:40px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <div class="pagination-info" id="payments-pagination-info">Showing 0-0 of 0</div>
+              <div class="pagination-controls">
+                <button class="pagination-btn" id="payments-prev-btn" onclick="paymentsChangePage(-1)" disabled>Previous</button>
+                <button class="pagination-btn" id="payments-next-btn" onclick="paymentsChangePage(1)" disabled>Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════
+           PIPELINE RUNNER PAGE
+           ═══════════════════════════════════════════════════════════════════ -->
+      <section class="page-section" id="page-pipeline">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Run Lead Generation Pipeline</h3>
+          </div>
+          <div class="card-body">
+            <div class="pipeline-form">
+              <div class="form-group">
+                <label class="form-label">City</label>
+                <input type="text" class="form-input" id="pipeline-city" placeholder="e.g., Houston">
+              </div>
+              <div class="form-group">
+                <label class="form-label">State</label>
+                <input type="text" class="form-input" id="pipeline-state" placeholder="e.g., TX">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Max Results</label>
+                <input type="number" class="form-input" id="pipeline-limit" value="20" min="1" max="100">
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;margin-bottom:16px;">
+              <button class="btn btn-primary" id="pipeline-run-btn" onclick="runPipeline()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                Run Pipeline
+              </button>
+              <button class="btn btn-secondary" id="pipeline-download-btn" onclick="downloadPipelineResults()" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download Results
               </button>
             </div>
+            <div class="pipeline-log" id="pipeline-log">
+              <div class="pipeline-log-entry">Ready to run pipeline...</div>
+            </div>
           </div>
-        `).join('');
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MODALS
+       ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <!-- Edit Lead Modal -->
+  <div class="modal-overlay" id="edit-lead-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Lead</h2>
+        <button class="modal-close" onclick="closeModal('edit-lead-modal')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-lead-id">
+        <div class="form-group">
+          <label class="form-label">Business Name</label>
+          <input type="text" class="form-input" id="edit-lead-name">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="edit-lead-email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-input" id="edit-lead-phone">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Score</label>
+            <input type="number" class="form-input" id="edit-lead-score" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="edit-lead-status">
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="qualified">Qualified</option>
+              <option value="won">Won</option>
+              <option value="lost">Lost</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('edit-lead-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveLeadEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Campaign Modal -->
+  <div class="modal-overlay" id="new-campaign-modal">
+    <div class="modal" style="max-width:700px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Create Email Campaign</h2>
+        <button class="modal-close" onclick="closeModal('new-campaign-modal')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Campaign Name</label>
+          <input type="text" class="form-input" id="campaign-name" placeholder="e.g., March Outreach">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject Line</label>
+          <input type="text" class="form-input" id="campaign-subject" placeholder="e.g., Boost Your Smoke Shop's Online Presence">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Body</label>
+          <textarea class="form-textarea" id="campaign-body" rows="6" placeholder="Hi {{business_name}}, ..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Target Leads</label>
+            <select class="form-select" id="campaign-filter">
+              <option value="all">All Leads with Email</option>
+              <option value="new">New Leads Only</option>
+              <option value="contacted">Contacted Leads</option>
+              <option value="qualified">Qualified Leads</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Schedule (optional)</label>
+            <input type="datetime-local" class="form-input" id="campaign-schedule">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('new-campaign-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="createCampaign()">Create Campaign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Call Modal -->
+  <div class="modal-overlay" id="edit-call-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Call Notes</h2>
+        <button class="modal-close" onclick="closeModal('edit-call-modal')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-call-id">
+        <div class="form-group">
+          <label class="form-label">Outcome</label>
+          <select class="form-select" id="edit-call-outcome">
+            <option value="interested">Interested</option>
+            <option value="not_interested">Not Interested</option>
+            <option value="callback">Callback</option>
+            <option value="voicemail">Voicemail</option>
+            <option value="no_answer">No Answer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Summary / Notes</label>
+          <textarea class="form-textarea" id="edit-call-summary" rows="4"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('edit-call-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCallEdit()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       JAVASCRIPT
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <script>
+    // ── State ─────────────────────────────────────────────────────────────
+    let currentPage = 'dashboard';
+    let leadsPage = 1;
+    let leadsPagination = null;
+    let selectedLeads = new Set();
+    let callsPage = 1;
+    let callsPagination = null;
+    let paymentsPage = 1;
+    let paymentsPagination = null;
+    let currentJobId = null;
+
+    // ── Navigation ────────────────────────────────────────────────────────
+    function navigateTo(page) {
+      currentPage = page;
+      
+      // Update nav
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.page === page);
+      });
+
+      // Update page sections
+      document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.toggle('active', section.id === `page-${page}`);
+      });
+
+      // Update title
+      const titles = {
+        dashboard: 'Dashboard',
+        leads: 'Leads CRM',
+        campaigns: 'Email Campaigns',
+        calls: 'Call Center',
+        payments: 'Payments',
+        pipeline: 'Pipeline Runner'
+      };
+      document.getElementById('page-title').textContent = titles[page] || 'Dashboard';
+
+      // Load page data
+      if (page === 'dashboard') loadDashboard();
+      else if (page === 'leads') loadLeads();
+      else if (page === 'campaigns') loadCampaigns();
+      else if (page === 'calls') loadCalls();
+      else if (page === 'payments') loadPayments();
+
+      // Close mobile sidebar
+      document.getElementById('sidebar').classList.remove('open');
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    // Set up nav click handlers
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => navigateTo(item.dataset.page));
+    });
+
+    // ── Utilities ─────────────────────────────────────────────────────────
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatDuration(secs) {
+      if (!secs) return '-';
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    function getScoreBadgeClass(score) {
+      if (score >= 70) return 'score-high';
+      if (score >= 40) return 'score-medium';
+      return 'score-low';
+    }
+
+    function getStatusBadgeClass(status) {
+      const map = {
+        new: 'badge-new',
+        contacted: 'badge-contacted',
+        qualified: 'badge-qualified',
+        won: 'badge-won',
+        lost: 'badge-lost',
+        draft: 'badge-draft',
+        scheduled: 'badge-scheduled',
+        sending: 'badge-sending',
+        sent: 'badge-sent'
+      };
+      return map[status] || 'badge-new';
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 5000);
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // ── Dashboard ─────────────────────────────────────────────────────────
+    async function loadDashboard() {
+      try {
+        const [statsRes, leadsRes, paymentsRes] = await Promise.all([
+          fetch('/api/dashboard/stats'),
+          fetch('/api/leads?limit=5'),
+          fetch('/api/payments/stats')
+        ]);
+
+        const stats = await statsRes.json();
+        const leadsData = await leadsRes.json();
+        const paymentStats = await paymentsRes.json();
+
+        // Update stat cards
+        document.getElementById('stat-total-leads').textContent = stats.total_leads || 0;
+        document.getElementById('stat-leads-week').textContent = `+${stats.leads_this_week || 0} this week`;
+        document.getElementById('stat-campaigns').textContent = stats.active_campaigns || 0;
+        document.getElementById('stat-calls').textContent = stats.calls_today || 0;
+        document.getElementById('stat-revenue').textContent = formatCurrency(stats.revenue_this_month);
+        document.getElementById('leads-count-badge').textContent = stats.total_leads || 0;
+
+        // Recent leads table
+        const leadsTable = document.getElementById('recent-leads-table');
+        if (leadsData.leads && leadsData.leads.length > 0) {
+          leadsTable.innerHTML = leadsData.leads.map(lead => `
+            <tr>
+              <td>${lead.business_name || '-'}</td>
+              <td>${lead.city_slug || '-'}</td>
+              <td><span class="score-badge ${getScoreBadgeClass(lead.score)}">${lead.score || 0}</span></td>
+              <td><span class="badge ${getStatusBadgeClass(lead.status)}">${lead.status || 'new'}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          leadsTable.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">No leads yet</td></tr>';
+        }
+
+        // Recent payments table
+        const paymentsTable = document.getElementById('recent-payments-table');
+        if (paymentStats.recent && paymentStats.recent.length > 0) {
+          paymentsTable.innerHTML = paymentStats.recent.map(p => `
+            <tr>
+              <td>${p.business_name || '-'}</td>
+              <td>${formatCurrency(p.amount)}</td>
+            </tr>
+          `).join('');
+        } else {
+          paymentsTable.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:40px;color:var(--text-muted);">No payments yet</td></tr>';
+        }
+
       } catch (err) {
+        console.error('[Dashboard] Load error:', err);
+        showToast('Failed to load dashboard', 'error');
+      }
+    }
+
+    // ── Leads CRM ─────────────────────────────────────────────────────────
+    async function loadLeads() {
+      const status = document.getElementById('filter-status').value;
+      const city = document.getElementById('filter-city').value;
+
+      try {
+        const params = new URLSearchParams({ page: leadsPage, limit: 25 });
+        if (status) params.set('status', status);
+        if (city) params.set('city', city);
+
+        const res = await fetch(`/api/leads?${params}`);
+        const data = await res.json();
+        leadsPagination = data.pagination;
+
+        const table = document.getElementById('leads-table');
+        if (data.leads && data.leads.length > 0) {
+          table.innerHTML = data.leads.map(lead => `
+            <tr>
+              <td class="table-checkbox">
+                <input type="checkbox" data-id="${lead.place_id}" onchange="toggleLeadSelection('${lead.place_id}')" ${selectedLeads.has(lead.place_id) ? 'checked' : ''}>
+              </td>
+              <td>${lead.business_name || '-'}</td>
+              <td>${lead.email || '-'}</td>
+              <td>${lead.phone || '-'}</td>
+              <td>${lead.city_slug || '-'}</td>
+              <td><span class="score-badge ${getScoreBadgeClass(lead.score)}">${lead.score || 0}</span></td>
+              <td><span class="badge ${getStatusBadgeClass(lead.status)}">${lead.status || 'new'}</span></td>
+              <td>
+                <button class="btn btn-icon btn-sm" onclick="openEditLeadModal('${lead.place_id}')" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+                <button class="btn btn-icon btn-sm" onclick="deleteLead('${lead.place_id}')" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          table.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">No leads found</td></tr>';
+        }
+
+        // Update pagination
+        const { page, limit, total, totalPages } = leadsPagination;
+        const start = (page - 1) * limit + 1;
+        const end = Math.min(page * limit, total);
+        document.getElementById('leads-pagination-info').textContent = `Showing ${total > 0 ? start : 0}-${end} of ${total}`;
+        document.getElementById('leads-prev-btn').disabled = page <= 1;
+        document.getElementById('leads-next-btn').disabled = page >= totalPages;
+
+        // Populate city filter if needed
+        await populateCityFilter();
+
+      } catch (err) {
+        console.error('[Leads] Load error:', err);
         showToast('Failed to load leads', 'error');
       }
     }
 
-    async function deploySite(business, email, tier) {
-      showToast(`Building site for ${business}...`, 'info');
+    async function populateCityFilter() {
+      const select = document.getElementById('filter-city');
+      if (select.options.length > 1) return; // Already populated
+
       try {
-        const res = await fetch('/api/deploy-site', {
+        const res = await fetch('/api/leads?limit=1000');
+        const data = await res.json();
+        const cities = [...new Set(data.leads.map(l => l.city_slug).filter(Boolean))].sort();
+        cities.forEach(city => {
+          const opt = document.createElement('option');
+          opt.value = city;
+          opt.textContent = city;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.error('[Leads] City filter error:', err);
+      }
+    }
+
+    function leadsChangePage(delta) {
+      leadsPage += delta;
+      loadLeads();
+    }
+
+    function toggleLeadSelection(placeId) {
+      if (selectedLeads.has(placeId)) {
+        selectedLeads.delete(placeId);
+      } else {
+        selectedLeads.add(placeId);
+      }
+      updateBulkActions();
+    }
+
+    function toggleSelectAllLeads() {
+      const checkAll = document.getElementById('select-all-leads').checked;
+      const checkboxes = document.querySelectorAll('#leads-table input[type="checkbox"]');
+      checkboxes.forEach(cb => {
+        const id = cb.dataset.id;
+        if (checkAll) {
+          selectedLeads.add(id);
+          cb.checked = true;
+        } else {
+          selectedLeads.delete(id);
+          cb.checked = false;
+        }
+      });
+      updateBulkActions();
+    }
+
+    function updateBulkActions() {
+      const bulkActions = document.getElementById('bulk-actions');
+      const count = selectedLeads.size;
+      document.getElementById('selected-count').textContent = count;
+      bulkActions.classList.toggle('active', count > 0);
+    }
+
+    async function bulkUpdateStatus() {
+      const status = document.getElementById('bulk-status').value;
+      if (!status) return showToast('Select a status first', 'error');
+
+      try {
+        const res = await fetch('/api/leads/bulk', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ business, email, tier })
+          body: JSON.stringify({ action: 'updateStatus', placeIds: Array.from(selectedLeads), status })
         });
         const data = await res.json();
-        if (data.success) {
-          showToast(`✅ Site ready in: /deployments/${data.folder}`, 'success');
-          window.open(data.url, '_blank');
+        if (!res.ok) throw new Error(data.error);
+
+        showToast(`Updated ${data.affected} leads`, 'success');
+        selectedLeads.clear();
+        updateBulkActions();
+        loadLeads();
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function bulkDeleteLeads() {
+      if (!confirm(`Delete ${selectedLeads.size} leads? This cannot be undone.`)) return;
+
+      try {
+        const res = await fetch('/api/leads/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete', placeIds: Array.from(selectedLeads) })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        showToast(`Deleted ${data.affected} leads`, 'success');
+        selectedLeads.clear();
+        updateBulkActions();
+        loadLeads();
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function openEditLeadModal(placeId) {
+      try {
+        const res = await fetch(`/api/leads/${placeId}`);
+        const lead = await res.json();
+        if (!res.ok) throw new Error(lead.error);
+
+        document.getElementById('edit-lead-id').value = lead.place_id;
+        document.getElementById('edit-lead-name').value = lead.business_name || '';
+        document.getElementById('edit-lead-email').value = lead.email || '';
+        document.getElementById('edit-lead-phone').value = lead.phone || '';
+        document.getElementById('edit-lead-score').value = lead.score || 0;
+        document.getElementById('edit-lead-status').value = lead.status || 'new';
+        openModal('edit-lead-modal');
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function saveLeadEdit() {
+      const placeId = document.getElementById('edit-lead-id').value;
+      const data = {
+        business_name: document.getElementById('edit-lead-name').value,
+        email: document.getElementById('edit-lead-email').value,
+        phone: document.getElementById('edit-lead-phone').value,
+        score: parseInt(document.getElementById('edit-lead-score').value) || 0,
+        status: document.getElementById('edit-lead-status').value
+      };
+
+      try {
+        const res = await fetch(`/api/leads/${placeId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+
+        showToast('Lead updated', 'success');
+        closeModal('edit-lead-modal');
+        loadLeads();
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function deleteLead(placeId) {
+      if (!confirm('Delete this lead?')) return;
+
+      try {
+        const res = await fetch(`/api/leads/${placeId}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        showToast('Lead deleted', 'success');
+        loadLeads();
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    function exportLeadsCSV() {
+      window.location.href = '/api/leads/export/csv';
+    }
+
+    function handleGlobalSearch(e) {
+      if (e.key === 'Enter') {
+        const query = e.target.value.trim();
+        if (query) {
+          navigateTo('leads');
+          // Use search API
+          fetch(`/api/leads?search=${encodeURIComponent(query)}`)
+            .then(r => r.json())
+            .then(data => {
+              leadsPagination = data.pagination;
+              const table = document.getElementById('leads-table');
+              if (data.leads && data.leads.length > 0) {
+                table.innerHTML = data.leads.map(lead => `
+                  <tr>
+                    <td class="table-checkbox"><input type="checkbox" data-id="${lead.place_id}" onchange="toggleLeadSelection('${lead.place_id}')"></td>
+                    <td>${lead.business_name || '-'}</td>
+                    <td>${lead.email || '-'}</td>
+                    <td>${lead.phone || '-'}</td>
+                    <td>${lead.city_slug || '-'}</td>
+                    <td><span class="score-badge ${getScoreBadgeClass(lead.score)}">${lead.score || 0}</span></td>
+                    <td><span class="badge ${getStatusBadgeClass(lead.status)}">${lead.status || 'new'}</span></td>
+                    <td>
+                      <button class="btn btn-icon btn-sm" onclick="openEditLeadModal('${lead.place_id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    </td>
+                  </tr>
+                `).join('');
+              } else {
+                table.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">No leads found</td></tr>';
+              }
+              document.getElementById('leads-pagination-info').textContent = `Found ${data.leads?.length || 0} results`;
+            });
+        }
+      }
+    }
+
+    // ── Email Campaigns ───────────────────────────────────────────────────
+    async function loadCampaigns() {
+      try {
+        const res = await fetch('/api/campaigns');
+        const data = await res.json();
+
+        const table = document.getElementById('campaigns-table');
+        if (data.campaigns && data.campaigns.length > 0) {
+          table.innerHTML = data.campaigns.map(c => `
+            <tr>
+              <td>${c.name}</td>
+              <td>${c.subject}</td>
+              <td><span class="badge ${getStatusBadgeClass(c.status)}">${c.status}</span></td>
+              <td>${c.stats?.total || 0}</td>
+              <td>${c.stats?.sent || 0}</td>
+              <td>${c.stats?.opened || 0}</td>
+              <td>${c.stats?.clicked || 0}</td>
+              <td>
+                ${c.status === 'draft' || c.status === 'scheduled' ? `
+                  <button class="btn btn-sm btn-primary" onclick="sendCampaign(${c.id})">Send</button>
+                  <button class="btn btn-icon btn-sm" onclick="deleteCampaign(${c.id})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                      <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+                ` : '<span style="color:var(--text-muted);">-</span>'}
+              </td>
+            </tr>
+          `).join('');
         } else {
-          showToast(data.error || 'Deployment failed', 'error');
+          table.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">No campaigns yet. Create one to get started!</td></tr>';
         }
       } catch (err) {
-        showToast('Deployment error', 'error');
+        console.error('[Campaigns] Load error:', err);
+        showToast('Failed to load campaigns', 'error');
       }
     }
 
-    // Initial load
-    refreshLeads();
-
-    // ── Social Media Manager Logic ──
-    let currentCalendar = null;
-    let currentCalendarBiz = null;
-
-    function socLog(msg, type = 'log') {
-      const terminal = document.getElementById('soc-terminal');
-      const log = document.getElementById('soc-log');
-      log.style.display = 'block';
-      const line = document.createElement('div');
-      line.className = 'log-line';
-      const now = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      line.innerHTML = `<span class="log-ts">${now}</span><span class="log-msg ${type}">${escHtml(msg)}</span>`;
-      terminal.appendChild(line);
-      terminal.scrollTop = terminal.scrollHeight;
+    function openNewCampaignModal() {
+      document.getElementById('campaign-name').value = '';
+      document.getElementById('campaign-subject').value = '';
+      document.getElementById('campaign-body').value = '';
+      document.getElementById('campaign-filter').value = 'all';
+      document.getElementById('campaign-schedule').value = '';
+      openModal('new-campaign-modal');
     }
 
-    async function generateCalendar() {
-      const biz = document.getElementById('soc-biz').value.trim();
-      const city = document.getElementById('soc-city').value.trim();
-      const ig = document.getElementById('soc-ig').value.trim();
-      const specialty = document.getElementById('soc-specialty').value.trim();
-      if (!biz) { showToast('Enter a business name first', 'error'); return; }
+    async function createCampaign() {
+      const name = document.getElementById('campaign-name').value.trim();
+      const subject = document.getElementById('campaign-subject').value.trim();
+      const body = document.getElementById('campaign-body').value.trim();
+      const filter = document.getElementById('campaign-filter').value;
+      const schedule = document.getElementById('campaign-schedule').value;
 
-      const btn = document.getElementById('soc-gen-btn');
-      const btnText = document.getElementById('soc-gen-text');
+      if (!name || !subject || !body) {
+        return showToast('Please fill in all required fields', 'error');
+      }
+
+      const recipientFilter = filter === 'all' ? {} : { status: filter };
+
+      try {
+        const res = await fetch('/api/campaigns', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            subject,
+            body,
+            scheduled_at: schedule || null,
+            recipientFilter
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        showToast('Campaign created!', 'success');
+        closeModal('new-campaign-modal');
+        loadCampaigns();
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function sendCampaign(id) {
+      if (!confirm('Send this campaign now? This will email all recipients.')) return;
+
+      try {
+        const res = await fetch(`/api/campaigns/${id}/send`, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        showToast(`Campaign sent to ${data.sent} recipients!`, 'success');
+        loadCampaigns();
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function deleteCampaign(id) {
+      if (!confirm('Delete this campaign?')) return;
+
+      try {
+        const res = await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        showToast('Campaign deleted', 'success');
+        loadCampaigns();
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    // ── Call Center ───────────────────────────────────────────────────────
+    async function loadCalls() {
+      const outcome = document.getElementById('filter-outcome').value;
+
+      try {
+        const params = new URLSearchParams({ page: callsPage, limit: 25 });
+        if (outcome) params.set('outcome', outcome);
+
+        const res = await fetch(`/api/calls?${params}`);
+        const data = await res.json();
+        callsPagination = data.pagination;
+
+        const table = document.getElementById('calls-table');
+        if (data.calls && data.calls.length > 0) {
+          table.innerHTML = data.calls.map(c => `
+            <tr>
+              <td>${c.business_name || '-'}</td>
+              <td>${c.phone || '-'}</td>
+              <td>${c.city || '-'}</td>
+              <td>${formatDuration(c.duration_secs)}</td>
+              <td>
+                <span class="call-outcome">
+                  <span class="call-outcome-dot ${c.outcome || 'no_answer'}"></span>
+                  ${c.outcome || 'no_answer'}
+                </span>
+              </td>
+              <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.summary || ''}">${c.summary || '-'}</td>
+              <td>${formatDate(c.called_at)}</td>
+              <td>
+                <button class="btn btn-icon btn-sm" onclick="openEditCallModal(${c.id})" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          table.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">No calls recorded yet</td></tr>';
+        }
+
+        // Update pagination
+        const { page, limit, total, totalPages } = callsPagination;
+        const start = (page - 1) * limit + 1;
+        const end = Math.min(page * limit, total);
+        document.getElementById('calls-pagination-info').textContent = `Showing ${total > 0 ? start : 0}-${end} of ${total}`;
+        document.getElementById('calls-prev-btn').disabled = page <= 1;
+        document.getElementById('calls-next-btn').disabled = page >= totalPages;
+
+      } catch (err) {
+        console.error('[Calls] Load error:', err);
+        showToast('Failed to load calls', 'error');
+      }
+    }
+
+    function callsChangePage(delta) {
+      callsPage += delta;
+      loadCalls();
+    }
+
+    async function openEditCallModal(id) {
+      try {
+        const res = await fetch(`/api/calls/${id}`);
+        const call = await res.json();
+        if (!res.ok) throw new Error(call.error);
+
+        document.getElementById('edit-call-id').value = call.id;
+        document.getElementById('edit-call-outcome').value = call.outcome || 'no_answer';
+        document.getElementById('edit-call-summary').value = call.summary || '';
+        openModal('edit-call-modal');
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function saveCallEdit() {
+      const id = document.getElementById('edit-call-id').value;
+      const outcome = document.getElementById('edit-call-outcome').value;
+      const summary = document.getElementById('edit-call-summary').value;
+
+      try {
+        const res = await fetch(`/api/calls/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ outcome, summary })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        showToast('Call updated', 'success');
+        closeModal('edit-call-modal');
+        loadCalls();
+      } catch (err) {
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    // ── Payments ──────────────────────────────────────────────────────────
+    async function loadPayments() {
+      try {
+        const [statsRes, paymentsRes] = await Promise.all([
+          fetch('/api/payments/stats'),
+          fetch(`/api/payments?page=${paymentsPage}&limit=25`)
+        ]);
+
+        const stats = await statsRes.json();
+        const paymentsData = await paymentsRes.json();
+        paymentsPagination = paymentsData.pagination;
+
+        // Update stats
+        document.getElementById('payment-stat-total').textContent = formatCurrency(stats.total_revenue);
+        document.getElementById('payment-stat-orders').textContent = stats.total_payments || 0;
+        document.getElementById('payment-stat-aov').textContent = formatCurrency(stats.avg_order_value);
+
+        // Render charts
+        renderBarChart('chart-by-city', stats.byCity || [], 'city', 'revenue');
+        renderBarChart('chart-by-tier', stats.byTier || [], 'tier', 'revenue');
+
+        // Payments table
+        const table = document.getElementById('payments-table');
+        if (paymentsData.payments && paymentsData.payments.length > 0) {
+          table.innerHTML = paymentsData.payments.map(p => `
+            <tr>
+              <td>${p.business_name || '-'}</td>
+              <td>${p.email || '-'}</td>
+              <td>${p.city || '-'}</td>
+              <td>${p.tier || '-'}</td>
+              <td>${formatCurrency(p.amount)}</td>
+              <td>${formatDate(p.paid_at)}</td>
+            </tr>
+          `).join('');
+        } else {
+          table.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No payments recorded yet</td></tr>';
+        }
+
+        // Update pagination
+        const { page, limit, total, totalPages } = paymentsPagination;
+        const start = (page - 1) * limit + 1;
+        const end = Math.min(page * limit, total);
+        document.getElementById('payments-pagination-info').textContent = `Showing ${total > 0 ? start : 0}-${end} of ${total}`;
+        document.getElementById('payments-prev-btn').disabled = page <= 1;
+        document.getElementById('payments-next-btn').disabled = page >= totalPages;
+
+      } catch (err) {
+        console.error('[Payments] Load error:', err);
+        showToast('Failed to load payments', 'error');
+      }
+    }
+
+    function paymentsChangePage(delta) {
+      paymentsPage += delta;
+      loadPayments();
+    }
+
+    function renderBarChart(containerId, data, labelKey, valueKey) {
+      const container = document.getElementById(containerId);
+      if (!data || data.length === 0) {
+        container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);">No data available</div>';
+        return;
+      }
+
+      const maxValue = Math.max(...data.map(d => d[valueKey] || 0));
+      container.innerHTML = data.slice(0, 8).map(d => {
+        const height = maxValue > 0 ? ((d[valueKey] || 0) / maxValue) * 100 : 10;
+        return `
+          <div class="chart-bar" style="height:${Math.max(height, 5)}%;">
+            <span class="chart-bar-value">${formatCurrency(d[valueKey])}</span>
+            <span class="chart-bar-label">${d[labelKey] || '-'}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── Pipeline Runner ───────────────────────────────────────────────────
+    function pipelineLog(msg, type = 'log') {
+      const log = document.getElementById('pipeline-log');
+      const entry = document.createElement('div');
+      entry.className = `pipeline-log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function runPipeline() {
+      const city = document.getElementById('pipeline-city').value.trim();
+      const state = document.getElementById('pipeline-state').value.trim();
+      const limit = parseInt(document.getElementById('pipeline-limit').value) || 20;
+
+      if (!city || !state) {
+        return showToast('Please enter city and state', 'error');
+      }
+
+      const btn = document.getElementById('pipeline-run-btn');
       btn.disabled = true;
-      btnText.textContent = 'Generating…';
-      if (!btn.querySelector('.spinner')) {
-        const sp = document.createElement('span'); sp.className = 'spinner';
-        btn.insertBefore(sp, btnText);
-      }
-
-      socLog(`Generating 30-day calendar for "${biz}" via GPT-4o…`, 'step');
+      document.getElementById('pipeline-log').innerHTML = '';
+      pipelineLog(`Starting pipeline for ${city}, ${state}...`, 'step');
 
       try {
-        const res = await fetch('/api/social/generate-calendar', {
+        const res = await fetch('/api/run', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ business_name: biz, city, instagram: ig, specialty }),
+          body: JSON.stringify({
+            city,
+            state,
+            limit,
+            steps: ['scrape', 'audit', 'generate', 'send']
+          })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
+        if (!res.ok) throw new Error(data.error);
 
-        currentCalendar = data.posts;
-        currentCalendarBiz = biz;
+        currentJobId = data.jobId;
+        pipelineLog(`Job started: ${data.jobId}`, 'success');
 
-        // Show preview
-        const preview = document.getElementById('soc-calendar-preview');
-        const previewRows = document.getElementById('soc-preview-rows');
-        preview.style.display = 'block';
-        previewRows.innerHTML = data.posts.slice(0, 3).map(p =>
-          `Day ${p.day} [${p.post_type}] ${p.platform} @ ${p.best_time}\n${p.caption.substring(0, 90)}…`
-        ).join('\n\n');
+        // Connect to SSE
+        const es = new EventSource(`/api/status/${data.jobId}`);
+        es.onmessage = (e) => {
+          try {
+            const msg = JSON.parse(e.data);
+            if (msg.type === 'log') {
+              pipelineLog(msg.message, msg.level || 'log');
+            } else if (msg.type === 'done') {
+              pipelineLog('Pipeline complete!', 'success');
+              document.getElementById('pipeline-download-btn').disabled = false;
+              es.close();
+              btn.disabled = false;
+            } else if (msg.type === 'error') {
+              pipelineLog(`Error: ${msg.message}`, 'error');
+              es.close();
+              btn.disabled = false;
+            }
+          } catch (err) {
+            pipelineLog(e.data, 'log');
+          }
+        };
+        es.onerror = () => {
+          pipelineLog('Connection lost', 'error');
+          es.close();
+          btn.disabled = false;
+        };
 
-        // Enable scheduler
-        document.getElementById('soc-sched-btn').disabled = false;
-
-        socLog(`✅ ${data.posts.length} posts generated! Preview shown above.`, 'success');
-        showToast(`30-day calendar ready for ${biz}!`, 'success');
       } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
-        showToast(`Failed: ${err.message}`, 'error');
-      } finally {
+        pipelineLog(`Error: ${err.message}`, 'error');
         btn.disabled = false;
-        btnText.textContent = '✨ Generate 30-Day Calendar (GPT-4o)';
-        const sp = btn.querySelector('.spinner');
-        if (sp) sp.remove();
       }
     }
 
-    async function listBufferProfiles() {
-      socLog('Fetching Buffer profiles…', 'step');
-      try {
-        const res = await fetch('/api/social/buffer-profiles');
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-        data.profiles.forEach(p => {
-          socLog(`  ${p.service} | ${p.formatted_username} | ID: ${p.id}`, 'log');
-        });
-        showToast('Profiles listed in log below', 'info');
-      } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
-        showToast(`Failed: ${err.message}`, 'error');
+    function downloadPipelineResults() {
+      if (currentJobId) {
+        window.location.href = `/api/download/${currentJobId}/results.csv`;
       }
     }
 
-    async function scheduleCalendar() {
-      if (!currentCalendar) { showToast('Generate a calendar first', 'error'); return; }
-      const profileId = document.getElementById('soc-profile').value.trim();
-      if (!profileId) { showToast('Enter a Buffer Profile ID', 'error'); return; }
-
-      const btn = document.getElementById('soc-sched-btn');
-      const btnText = document.getElementById('soc-sched-text');
-      btn.disabled = true;
-      btnText.textContent = 'Scheduling…';
-
-      socLog(`Scheduling ${currentCalendar.length} posts to Buffer profile ${profileId}…`, 'step');
-
-      try {
-        const res = await fetch('/api/social/schedule', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ posts: currentCalendar, profileId, businessName: currentCalendarBiz }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-        socLog(`✅ Scheduled! ${data.success} posted, ${data.failed} failed.`, 'success');
-        showToast(`${data.success} posts scheduled to Buffer!`, 'success');
-      } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
-        showToast(`Failed: ${err.message}`, 'error');
-      } finally {
-        btn.disabled = false;
-        btnText.textContent = '📅 Schedule All 30 Posts to Buffer';
-      }
-    }
-
-    async function dryRunOutreach() {
-      const inputFile = document.getElementById('soc-outreach-file').value.trim();
-      const limit = document.getElementById('soc-dm-limit').value;
-      socLog('Running DM outreach dry-run (preview only)…', 'step');
-      try {
-        const res = await fetch('/api/social/outreach-preview', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inputFile, limit }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-        data.preview.forEach(p => socLog(`  @${p.handle}: "${p.message.substring(0, 60)}…"`, 'log'));
-        showToast(`Preview: ${data.preview.length} DMs would be sent`, 'info');
-      } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
-      }
-    }
-
-    async function runOutreach() {
-      const inputFile = document.getElementById('soc-outreach-file').value.trim();
-      const limit = document.getElementById('soc-dm-limit').value;
-      if (!confirm(`Send up to ${limit} Instagram DMs? This will open a browser and run for ~${Math.round(limit * 67 / 60)} minutes.`)) return;
-      socLog(`Starting DM outreach (${limit}/day limit)…`, 'step');
-      try {
-        const res = await fetch('/api/social/outreach-run', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inputFile, limit }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-        socLog(`✅ Outreach started as background job.`, 'success');
-        showToast('DM outreach running in background!', 'success');
-      } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
-        showToast(`Failed: ${err.message}`, 'error');
-      }
-    }
-
-    // Initial load
-    refreshLeads();
+    // ── Initial Load ──────────────────────────────────────────────────────
+    loadDashboard();
   </script>
 </body>
-
 </html>
