@@ -3,7 +3,7 @@ src/python/
 src/agents/
 tests/
 *.py
-requirements.txt
+python-requirements.txt
 
 # Development files
 *.md
