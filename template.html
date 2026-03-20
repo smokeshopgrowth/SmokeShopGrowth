@@ -73,8 +73,12 @@
       display: flex; align-items:center; justify-content:space-between;
       padding: 20px 48px;
       background: linear-gradient(to bottom, rgba(13,13,13,0.95), transparent);
+      -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
     }
+    .gold-em { font-style: italic; color: var(--gold); }
+    .gold-divider-left { margin-left: 0; margin-right: auto; }
+    .visit-phone-link { color: var(--gold); text-decoration: none; }
     .nav-logo {
       font-family: 'Playfair Display', serif;
       font-size: 22px;
@@ -255,7 +259,6 @@
       background: var(--charcoal);
       overflow: hidden;
       cursor: pointer;
-      group: true;
     }
     .product-img {
       width: 100%; aspect-ratio: 1;
@@ -779,7 +782,7 @@
     <div class="section-inner">
       <div class="section-header">
         <span class="label fade-up">Featured Collections</span>
-        <h2 class="section-title fade-up d1">Curated for <em style="font-style:italic;color:var(--gold)">Connoisseurs</em></h2>
+        <h2 class="section-title fade-up d1">Curated for <em class="gold-em">Connoisseurs</em></h2>
         <div class="gold-divider"></div>
         <p class="section-sub fade-up d2">Where craftsmanship meets artistry. Discover functional art that elevates your experience.</p>
       </div>
@@ -865,7 +868,7 @@
         <div class="about-content">
           <span class="label fade-up">Our Story</span>
           <h2 class="section-title fade-up d1">{{BUSINESS_NAME}}</h2>
-          <div class="gold-divider" style="margin-left:0;margin-right:auto;"></div>
+          <div class="gold-divider gold-divider-left"></div>
           <p class="about-text fade-up d2">Located in the heart of {{CITY}}, {{STATE}}, we are your premier destination for functional art, premium glass, and curated smoke culture accessories.</p>
           <p class="about-text fade-up d2">Our knowledgeable staff is passionate about connecting connoisseurs with the finest pieces — from artisan glass to cutting-edge vaporizers.</p>
           <ul class="about-features fade-up d3">
@@ -918,11 +921,11 @@
           <div class="chat-messages">
             <div class="chat-bubble">Welcome to {{BUSINESS_NAME}}. I'm here to help you discover the perfect piece, answer questions, or guide you through our collections. What can I help you find today?</div>
           </div>
-          <button class="chat-human-link">Prefer to call us? <span style="color:var(--gold)">{{PHONE}} →</span></button>
+          <button class="chat-human-link">Prefer to call us? <span class="gold-em" style="font-style:normal;">{{PHONE}} →</span></button>
           <div class="chat-input-row">
             <input class="chat-input" placeholder="Ask about a product, category, or our store..." />
-            <button class="chat-send">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <button class="chat-send" aria-label="Send message">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
           </div>
         </div>
@@ -935,7 +938,7 @@
     <div class="section-inner">
       <div class="section-header">
         <span class="label fade-up">Exclusive Membership</span>
-        <h2 class="section-title fade-up d1">Join The <em style="font-style:italic;color:var(--gold)">{{BUSINESS_NAME}}</em> Collective</h2>
+        <h2 class="section-title fade-up d1">Join The <em class="gold-em">{{BUSINESS_NAME}}</em> Collective</h2>
         <div class="gold-divider"></div>
         <p class="section-sub fade-up d2">Become part of an exclusive community of connoisseurs. Unlock early access to new drops, member-only events, and personalized curator services.</p>
       </div>
@@ -998,7 +1001,7 @@
     <div class="section-inner">
       <div class="section-header">
         <span class="label fade-up">Social Proof</span>
-        <h2 class="section-title fade-up d1">What People<br><em style="font-style:italic;color:var(--gold)">Are Saying</em></h2>
+        <h2 class="section-title fade-up d1">What People<br><em class="gold-em">Are Saying</em></h2>
         <div class="gold-divider"></div>
       </div>
       <div class="reviews-grid">
@@ -1044,7 +1047,7 @@
     <div class="section-inner">
       <div class="section-header">
         <span class="label fade-up">Ready to Visit?</span>
-        <h2 class="section-title fade-up d1">Come Experience<br><em style="font-style:italic;color:var(--gold)">{{BUSINESS_NAME}}</em></h2>
+        <h2 class="section-title fade-up d1">Come Experience<br><em class="gold-em">{{BUSINESS_NAME}}</em></h2>
         <div class="gold-divider"></div>
       </div>
       <div class="visit-grid">
@@ -1063,14 +1066,15 @@
         <div class="visit-card fade-up d3">
           <div class="visit-icon">📞</div>
           <div class="visit-card-label">Call or Text</div>
-          <div class="visit-card-main"><a href="tel:{{PHONE}}" style="color:var(--gold);text-decoration:none;">{{PHONE}}</a></div>
+          <div class="visit-card-main"><a href="tel:{{PHONE}}" class="visit-phone-link">{{PHONE}}</a></div>
           <div class="visit-card-sub">Speak with our expert staff</div>
         </div>
       </div>
       <div class="map-container fade-up d2">
         <iframe
+          title="Store location map"
           src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU3s_E&q={{ADDRESS}},{{CITY}},{{STATE}}"
-          allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+          allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin">
         </iframe>
         <div class="map-overlay"></div>
       </div>
