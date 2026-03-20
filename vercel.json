@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "framework": null,
+  "buildCommand": "npm install",
+  "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/webhook/(.*)", "destination": "/webhook/$1" },
+    { "source": "/demos/(.*)", "destination": "/demos/$1" },
+    { "source": "/social/(.*)", "destination": "/social/$1" },
+    { "source": "/(.*)", "destination": "/" }
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}
