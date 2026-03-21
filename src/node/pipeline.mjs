@@ -47,7 +47,7 @@ async function main() {
 
         // Step 2: Generate demo websites from the new leads
         logger.info('\n-- STEP 2: GENERATING DEMO SITES ---------');
-        runScript('src/node/generate-from-templates.js', '--input leads.csv');
+        runScript('src/node/generate-from-templates.mjs', '--input leads.csv');
 
         // Step 3: Start the batch calling process
         logger.info('\n-- STEP 3: INITIATING BATCH CALLS --------');
