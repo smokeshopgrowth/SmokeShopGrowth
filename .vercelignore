@@ -1,0 +1,14 @@
+# Python files - not needed for Vercel deployment
+src/python/
+src/agents/
+tests/
+*.py
+python-requirements.txt
+
+# Development files
+*.md
+.git/
+.github/
+scripts/
+data/
+v0_plans/

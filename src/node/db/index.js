@@ -83,6 +83,37 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
   CREATE INDEX IF NOT EXISTS idx_leads_city ON leads(city_slug);
   CREATE INDEX IF NOT EXISTS idx_leads_score ON leads(score DESC);
+
+  CREATE TABLE IF NOT EXISTS email_campaigns (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    body TEXT NOT NULL,
+    status TEXT DEFAULT 'draft' CHECK(status IN ('draft','scheduled','sending','sent','cancelled')),
+    scheduled_at TEXT,
+    sent_at TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS campaign_recipients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    campaign_id INTEGER NOT NULL,
+    lead_id TEXT NOT NULL,
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending','sent','opened','clicked','bounced','failed')),
+    sent_at TEXT,
+    opened_at TEXT,
+    clicked_at TEXT,
+    error_message TEXT DEFAULT '',
+    FOREIGN KEY (campaign_id) REFERENCES email_campaigns(id) ON DELETE CASCADE,
+    FOREIGN KEY (lead_id) REFERENCES leads(place_id)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_campaigns_status ON email_campaigns(status);
+  CREATE INDEX IF NOT EXISTS idx_recipients_campaign ON campaign_recipients(campaign_id);
+  CREATE INDEX IF NOT EXISTS idx_recipients_lead ON campaign_recipients(lead_id);
+  CREATE INDEX IF NOT EXISTS idx_call_log_outcome ON call_log(outcome);
+  CREATE INDEX IF NOT EXISTS idx_payments_city ON payments(city);
 `);
 
 // ── Prepared statements ─────────────────────────
@@ -173,8 +204,180 @@ const insertCallLog = db.prepare(`
   VALUES (@place_id, @business_name, @phone, @city, @call_id, @duration_secs, @outcome, @summary, @email_collected)
 `);
 
+// ── Extended Lead queries for CRM ───────────────
+
+const getLeadsPaginated = db.prepare(`
+  SELECT * FROM leads 
+  ORDER BY created_at DESC 
+  LIMIT ? OFFSET ?
+`);
+
+const getLeadsCount = db.prepare('SELECT COUNT(*) as total FROM leads');
+
+const updateLead = db.prepare(`
+  UPDATE leads SET 
+    business_name = @business_name,
+    email = @email,
+    phone = @phone,
+    status = @status,
+    score = @score,
+    updated_at = datetime('now')
+  WHERE place_id = @place_id
+`);
+
+const deleteLead = db.prepare('DELETE FROM leads WHERE place_id = ?');
+
+const searchLeads = db.prepare(`
+  SELECT * FROM leads 
+  WHERE business_name LIKE ? OR email LIKE ? OR city_slug LIKE ?
+  ORDER BY score DESC 
+  LIMIT 50
+`);
+
+// ── Email Campaign queries ──────────────────────
+
+const getAllCampaigns = db.prepare('SELECT * FROM email_campaigns ORDER BY created_at DESC');
+
+const getCampaign = db.prepare('SELECT * FROM email_campaigns WHERE id = ?');
+
+const insertCampaign = db.prepare(`
+  INSERT INTO email_campaigns (name, subject, body, status, scheduled_at)
+  VALUES (@name, @subject, @body, @status, @scheduled_at)
+`);
+
+const updateCampaign = db.prepare(`
+  UPDATE email_campaigns SET 
+    name = @name,
+    subject = @subject,
+    body = @body,
+    status = @status,
+    scheduled_at = @scheduled_at,
+    updated_at = datetime('now')
+  WHERE id = @id
+`);
+
+const updateCampaignStatus = db.prepare(`
+  UPDATE email_campaigns SET status = ?, sent_at = ?, updated_at = datetime('now') WHERE id = ?
+`);
+
+const deleteCampaign = db.prepare('DELETE FROM email_campaigns WHERE id = ?');
+
+const getCampaignRecipients = db.prepare(`
+  SELECT cr.*, l.business_name, l.email, l.city_slug 
+  FROM campaign_recipients cr
+  JOIN leads l ON cr.lead_id = l.place_id
+  WHERE cr.campaign_id = ?
+  ORDER BY cr.id
+`);
+
+const insertCampaignRecipient = db.prepare(`
+  INSERT INTO campaign_recipients (campaign_id, lead_id, status)
+  VALUES (@campaign_id, @lead_id, @status)
+`);
+
+const insertCampaignRecipientMany = db.transaction((recipients) => {
+  for (const r of recipients) insertCampaignRecipient.run(r);
+});
+
+const updateRecipientStatus = db.prepare(`
+  UPDATE campaign_recipients SET status = ?, sent_at = ?, opened_at = ?, clicked_at = ? WHERE id = ?
+`);
+
+const getCampaignStats = db.prepare(`
+  SELECT 
+    COUNT(*) as total,
+    SUM(CASE WHEN status = 'sent' OR status = 'opened' OR status = 'clicked' THEN 1 ELSE 0 END) as sent,
+    SUM(CASE WHEN status = 'opened' OR status = 'clicked' THEN 1 ELSE 0 END) as opened,
+    SUM(CASE WHEN status = 'clicked' THEN 1 ELSE 0 END) as clicked,
+    SUM(CASE WHEN status = 'bounced' OR status = 'failed' THEN 1 ELSE 0 END) as failed
+  FROM campaign_recipients WHERE campaign_id = ?
+`);
+
+// ── Call Log queries ────────────────────────────
+
+const getAllCalls = db.prepare('SELECT * FROM call_log ORDER BY called_at DESC');
+
+const getCallsPaginated = db.prepare(`
+  SELECT * FROM call_log 
+  ORDER BY called_at DESC 
+  LIMIT ? OFFSET ?
+`);
+
+const getCallsCount = db.prepare('SELECT COUNT(*) as total FROM call_log');
+
+const getCall = db.prepare('SELECT * FROM call_log WHERE id = ?');
+
+const updateCall = db.prepare(`
+  UPDATE call_log SET outcome = ?, summary = ? WHERE id = ?
+`);
+
+const getCallsByOutcome = db.prepare(`
+  SELECT * FROM call_log WHERE outcome = ? ORDER BY called_at DESC
+`);
+
+// ── Payment queries ─────────────────────────────
+
+const getAllPayments = db.prepare('SELECT * FROM payments ORDER BY paid_at DESC');
+
+const getPaymentsPaginated = db.prepare(`
+  SELECT * FROM payments 
+  ORDER BY paid_at DESC 
+  LIMIT ? OFFSET ?
+`);
+
+const getPaymentsCount = db.prepare('SELECT COUNT(*) as total FROM payments');
+
+const getPaymentStats = db.prepare(`
+  SELECT 
+    SUM(amount) as total_revenue,
+    COUNT(*) as total_payments,
+    AVG(amount) as avg_order_value
+  FROM payments
+`);
+
+const getPaymentStatsByMonth = db.prepare(`
+  SELECT 
+    strftime('%Y-%m', paid_at) as month,
+    SUM(amount) as revenue,
+    COUNT(*) as count
+  FROM payments 
+  GROUP BY strftime('%Y-%m', paid_at)
+  ORDER BY month DESC
+  LIMIT 12
+`);
+
+const getPaymentStatsByCity = db.prepare(`
+  SELECT city, SUM(amount) as revenue, COUNT(*) as count
+  FROM payments 
+  GROUP BY city
+  ORDER BY revenue DESC
+`);
+
+const getPaymentStatsByTier = db.prepare(`
+  SELECT tier, SUM(amount) as revenue, COUNT(*) as count
+  FROM payments 
+  GROUP BY tier
+  ORDER BY revenue DESC
+`);
+
+const getRecentPayments = db.prepare(`
+  SELECT * FROM payments ORDER BY paid_at DESC LIMIT ?
+`);
+
+// ── Dashboard Stats ─────────────────────────────
+
+const getDashboardStats = db.prepare(`
+  SELECT
+    (SELECT COUNT(*) FROM leads) as total_leads,
+    (SELECT COUNT(*) FROM leads WHERE created_at >= datetime('now', '-7 days')) as leads_this_week,
+    (SELECT COUNT(*) FROM email_campaigns WHERE status != 'draft') as active_campaigns,
+    (SELECT COUNT(*) FROM call_log WHERE date(called_at) = date('now')) as calls_today,
+    (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE strftime('%Y-%m', paid_at) = strftime('%Y-%m', 'now')) as revenue_this_month
+`);
+
 module.exports = {
     db,
+    // Leads
     upsertLead,
     upsertLeadMany,
     getLeadByPlaceId,
@@ -186,12 +389,48 @@ module.exports = {
     getLeadsByCityCount,
     getLeadsByStatusPaginated,
     getLeadsByStatusCount,
+    getLeadsPaginated,
+    getLeadsCount,
     updateLeadStatus,
     updateLeadEmail,
+    updateLead,
+    deleteLead,
+    searchLeads,
+    // Jobs
     insertJob,
     updateJob,
     getJob,
     getJobs,
+    // Payments
     insertPayment,
+    getAllPayments,
+    getPaymentsPaginated,
+    getPaymentsCount,
+    getPaymentStats,
+    getPaymentStatsByMonth,
+    getPaymentStatsByCity,
+    getPaymentStatsByTier,
+    getRecentPayments,
+    // Call Log
     insertCallLog,
+    getAllCalls,
+    getCallsPaginated,
+    getCallsCount,
+    getCall,
+    updateCall,
+    getCallsByOutcome,
+    // Email Campaigns
+    getAllCampaigns,
+    getCampaign,
+    insertCampaign,
+    updateCampaign,
+    updateCampaignStatus,
+    deleteCampaign,
+    getCampaignRecipients,
+    insertCampaignRecipient,
+    insertCampaignRecipientMany,
+    updateRecipientStatus,
+    getCampaignStats,
+    // Dashboard
+    getDashboardStats,
 };
