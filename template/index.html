@@ -48,9 +48,545 @@
     if (isDark) document.documentElement.setAttribute('data-dark', 'true');
   </script>
   <script src="config.js"></script>
+  <style>
+    /* ── Sticky CTA Bar ─────────────────────────────────────────────────────── */
+    .sticky-cta {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, var(--accent), var(--second));
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      z-index: 1001;
+      transform: translateY(-100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .sticky-cta.visible {
+      transform: translateY(0);
+    }
+
+    .sticky-cta-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sticky-cta-btn {
+      background: white;
+      color: var(--accent);
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .sticky-cta-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav.scrolled {
+      top: 48px;
+    }
+
+    /* ── Social Proof Ticker ────────────────────────────────────────────────── */
+    .social-proof-ticker {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      border-radius: 12px;
+      padding: 12px 20px;
+      margin: 24px auto;
+      max-width: fit-content;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .social-proof-ticker .avatar-stack {
+      display: flex;
+    }
+
+    .social-proof-ticker .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--second));
+      border: 2px solid var(--bg);
+      margin-left: -10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .social-proof-ticker .avatar:first-child {
+      margin-left: 0;
+    }
+
+    .social-proof-ticker .proof-text {
+      font-size: 0.85rem;
+      color: var(--second);
+      font-weight: 500;
+    }
+
+    .social-proof-ticker .proof-text strong {
+      color: var(--text);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Countdown Timer ────────────────────────────────────────────────────── */
+    .countdown-banner {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(245, 158, 11, 0.12));
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 16px;
+      padding: 20px 28px;
+      margin: 32px auto;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .countdown-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fca5a5;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .countdown-timer {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .countdown-value {
+      font-family: 'JetBrains Mono', 'Outfit', monospace;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 8px 16px;
+      min-width: 70px;
+    }
+
+    .countdown-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 6px;
+    }
+
+    /* ── Trust Badges ───────────────────────────────────────────────────────── */
+    .trust-badges {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      padding: 40px 20px;
+      margin: 40px 0;
+      border-top: 1px solid var(--surface-border);
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .trust-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .trust-badge:hover {
+      opacity: 1;
+    }
+
+    .trust-badge-icon {
+      font-size: 2rem;
+      filter: grayscale(50%);
+    }
+
+    .trust-badge-text {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── FAQ Accordion ──────────────────────────────────────────────────────── */
+    .faq-section {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .faq-item:hover {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .faq-question {
+      width: 100%;
+      padding: 20px 24px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-family: inherit;
+    }
+
+    .faq-question:hover {
+      color: var(--accent);
+    }
+
+    .faq-icon {
+      font-size: 1.2rem;
+      transition: transform 0.3s ease;
+      color: var(--muted);
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s ease;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+    }
+
+    .faq-answer-content {
+      padding: 0 24px 20px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* ── Exit Intent Popup ──────────────────────────────────────────────────── */
+    .exit-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+
+    .exit-popup-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .exit-popup {
+      background: var(--bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 24px;
+      padding: 48px 40px;
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .exit-popup-overlay.visible .exit-popup {
+      transform: scale(1) translateY(0);
+    }
+
+    .exit-popup-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .exit-popup-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+
+    .exit-popup-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+    }
+
+    .exit-popup h3 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--second));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .exit-popup p {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .exit-popup .discount-code {
+      background: rgba(167, 139, 250, 0.1);
+      border: 2px dashed var(--accent);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .exit-popup .discount-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .exit-popup .discount-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+
+    .exit-popup .btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.05rem;
+    }
+
+    /* ── Live Visitor Counter ───────────────────────────────────────────────── */
+    .live-visitors {
+      position: fixed;
+      bottom: 80px;
+      left: 20px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 999px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--second);
+      z-index: 100;
+      animation: slideInLeft 0.5s ease-out 2s both;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--second);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* ── Floating Action Button ─────────────────────────────────────────────── */
+    .fab-contact {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--second));
+      color: white;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      box-shadow: 0 8px 24px rgba(167, 139, 250, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+    }
+
+    .fab-contact:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 32px rgba(167, 139, 250, 0.5);
+    }
+
+    .fab-contact:active {
+      transform: scale(0.95);
+    }
+
+    /* ── Guarantee Badge ────────────────────────────────────────────────────── */
+    .guarantee-section {
+      text-align: center;
+      padding: 48px 20px;
+      margin: 48px 0;
+    }
+
+    .guarantee-badge {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px solid rgba(52, 211, 153, 0.2);
+      border-radius: 24px;
+      padding: 32px 48px;
+    }
+
+    .guarantee-icon {
+      font-size: 3rem;
+    }
+
+    .guarantee-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--second);
+    }
+
+    .guarantee-text {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 300px;
+      line-height: 1.6;
+    }
+
+    /* ── Mobile Optimizations ───────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .sticky-cta {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        gap: 10px;
+      }
+
+      .sticky-cta-btn {
+        padding: 6px 14px;
+        font-size: 0.75rem;
+      }
+
+      .countdown-timer {
+        gap: 10px;
+      }
+
+      .countdown-value {
+        font-size: 1.5rem;
+        padding: 6px 12px;
+        min-width: 55px;
+      }
+
+      .trust-badges {
+        gap: 20px;
+      }
+
+      .live-visitors {
+        left: 12px;
+        bottom: 70px;
+        padding: 8px 14px;
+        font-size: 0.75rem;
+      }
+
+      .fab-contact {
+        width: 52px;
+        height: 52px;
+        font-size: 1.3rem;
+      }
+
+      .exit-popup {
+        padding: 36px 24px;
+      }
+
+      .exit-popup h3 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Sticky CTA Bar -->
+  <div class="sticky-cta" id="sticky-cta">
+    <span class="sticky-cta-text">
+      <span>Limited Time:</span> <strong>20% OFF</strong> all website packages
+    </span>
+    <a href="#pricing" class="sticky-cta-btn">Claim Offer</a>
+  </div>
 
   <div class="ambient-glow glow-1"></div>
   <div class="ambient-glow glow-2"></div>
@@ -58,13 +594,13 @@
   <div class="cursor-glow" id="cursor-glow"></div>
 
   <!-- ── Nav ───────────────────────────────────────────────────────────────── -->
-  <nav class="nav">
+  <nav class="nav" id="main-nav">
     <span class="nav-logo" data-bind="name">Smoke Shop</span>
     <div class="nav-actions">
       <a data-bind="href:phone-tel" class="btn btn-glass" id="nav-phone" aria-label="Call us">Call Us</a>
       <a href="#contact" class="btn btn-primary">Get Website</a>
       <button id="dark-mode-toggle" class="btn btn-glass dark-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
-        <span class="dark-icon">🌙</span><span class="light-icon">☀️</span>
+        <span class="dark-icon">&#127769;</span><span class="light-icon">&#9728;&#65039;</span>
       </button>
     </div>
   </nav>
@@ -72,6 +608,16 @@
   <!-- ── Hero ──────────────────────────────────────────────────────────────── -->
   <section class="hero">
     <div class="hero-content gs-reveal">
+      <!-- Social Proof Ticker -->
+      <div class="social-proof-ticker">
+        <div class="avatar-stack">
+          <div class="avatar">J</div>
+          <div class="avatar">M</div>
+          <div class="avatar">S</div>
+        </div>
+        <span class="proof-text"><strong>127 shop owners</strong> claimed their site this month</span>
+      </div>
+
       <h1>
         Dominate Local Search For<br>
         <span class="text-gradient" data-bind="name">Your Smoke Shop</span>
@@ -96,6 +642,27 @@
     </div>
   </section>
 
+  <!-- ── Countdown Timer ────────────────────────────────────────────────────── -->
+  <div class="countdown-banner gs-reveal">
+    <div class="countdown-title">
+      <span>&#9200;</span> Launch Pricing Ends In
+    </div>
+    <div class="countdown-timer" id="countdown-timer">
+      <div class="countdown-unit">
+        <div class="countdown-value" id="countdown-hours">23</div>
+        <div class="countdown-label">Hours</div>
+      </div>
+      <div class="countdown-unit">
+        <div class="countdown-value" id="countdown-minutes">59</div>
+        <div class="countdown-label">Minutes</div>
+      </div>
+      <div class="countdown-unit">
+        <div class="countdown-value" id="countdown-seconds">59</div>
+        <div class="countdown-label">Seconds</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Fast Info Strip ────────────────────────────────────────────────────── -->
   <div class="info-grid gs-reveal">
     <div class="info-card">
@@ -114,6 +681,30 @@
     <div class="info-card">
       <span class="info-label">Social</span>
       <span class="info-value"><a data-bind="href:instagram" target="_blank" rel="noopener">@yourshop</a></span>
+    </div>
+  </div>
+
+  <!-- ── Trust Badges ───────────────────────────────────────────────────────── -->
+  <div class="trust-badges gs-reveal">
+    <div class="trust-badge">
+      <span class="trust-badge-icon">&#128274;</span>
+      <span class="trust-badge-text">SSL Secured</span>
+    </div>
+    <div class="trust-badge">
+      <span class="trust-badge-icon">&#128241;</span>
+      <span class="trust-badge-text">Mobile Optimized</span>
+    </div>
+    <div class="trust-badge">
+      <span class="trust-badge-icon">&#9889;</span>
+      <span class="trust-badge-text">Fast Loading</span>
+    </div>
+    <div class="trust-badge">
+      <span class="trust-badge-icon">&#127919;</span>
+      <span class="trust-badge-text">SEO Ready</span>
+    </div>
+    <div class="trust-badge">
+      <span class="trust-badge-icon">&#128176;</span>
+      <span class="trust-badge-text">Money Back</span>
     </div>
   </div>
 
@@ -136,17 +727,17 @@
       </h2>
       <div class="features-grid">
         <div class="feature-bento gs-reveal">
-          <span class="feature-icon">📱</span>
+          <span class="feature-icon">&#128241;</span>
           <h3>Mobile Perfection</h3>
           <p>Over 80% of smoke shop searches happen on phones. This site feels like a native app.</p>
         </div>
         <div class="feature-bento gs-reveal">
-          <span class="feature-icon">📍</span>
+          <span class="feature-icon">&#128205;</span>
           <h3>Local SEO Boost</h3>
           <p>Structured perfectly for Google Maps to capture customers right around the corner.</p>
         </div>
         <div class="feature-bento gs-reveal">
-          <span class="feature-icon">⚡</span>
+          <span class="feature-icon">&#9889;</span>
           <h3>Lightning Fast</h3>
           <p>Built with modern web standards ensuring near-instant load times on any connection.</p>
         </div>
@@ -163,6 +754,15 @@
       </div>
     </div>
   </section>
+
+  <!-- ── Guarantee Section ──────────────────────────────────────────────────── -->
+  <div class="guarantee-section gs-reveal">
+    <div class="guarantee-badge">
+      <span class="guarantee-icon">&#128737;&#65039;</span>
+      <span class="guarantee-title">30-Day Money Back Guarantee</span>
+      <span class="guarantee-text">Not satisfied with your website? Get a full refund within 30 days, no questions asked.</span>
+    </div>
+  </div>
 
   <!-- ── Pricing ───────────────────────────────────────────────────────────── -->
   <section id="pricing">
@@ -184,7 +784,7 @@
             <li>Testimonial from You</li>
           </ul>
           <a href="https://buy.stripe.com/cNi8wO5Na2DwfSB9WJ1Jm05" class="btn btn-glass btn-block-large stripe-checkout-btn" data-tier="starter" target="_blank"
-            rel="noopener noreferrer">Get Started — $99</a>
+            rel="noopener noreferrer">Get Started - $99</a>
         </div>
 
         <!-- Tier 2 -->
@@ -202,7 +802,7 @@
             <li>Priority Support</li>
           </ul>
           <a href="https://buy.stripe.com/dRmfZgcby1zs9ud2uh1Jm06" class="glow-btn btn-block-large stripe-checkout-btn" data-tier="growth" target="_blank"
-            rel="noopener noreferrer">Get Growth — $299</a>
+            rel="noopener noreferrer">Get Growth - $299</a>
         </div>
 
         <!-- Tier 3 -->
@@ -219,9 +819,73 @@
             <li>Social Media Management</li>
           </ul>
           <a href="https://buy.stripe.com/eVq28qdfC5PI7m57OB1Jm04" class="btn btn-glass btn-block-large stripe-checkout-btn" data-tier="pro" target="_blank"
-            rel="noopener noreferrer">Get Pro — $499</a>
+            rel="noopener noreferrer">Get Pro - $499</a>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ Section ────────────────────────────────────────────────────────── -->
+  <section>
+    <div class="section-inner">
+      <h2 class="section-title text-center mb-3-5rem">Frequently Asked Questions</h2>
+      <div class="faq-section" id="faq-section">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            How long does it take to build my website?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              Most websites are completed within 24-48 hours after you provide your business information. For Pro tier sites with e-commerce, it may take 3-5 business days.
+            </div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Do I need to pay monthly fees?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              No! All our packages are one-time payments. The only recurring cost is your domain name ($12-15/year) if you want a custom domain.
+            </div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Can I update my website myself?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              Yes! We provide a simple content management system for basic updates like hours, contact info, and images. For major changes, we offer affordable update packages.
+            </div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What if I'm not satisfied with my website?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              We offer a 30-day money-back guarantee. If you're not completely satisfied with your website, we'll provide a full refund - no questions asked.
+            </div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Will my website show up on Google?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              Absolutely! All our websites are built with SEO best practices and optimized for local search. We also help set up your Google Business Profile for maximum visibility.
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -261,7 +925,7 @@
   <!-- ── Footer ──────────────────────────────────────────────────────────────── -->
   <footer>
     <p>
-      &copy; <span data-bind="name">Your Shop</span> · Demo created by <a href="https://smokeshopgrowth.com"
+      &copy; <span data-bind="name">Your Shop</span> - Demo created by <a href="https://smokeshopgrowth.com"
         target="_blank" rel="noopener" class="text-accent font-semibold">SmokeShopGrowth</a>
     </p>
   </footer>
@@ -271,11 +935,128 @@
     Demo website generated for <span data-bind="name">this smoke shop</span> in <span data-bind="city">your city</span>
   </div>
 
+  <!-- ── Live Visitors Counter ─────────────────────────────────────────────── -->
+  <div class="live-visitors" id="live-visitors">
+    <span class="live-dot"></span>
+    <span><strong id="visitor-count">3</strong> people viewing this page</span>
+  </div>
+
+  <!-- ── Floating Action Button ────────────────────────────────────────────── -->
+  <button class="fab-contact" onclick="scrollToContact()" aria-label="Contact us">
+    &#9993;
+  </button>
+
+  <!-- ── Exit Intent Popup ─────────────────────────────────────────────────── -->
+  <div class="exit-popup-overlay" id="exit-popup">
+    <div class="exit-popup">
+      <button class="exit-popup-close" onclick="closeExitPopup()" aria-label="Close">&times;</button>
+      <div class="exit-popup-icon">&#127873;</div>
+      <h3>Wait! Don't Miss Out</h3>
+      <p>Get an exclusive 10% discount on any website package when you sign up today.</p>
+      <div class="discount-code">
+        <div class="discount-label">Your Discount Code</div>
+        <div class="discount-value">SAVE10</div>
+      </div>
+      <a href="#contact" class="btn btn-primary" onclick="closeExitPopup()">Claim My Discount</a>
+    </div>
+  </div>
+
   <!-- ── Scripts ─────────────────────────────────────────────────────────────── -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
   <script>
+    // ── Sticky CTA Bar ──
+    let lastScrollY = 0;
+    const stickyCta = document.getElementById('sticky-cta');
+    const mainNav = document.getElementById('main-nav');
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      
+      if (scrollY > 300) {
+        stickyCta.classList.add('visible');
+        mainNav.classList.add('scrolled');
+      } else {
+        stickyCta.classList.remove('visible');
+        mainNav.classList.remove('scrolled');
+      }
+      
+      lastScrollY = scrollY;
+    });
+
+    // ── Countdown Timer ──
+    function updateCountdown() {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(23, 59, 59, 999);
+      
+      const diff = midnight - now;
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      document.getElementById('countdown-hours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
+      document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
+    }
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // ── Live Visitor Counter ──
+    function updateVisitorCount() {
+      const base = 2;
+      const variation = Math.floor(Math.random() * 4);
+      document.getElementById('visitor-count').textContent = base + variation;
+    }
+    
+    updateVisitorCount();
+    setInterval(updateVisitorCount, 30000);
+
+    // ── FAQ Accordion ──
+    function toggleFaq(button) {
+      const item = button.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      
+      // Close all
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      
+      // Open clicked if it was closed
+      if (!isOpen) {
+        item.classList.add('open');
+      }
+    }
+
+    // ── Exit Intent Popup ──
+    let exitPopupShown = false;
+    
+    function showExitPopup() {
+      if (exitPopupShown) return;
+      if (sessionStorage.getItem('exitPopupShown')) return;
+      
+      exitPopupShown = true;
+      sessionStorage.setItem('exitPopupShown', 'true');
+      document.getElementById('exit-popup').classList.add('visible');
+    }
+    
+    function closeExitPopup() {
+      document.getElementById('exit-popup').classList.remove('visible');
+    }
+    
+    document.addEventListener('mouseout', (e) => {
+      if (e.clientY < 10 && e.relatedTarget === null) {
+        showExitPopup();
+      }
+    });
+
+    // ── Scroll to Contact ──
+    function scrollToContact() {
+      document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ── Bind Business Data ──
     (function bindBusiness() {
       const B = window.BUSINESS;
       if (!B) return;
@@ -300,7 +1081,6 @@
         "og-description": `Discover ${B.name}, your premium smoke shop in ${B.city}.`,
       };
 
-      // Update title and meta tags
       document.title = lookup.title;
       document.querySelector('meta[name="description"]').setAttribute('content', lookup["meta-description"]);
       
@@ -310,7 +1090,6 @@
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute('content', lookup["og-description"]);
 
-      // Update Schema.org data
       const schema = document.getElementById('schema-data');
       if (schema) {
         try {
@@ -331,7 +1110,6 @@
         }
       }
 
-      // Bind HTML elements
       document.querySelectorAll("[data-bind]").forEach(el => {
         const raw = el.getAttribute("data-bind");
         if (raw.startsWith("href:")) {
@@ -367,7 +1145,6 @@
         }
       }
 
-      // Pre-fill form
       const fShop = document.getElementById("formShop");
       const fCity = document.getElementById("formCity");
       const fPhone = document.getElementById("formPhone");
@@ -375,18 +1152,16 @@
       if (fCity) fCity.value = B.city || "";
       if (fPhone) fPhone.value = B.phone || "";
 
-      // Render categories
       const grid = document.getElementById("categories-grid");
       if (grid && Array.isArray(B.categories)) {
         grid.innerHTML = B.categories.map(c => `<span class="category-pill">${c}</span>`).join("");
       }
 
-      // Render testimonials
       const tGrid = document.getElementById("testimonials-grid");
       if (tGrid && Array.isArray(B.testimonials)) {
         tGrid.innerHTML = B.testimonials.map(t => `
           <div class="testimonial-card">
-            <div class="stars">${'★'.repeat(t.stars)}${'☆'.repeat(5 - t.stars)}</div>
+            <div class="stars">${'\u2605'.repeat(t.stars)}${'\u2606'.repeat(5 - t.stars)}</div>
             <p class="quote">"${t.quote}"</p>
             <div class="author">
               <div class="avatar">${t.name.charAt(0)}</div>
@@ -396,10 +1171,9 @@
         `).join("");
       }
 
-      // Form submission with analytics and validation
+      // Form submission with validation
       const form = document.getElementById("leadForm");
       if (form) {
-        // Add real-time validation
         const validateForm = (e) => {
           const shop = document.getElementById("formShop");
           const city = document.getElementById("formCity");
@@ -408,7 +1182,6 @@
           
           let isValid = true;
           
-          // Validate shop name
           if (!shop.value.trim()) {
             document.getElementById("shopError").textContent = "Shop name is required";
             isValid = false;
@@ -419,7 +1192,6 @@
             document.getElementById("shopError").textContent = "";
           }
           
-          // Validate city
           if (!city.value.trim()) {
             document.getElementById("cityError").textContent = "City is required";
             isValid = false;
@@ -427,7 +1199,6 @@
             document.getElementById("cityError").textContent = "";
           }
           
-          // Validate phone
           const phoneRegex = /^[\d\s()+-]{10,}$/;
           if (!phone.value.trim()) {
             document.getElementById("phoneError").textContent = "Phone number is required";
@@ -439,7 +1210,6 @@
             document.getElementById("phoneError").textContent = "";
           }
           
-          // Validate email
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (!email.value.trim()) {
             document.getElementById("emailError").textContent = "Email is required";
@@ -454,7 +1224,6 @@
           return isValid;
         };
         
-        // Real-time validation on input
         document.getElementById("formShop").addEventListener("blur", validateForm);
         document.getElementById("formCity").addEventListener("blur", validateForm);
         document.getElementById("formPhone").addEventListener("blur", validateForm);
@@ -484,7 +1253,6 @@
           .then(res => res.json())
           .then(data => {
             if (data.success) {
-              // Track conversion if GA available
               if (window.gtag) {
                 gtag('event', 'form_submit', {
                   'event_category': 'engagement',
@@ -549,9 +1317,7 @@
   </script>
 
   <script>
-    // ── Stripe Payment Link personalization ───────────────────────────────────
-    // Appends client_reference_id (shop name) and prefilled_email to Stripe
-    // Payment Links so we can identify the buyer when payment completes.
+    // ── Stripe Payment Link personalization ──
     (function personalizeStripeLinks() {
       const B = window.BUSINESS;
       if (!B || !B.name) return;
@@ -564,7 +1330,6 @@
         const params = new URLSearchParams();
         params.set('client_reference_id', B.name + '|' + (B.city || ''));
 
-        // Pre-fill email if we have it from form or URL
         const urlEmail = new URLSearchParams(window.location.search).get('email');
         if (urlEmail) params.set('prefilled_email', urlEmail);
 
