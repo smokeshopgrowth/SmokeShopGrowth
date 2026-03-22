@@ -71,6 +71,11 @@ function normalizePhone(phone) {
 }
 
 async function makeCall({ phone, name, city, leadId, problem, rating, reviews }) {
+    // Truncate long names to avoid VAPI error
+    if (name && name.length > 40) {
+        name = name.substring(0, 37) + '...';
+    }
+
     const e164 = normalizePhone(phone);
     const websiteProblem = problem || "no website";
 

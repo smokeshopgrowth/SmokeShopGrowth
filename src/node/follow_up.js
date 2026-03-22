@@ -44,25 +44,10 @@ async function findLeadDetails(businessName, city) {
 }
 
 // ── Build the personalized demo URL ──────────────────────────────────────────
-function buildDemoUrl(businessName, city, extraDetails = {}) {
-    const base = process.env.DEMO_BASE_URL || "https://smoke-shop-premium-demo.netlify.app";
-
-    // Filter out empty extra details
-    const cleanDetails = Object.fromEntries(
-        Object.entries(extraDetails).filter(([_, v]) => v != null && v !== '')
-    );
-
-    const params = new URLSearchParams({
-        shop: businessName,
-        city: city,
-        ...cleanDetails
-    });
-
-    // Static deploys (Netlify/Vercel) serve from root; dynamic servers use /demo route
-    const isStaticDeploy = base.includes("netlify.app") || base.includes("vercel.app");
-    const route = isStaticDeploy ? "" : "/demo";
-
-    return `${base}${route}?${params.toString()}`;
+function buildDemoUrl(businessName) {
+    const base = process.env.DEMO_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const slug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return `${base}/demos/${slug}/index.html`;
 }
 
 // ── Email template ────────────────────────────────────────────────────────────
@@ -203,8 +188,7 @@ async function sendFollowUp(payload) {
         return;
     }
 
-    const extraDetails = await findLeadDetails(business_name, city);
-    const demoUrl = buildDemoUrl(business_name, city, extraDetails);
+    const demoUrl = buildDemoUrl(business_name);
 
     console.log(`🚀 Sending follow-up to ${business_name} via ${contact_method}: ${contact_value}`);
     console.log(`   Demo URL: ${demoUrl}`);

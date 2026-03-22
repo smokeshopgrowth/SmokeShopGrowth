@@ -1,0 +1,20 @@
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\roryu\Build Google Maps Lead Scraper\testing.ts' imported from C:\Users\roryu\Build Google Maps Lead Scraper\
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:866:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at nextResolve (node:internal/modules/esm/hooks:785:28)
+    at resolveBase (file:///C:/Users/roryu/AppData/Local/npm-cache/_npx/fd45a72a545557e9/node_modules/tsx/dist/esm/index.mjs?1774055860612:2:3744)
+    at resolveDirectory (file:///C:/Users/roryu/AppData/Local/npm-cache/_npx/fd45a72a545557e9/node_modules/tsx/dist/esm/index.mjs?1774055860612:2:4243)
+    at resolveTsPaths (file:///C:/Users/roryu/AppData/Local/npm-cache/_npx/fd45a72a545557e9/node_modules/tsx/dist/esm/index.mjs?1774055860612:2:4984)
+    at resolve (file:///C:/Users/roryu/AppData/Local/npm-cache/_npx/fd45a72a545557e9/node_modules/tsx/dist/esm/index.mjs?1774055860612:2:5361)
+    at nextResolve (node:internal/modules/esm/hooks:785:28)
+    at AsyncLoaderHooksOnLoaderHookWorker.resolve (node:internal/modules/esm/hooks:269:30) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/roryu/Build%20Google%20Maps%20Lead%20Scraper/testing.ts'
+}
+
+Node.js v24.13.1

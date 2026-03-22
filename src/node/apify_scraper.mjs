@@ -125,7 +125,7 @@ async function main() {
             'issues',
         ];
 
-        await writeCsv(output, csvFields, leads);
+        await writeCsv(output, leads, csvFields);
         logger.info(`Successfully saved ${leads.length} leads to ${output}`);
 
     } catch (err) {

@@ -46,6 +46,8 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public'), {
     maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
 }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/demos', express.static(path.join(__dirname, 'public/demos')));
 
 const deployPath = path.join(__dirname, 'deployments');
 if (!fs.existsSync(deployPath)) fs.mkdirSync(deployPath);
@@ -67,6 +69,11 @@ app.get('/api/ping', (req, res) => {
         version: process.env.npm_package_version || '1.0.0',
         uptime: process.uptime(),
     });
+});
+
+// Railway health check
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', service: 'dashboard', ts: Date.now() });
 });
 
 // Mount route modules

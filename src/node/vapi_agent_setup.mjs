@@ -15,6 +15,9 @@ import { fileURLToPath } from "url";
 import logger from "./utils/logger.mjs";
 import { assistantConfig } from "./vapi_assistant_config.mjs";
 
+// Override Vapi default to make the AI more responsive.
+assistantConfig.endOfSpeechThreshold = 500;
+
 // ---------------------------------------------------------------------------- #
 //                                 CONFIGURATION                                #
 // ---------------------------------------------------------------------------- #
@@ -63,27 +66,27 @@ async function main() {
     try {
         let assistant;
 
-        if (isUpdate && VAPI_ASSISTANT_ID) {
-            assistant = await updateAssistant(VAPI_ASSISTANT_ID);
-        } else {
-            assistant = await createAssistant();
+        // Force creation of a new assistant for a clean slate.
+        assistant = await createAssistant();
+        logger.info(`\n✅ PLEASE UPDATE YOUR .env FILE WITH THIS NEW VAPI_ASSISTANT_ID: ${assistant.id}`);
 
-            // Append the assistant ID to .env
-            const envPath = path.join(__dirname, "..", "..", ".env");
+        // The original script also checked for WEBHOOK_URL. We'll keep that helpful check.
+        const envPath = path.join(__dirname, "..", "..", ".env");
+        try {
             const envContent = fs.readFileSync(envPath, "utf-8");
-            if (!envContent.includes("VAPI_ASSISTANT_ID")) {
-                fs.appendFileSync(
-                    envPath,
-                    `\nVAPI_ASSISTANT_ID=${assistant.id}\n`
-                );
-                logger.info("VAPI_ASSISTANT_ID saved to .env");
-            }
             if (!envContent.includes("WEBHOOK_URL")) {
                 fs.appendFileSync(
                     envPath,
                     `\nWEBHOOK_URL=https://your-webhook-url.com\n`
                 );
                 logger.info("WEBHOOK_URL added to .env, please update it with your server URL.");
+            }
+        } catch (err) {
+            // It's okay if the .env file doesn't exist yet.
+            if (err.code !== 'ENOENT') {
+                throw err;
+            } else {
+                 logger.warn(".env file not found. You will need to create it and add the new VAPI_ASSISTANT_ID.");
             }
         }
 

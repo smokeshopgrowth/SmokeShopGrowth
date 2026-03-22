@@ -4,1134 +4,1165 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{BUSINESS_NAME}} | Premium Smoke Shop in {{CITY}}, {{STATE}}</title>
-  <meta name="description" content="{{BUSINESS_NAME}} — {{CITY}}'s premier smoke shop. Premium glass, vaporizers, CBD, kratom, and accessories. Visit us today." />
+  <meta name="description" content="{{BUSINESS_NAME}} — {{CITY}}'s premier smoke shop. Discover curated collections of functional art, modern vaporizers, and artisanal accessories." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ═══════════════════════════════════════════════
-       {{BUSINESS_NAME}} — PREMIUM THEME
-       Built by Smoke Shop Growth
-       ═══════════════════════════════════════════════ */
     :root {
-      --primary: #e63946;
-      --primary-glow: rgba(230,57,70,0.25);
-      --primary-hover: #c1121f;
-      --gold: #d4a853;
-      --gold-glow: rgba(212,168,83,0.2);
-      --bg-dark: #0a0a0a;
-      --bg-card: #111111;
-      --bg-elevated: #1a1a1a;
-      --border: #222222;
-      --text: #f5f5f5;
-      --text-muted: #999999;
-      --text-dim: #666666;
-      --radius: 16px;
+      --onyx: #0d0d0d;
+      --onyx-2: #1a1815;
+      --onyx-3: #252220;
+      --charcoal: #2e2b28;
+      --gold: #c5a059;
+      --gold-light: #d4b472;
+      --gold-dim: rgba(197,160,89,0.15);
+      --gold-border: rgba(197,160,89,0.3);
+      --cream: #f5f0e8;
+      --text: #e8e2d9;
+      --text-muted: #8a8278;
+      --text-dim: #5c5650;
+      --border: rgba(255,255,255,0.07);
     }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { scroll-behavior: smooth; }
-
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg-dark);
+      font-family: 'Inter', sans-serif;
+      background: var(--onyx);
       color: var(--text);
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Animations ─────────────────────────────── */
+    /* ── ANIMATIONS ── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(40px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity:0; transform:translateY(32px); }
+      to   { opacity:1; transform:translateY(0); }
     }
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from { opacity:0; } to { opacity:1; }
     }
-    @keyframes shimmer {
-      0% { background-position: -200% center; }
-      100% { background-position: 200% center; }
+    @keyframes goldShimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
     }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
+    @keyframes pulse {
+      0%,100% { opacity:1; } 50% { opacity:0.5; }
     }
-    @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 0 20px var(--primary-glow); }
-      50% { box-shadow: 0 0 40px var(--primary-glow), 0 0 80px rgba(230,57,70,0.1); }
-    }
-    @keyframes grain {
-      0%, 100% { transform: translate(0,0); }
-      10% { transform: translate(-5%,-10%); }
-      30% { transform: translate(3%,-15%); }
-      50% { transform: translate(-10%,5%); }
-      70% { transform: translate(8%,10%); }
-      90% { transform: translate(-3%,8%); }
-    }
-    @keyframes smoke-drift {
-      0% { transform: translateY(0) scale(1); opacity: 0.15; }
-      50% { transform: translateY(-100px) scale(1.5); opacity: 0.05; }
-      100% { transform: translateY(-200px) scale(2); opacity: 0; }
-    }
+    .fade-up   { opacity:0; animation: fadeUp 0.9s ease-out forwards; }
+    .fade-in   { opacity:0; animation: fadeIn 0.7s ease-out forwards; }
+    .d1 { animation-delay:0.1s; }
+    .d2 { animation-delay:0.2s; }
+    .d3 { animation-delay:0.3s; }
+    .d4 { animation-delay:0.4s; }
+    .d5 { animation-delay:0.5s; }
 
-    .animate-up { animation: fadeUp 0.8s ease-out both; }
-    .animate-in { animation: fadeIn 0.6s ease-out both; }
-    .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.2s; }
-    .delay-3 { animation-delay: 0.3s; }
-    .delay-4 { animation-delay: 0.4s; }
-    .delay-5 { animation-delay: 0.5s; }
-
-    /* ── Film Grain Overlay ─────────────────────── */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      animation: grain 8s steps(10) infinite;
-    }
-
-    /* ── Utility ────────────────────────────────── */
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-    .section { padding: 100px 0; position: relative; }
-    .text-gradient {
-      background: linear-gradient(135deg, var(--primary), var(--gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .text-shimmer {
-      background: linear-gradient(90deg, var(--gold) 0%, #fff 25%, var(--gold) 50%, #fff 75%, var(--gold) 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 4s linear infinite;
-    }
-
-    /* ── Buttons ────────────────────────────────── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 16px 32px;
-      border-radius: 50px;
+    /* ── TYPOGRAPHY ── */
+    .serif { font-family: 'Playfair Display', Georgia, serif; }
+    .label {
+      font-size: 11px;
       font-weight: 600;
-      font-size: 15px;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      border: none;
-      letter-spacing: 0.3px;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-      color: #fff;
-      box-shadow: 0 4px 20px var(--primary-glow);
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 40px var(--primary-glow);
-    }
-    .btn-gold {
-      background: linear-gradient(135deg, var(--gold), #b8860b);
-      color: #0a0a0a;
-      box-shadow: 0 4px 20px var(--gold-glow);
-    }
-    .btn-gold:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 40px var(--gold-glow);
-    }
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1.5px solid var(--border);
-    }
-    .btn-outline:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      transform: translateY(-2px);
-    }
-    .btn-glass {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text);
-    }
-    .btn-glass:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.2);
-      transform: translateY(-2px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
     }
 
-    /* ── Age Verification Modal ─────────────────── */
-    .age-gate {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: rgba(0,0,0,0.95);
-      backdrop-filter: blur(30px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.4s ease;
-    }
-    .age-gate-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 48px;
-      text-align: center;
-      max-width: 440px;
-      width: 90%;
-    }
-    .age-gate-box h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      margin-bottom: 12px;
-    }
-    .age-gate-box p {
-      color: var(--text-muted);
-      font-size: 14px;
-      margin-bottom: 32px;
-      line-height: 1.6;
-    }
-    .age-gate-buttons { display: flex; gap: 12px; justify-content: center; }
-    .age-gate .btn { padding: 14px 40px; font-size: 16px; }
-
-    /* ── Navigation ─────────────────────────────── */
+    /* ── NAV ── */
     nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      padding: 20px 0;
-      transition: all 0.4s ease;
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      display: flex; align-items:center; justify-content:space-between;
+      padding: 20px 48px;
+      background: linear-gradient(to bottom, rgba(13,13,13,0.95), transparent);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
     }
-    nav.scrolled {
-      background: rgba(10,10,10,0.9);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 0;
-    }
-    .nav-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .nav-brand {
+    .gold-em { font-style: italic; color: var(--gold); }
+    .gold-divider-left { margin-left: 0; margin-right: auto; }
+    .visit-phone-link { color: var(--gold); text-decoration: none; }
+    .nav-logo {
       font-family: 'Playfair Display', serif;
       font-size: 22px;
-      font-weight: 800;
-      color: var(--text);
+      font-weight: 700;
+      color: var(--cream);
+      letter-spacing: 0.02em;
       text-decoration: none;
-      letter-spacing: -0.3px;
     }
     .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      list-style: none;
+      display: flex; gap: 36px; list-style:none;
     }
     .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: color 0.3s;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      font-size: 13px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); text-decoration: none;
+      transition: color 0.25s;
     }
-    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover { color: var(--gold); }
     .nav-cta {
-      padding: 10px 24px !important;
-      font-size: 13px !important;
+      background: var(--gold);
+      color: var(--onyx);
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 10px 24px;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: background 0.25s, transform 0.2s;
     }
-    .mobile-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-      padding: 8px;
-    }
-    .mobile-menu {
-      display: none;
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 300px;
-      background: var(--bg-card);
-      border-left: 1px solid var(--border);
-      padding: 80px 32px 32px;
-      z-index: 999;
-      flex-direction: column;
-      gap: 24px;
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a {
-      color: var(--text);
-      text-decoration: none;
-      font-size: 18px;
-      font-weight: 500;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .mobile-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 998;
-    }
-    .mobile-overlay.open { display: block; }
+    .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
 
-    /* ── Hero ───────────────────────────────────── */
+    /* ── HERO ── */
     .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
       position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      background: radial-gradient(ellipse 80% 60% at 50% 60%, #1e1a12 0%, var(--onyx) 70%);
       overflow: hidden;
-      padding: 120px 24px 80px;
+      padding: 140px 24px 80px;
     }
     .hero::before {
-      content: '';
-      position: absolute;
-      top: -20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
-      pointer-events: none;
+      content:'';
+      position:absolute; inset:0;
+      background: radial-gradient(ellipse 50% 40% at 50% 80%, rgba(197,160,89,0.08), transparent);
+      pointer-events:none;
     }
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 200px;
-      background: linear-gradient(to top, var(--bg-dark), transparent);
-      pointer-events: none;
+    .hero-location {
+      display: flex; align-items:center; gap: 6px;
+      margin-bottom: 28px;
     }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 20px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 50px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--gold);
-      margin-bottom: 32px;
+    .hero-location svg { color: var(--gold); }
+    .hero-location span {
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted);
     }
-    .hero h1 {
+    .hero-headline {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(42px, 8vw, 80px);
+      font-size: clamp(52px, 8vw, 96px);
       font-weight: 900;
       line-height: 1.05;
+      color: var(--cream);
       margin-bottom: 24px;
-      letter-spacing: -1px;
     }
-    .hero p {
-      font-size: 18px;
-      color: var(--text-muted);
-      max-width: 560px;
-      margin: 0 auto 40px;
-      line-height: 1.7;
+    .hero-headline em {
+      font-style: italic;
+      color: var(--gold);
     }
-    .hero-actions {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .hero-stats {
-      display: flex;
-      justify-content: center;
-      gap: 48px;
-      margin-top: 72px;
-      padding-top: 40px;
-      border-top: 1px solid var(--border);
-    }
-    .hero-stat-value {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
-      font-weight: 800;
-      color: var(--text);
-    }
-    .hero-stat-label {
-      font-size: 12px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-top: 4px;
-    }
-
-    /* ── Smoke Particles ───────────────────────── */
-    .smoke-container {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .smoke-particle {
-      position: absolute;
-      bottom: -20px;
-      width: 200px;
-      height: 200px;
+    .hero-dot {
+      width: 6px; height: 6px;
+      background: var(--gold);
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-      animation: smoke-drift 8s ease-out infinite;
+      margin: 0 auto 32px;
     }
-    .smoke-particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 10s; }
-    .smoke-particle:nth-child(2) { left: 30%; animation-delay: 2s; animation-duration: 12s; }
-    .smoke-particle:nth-child(3) { left: 50%; animation-delay: 4s; animation-duration: 9s; }
-    .smoke-particle:nth-child(4) { left: 70%; animation-delay: 1s; animation-duration: 11s; }
-    .smoke-particle:nth-child(5) { left: 85%; animation-delay: 3s; animation-duration: 10s; }
+    .hero-sub {
+      max-width: 520px;
+      font-size: 17px; font-weight: 300;
+      line-height: 1.75;
+      color: var(--text-muted);
+      margin-bottom: 48px;
+    }
+    .hero-cta-group {
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+    }
+    .hero-cta-label {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .btn-gold {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--onyx);
+      font-size: 13px; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 16px 48px;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-gold:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(197,160,89,0.3);
+    }
+    .hero-hours {
+      margin-top: 20px;
+      font-size: 12px; letter-spacing: 0.12em;
+      color: var(--text-dim);
+    }
+    .hero-hours span { color: var(--text-muted); }
+    .hero-scroll {
+      position: absolute; bottom: 36px; left:50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction:column; align-items:center; gap:8px;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: fadeIn 1s ease-out 1.5s both;
+    }
 
-    /* ── Section Headers ───────────────────────── */
-    .section-label {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      color: var(--primary);
-      margin-bottom: 12px;
-    }
+    /* ── SECTION BASE ── */
+    section { padding: 120px 48px; }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+    .section-header { text-align: center; margin-bottom: 64px; }
     .section-title {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(32px, 4vw, 48px);
-      font-weight: 800;
-      margin-bottom: 16px;
-      letter-spacing: -0.5px;
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.1;
+      margin: 16px 0 20px;
     }
-    .section-desc {
-      font-size: 16px;
+    .section-sub {
+      max-width: 560px; margin: 0 auto;
+      font-size: 16px; font-weight: 300; line-height: 1.7;
       color: var(--text-muted);
-      max-width: 560px;
-      line-height: 1.7;
+    }
+    .gold-divider {
+      width: 48px; height: 1px;
+      background: var(--gold);
+      margin: 24px auto;
     }
 
-    /* ── Products Grid ─────────────────────────── */
-    .products-grid {
+    /* ── PRODUCTS ── */
+    .products-section { background: var(--onyx-2); }
+    .filter-tabs {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 56px;
+    }
+    .filter-tab {
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 10px 24px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .filter-tab.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--onyx);
+    }
+    .filter-tab:hover:not(.active) {
+      border-color: var(--gold-border);
+      color: var(--gold);
+    }
+    .product-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 24px;
-      margin-top: 48px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
     }
     .product-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
       position: relative;
+      background: var(--charcoal);
       overflow: hidden;
-      transition: all 0.4s ease;
+      cursor: pointer;
     }
-    .product-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--primary), transparent);
-      opacity: 0;
-      transition: opacity 0.4s;
+    .product-img {
+      width: 100%; aspect-ratio: 1;
+      object-fit: cover;
+      background: var(--onyx-3);
+      display: flex; align-items:center; justify-content:center;
+      overflow: hidden;
+      transition: transform 0.5s ease;
     }
-    .product-card:hover {
-      border-color: rgba(230,57,70,0.3);
-      transform: translateY(-4px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    .product-card:hover .product-img { transform: scale(1.04); }
+    .product-img-placeholder {
+      width:100%; aspect-ratio:1;
+      background: linear-gradient(135deg, var(--onyx-3) 0%, var(--charcoal) 100%);
+      display: flex; align-items:center; justify-content:center;
+      font-size: 48px;
+      transition: transform 0.5s ease;
     }
-    .product-card:hover::before { opacity: 1; }
-    .product-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      background: rgba(230,57,70,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      font-size: 28px;
+    .product-card:hover .product-img-placeholder { transform: scale(1.04); }
+    .product-info {
+      padding: 20px 20px 24px;
     }
-    .product-card h3 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 10px;
+    .product-brand {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
     }
-    .product-card p {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.7;
-    }
-
-    /* ── Reviews ────────────────────────────────── */
-    .reviews-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      margin-top: 48px;
-    }
-    .review-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-      transition: all 0.3s ease;
-    }
-    .review-card:hover {
-      border-color: rgba(212,168,83,0.3);
-      transform: translateY(-2px);
-    }
-    .review-stars {
-      color: var(--gold);
-      font-size: 18px;
-      letter-spacing: 3px;
-      margin-bottom: 16px;
-    }
-    .review-text {
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.7;
-      font-style: italic;
-      margin-bottom: 20px;
-    }
-    .review-author {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-    .review-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--gold));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 16px;
-      color: #fff;
-    }
-    .review-name { font-weight: 600; font-size: 14px; }
-    .review-date { font-size: 12px; color: var(--text-dim); }
-
-    /* ── Rating Banner ──────────────────────────── */
-    .rating-banner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      padding: 32px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      margin-top: 48px;
-    }
-    .rating-number {
+    .product-name {
       font-family: 'Playfair Display', serif;
-      font-size: 56px;
-      font-weight: 900;
+      font-size: 18px; font-weight: 700;
+      color: var(--cream);
     }
-    .rating-stars { color: var(--gold); font-size: 24px; letter-spacing: 4px; }
-    .rating-source { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
 
-    /* ── Hours & Location ──────────────────────── */
-    .info-grid {
+    /* ── ABOUT ── */
+    .about-section { background: var(--onyx); }
+    .about-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-top: 48px;
+      gap: 80px;
+      align-items: center;
     }
-    .info-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 40px;
+    .about-visual {
+      position: relative;
     }
-    .info-card h3 {
+    .about-image-frame {
+      width: 100%;
+      aspect-ratio: 4/5;
+      background: linear-gradient(135deg, var(--onyx-3), var(--charcoal));
+      display: flex; align-items:center; justify-content:center;
+      font-size: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-image-frame::before {
+      content:'';
+      position:absolute; inset:0;
+      background: linear-gradient(to bottom, transparent 60%, rgba(13,13,13,0.6));
+    }
+    .about-badge {
+      position: absolute; bottom: -20px; right: -20px;
+      width: 120px; height: 120px;
+      background: var(--gold);
+      display: flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap: 2px;
+    }
+    .about-badge-num {
       font-family: 'Playfair Display', serif;
-      font-size: 24px;
+      font-size: 36px; font-weight: 900;
+      color: var(--onyx); line-height: 1;
+    }
+    .about-badge-label {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--onyx);
+      text-align: center;
+    }
+    .about-content .section-title { text-align:left; }
+    .about-content .label { display: inline-block; margin-bottom: 16px; }
+    .about-text {
+      font-size: 16px; font-weight: 300; line-height: 1.8;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .about-features {
+      list-style: none;
+      display: flex; flex-direction:column; gap: 16px;
+      margin: 36px 0;
+    }
+    .about-features li {
+      display: flex; align-items:center; gap: 14px;
+      font-size: 14px; font-weight: 500; color: var(--text);
+    }
+    .about-features li::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── AI CONCIERGE ── */
+    .concierge-section {
+      background: linear-gradient(180deg, var(--onyx-2) 0%, var(--onyx) 100%);
+    }
+    .concierge-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .concierge-content .label { margin-bottom: 16px; display:block; }
+    .concierge-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 4vw, 52px);
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.1;
       margin-bottom: 24px;
     }
-    .hours-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
+    .concierge-text {
+      font-size: 16px; font-weight: 300; line-height: 1.8;
+      color: var(--text-muted);
+      margin-bottom: 32px;
     }
-    .hours-day { color: var(--text-muted); }
-    .hours-time { font-weight: 600; }
-    .open-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 16px;
-      padding: 6px 14px;
-      background: rgba(34,197,94,0.1);
-      border: 1px solid rgba(34,197,94,0.2);
-      border-radius: 50px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #22c55e;
+    .concierge-features {
+      list-style: none;
+      display: flex; flex-direction:column; gap: 14px;
     }
-    .open-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #22c55e;
-      animation: pulse-glow 2s infinite;
-      box-shadow: 0 0 8px rgba(34,197,94,0.5);
+    .concierge-features li {
+      display: flex; align-items:center; gap: 12px;
+      font-size: 14px; color: var(--text-muted);
     }
-
-    /* ── Map ────────────────────────────────────── */
-    .map-container {
-      width: 100%;
-      height: 300px;
-      border-radius: var(--radius);
+    .concierge-features li::before {
+      content:'';
+      width: 5px; height: 5px;
+      background: var(--gold); border-radius:50%; flex-shrink:0;
+    }
+    .chat-widget {
+      background: var(--onyx-2);
+      border: 1px solid var(--border);
       overflow: hidden;
+    }
+    .chat-header {
+      display: flex; align-items:center; justify-content:space-between;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .chat-header-left {
+      display: flex; align-items:center; gap: 12px;
+    }
+    .chat-avatar {
+      width: 40px; height: 40px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      border-radius: 50%;
+      display: flex; align-items:center; justify-content:center;
+      font-size: 18px;
+    }
+    .chat-title { font-size: 14px; font-weight: 600; color: var(--cream); }
+    .chat-role { font-size: 11px; color: var(--text-dim); }
+    .chat-status {
+      display: flex; align-items:center; gap: 6px;
+      font-size: 11px; letter-spacing: 0.05em; color: var(--text-muted);
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    .chat-chips {
+      display: flex; flex-wrap:wrap; gap: 8px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .chat-chip {
+      font-size: 12px; font-weight: 500;
+      padding: 7px 14px;
       border: 1px solid var(--border);
-      margin-top: 24px;
+      border-radius: 100px;
+      color: var(--text-muted);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .map-container iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      filter: grayscale(1) invert(1) brightness(0.6) contrast(1.2);
+    .chat-chip:hover { border-color: var(--gold-border); color: var(--gold); }
+    .chat-label-row {
+      padding: 12px 24px 4px;
+      font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-dim);
     }
+    .chat-messages { padding: 12px 24px 20px; }
+    .chat-bubble {
+      background: var(--onyx-3);
+      border: 1px solid var(--border);
+      border-radius: 0 12px 12px 12px;
+      padding: 14px 18px;
+      font-size: 14px; line-height: 1.6;
+      color: var(--text-muted);
+      max-width: 90%;
+    }
+    .chat-input-row {
+      display: flex; gap: 8px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+    }
+    .chat-human-link {
+      display: block;
+      padding: 12px 24px;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      font-size: 12px; color: var(--text-muted);
+      text-align: left;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chat-human-link:hover { border-color: var(--gold-border); color: var(--gold); }
+    .chat-input {
+      flex: 1;
+      background: var(--onyx);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 12px 16px;
+      outline: none;
+    }
+    .chat-send {
+      width: 44px; height: 44px;
+      background: var(--gold);
+      border: none; cursor: pointer;
+      display: flex; align-items:center; justify-content:center;
+      transition: background 0.2s;
+    }
+    .chat-send:hover { background: var(--gold-light); }
+    .chat-send svg { color: var(--onyx); }
 
-    /* ── Contact / CTA ─────────────────────────── */
-    .cta-section {
-      text-align: center;
-      position: relative;
-    }
-    .cta-section::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .cta-box {
-      position: relative;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 64px 48px;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    .contact-grid {
+    /* ── MEMBERSHIP ── */
+    .membership-section { background: var(--onyx-2); }
+    .membership-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin: 40px 0;
+      gap: 2px;
+      margin-top: 64px;
     }
-    .contact-item {
-      padding: 24px 16px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      text-align: center;
+    .tier-card {
+      background: var(--charcoal);
+      padding: 40px 36px;
+      position: relative;
+      transition: transform 0.3s;
     }
-    .contact-item-icon {
-      font-size: 24px;
+    .tier-card:hover { transform: translateY(-4px); }
+    .tier-card.featured {
+      background: linear-gradient(135deg, var(--onyx-3), var(--charcoal));
+      border: 1px solid var(--gold-border);
+      z-index: 1;
+    }
+    .tier-badge {
+      position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+      background: var(--gold);
+      color: var(--onyx);
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 6px 20px;
+      display: flex; align-items:center; gap: 6px;
+    }
+    .tier-icon {
+      width: 48px; height: 48px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      border-radius: 50%;
+      display: flex; align-items:center; justify-content:center;
+      font-size: 20px;
+      margin-bottom: 24px;
+    }
+    .tier-card.featured .tier-icon { background: rgba(197,160,89,0.25); }
+    .tier-access {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--text-dim);
       margin-bottom: 8px;
     }
-    .contact-item-label {
-      font-size: 11px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 2px;
+    .tier-card.featured .tier-access { color: var(--gold); }
+    .tier-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px; font-weight: 700;
+      color: var(--cream);
       margin-bottom: 4px;
     }
-    .contact-item-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
+    .tier-card.featured .tier-name { color: var(--gold); }
+    .tier-tagline {
+      font-size: 12px; color: var(--text-dim);
+      margin-bottom: 24px;
     }
-    .contact-item a {
-      color: var(--text);
-      text-decoration: none;
+    .tier-divider {
+      height: 1px; background: var(--border);
+      margin-bottom: 24px;
     }
-    .contact-item a:hover { color: var(--primary); }
-
-    /* ── Claim Banner ──────────────────────────── */
-    .claim-banner {
-      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(230,57,70,0.05) 100%);
-      border: 1px solid rgba(230,57,70,0.2);
-      border-radius: 20px;
-      padding: 48px;
-      text-align: center;
-      margin-top: 80px;
-    }
-    .claim-banner h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      margin-bottom: 12px;
-    }
-    .claim-banner p {
+    .tier-desc {
+      font-size: 13px; line-height: 1.7;
       color: var(--text-muted);
-      font-size: 15px;
       margin-bottom: 28px;
-      max-width: 480px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.7;
+    }
+    .tier-perks {
+      list-style: none;
+      display: flex; flex-direction:column; gap: 12px;
+    }
+    .tier-perks li {
+      display: flex; align-items:center; gap: 10px;
+      font-size: 13px; color: var(--text-muted);
+    }
+    .tier-perks li svg { color: var(--gold); flex-shrink:0; }
+    .membership-cta {
+      text-align: center;
+      margin-top: 64px;
+    }
+    .membership-cta-sub {
+      margin-top: 16px;
+      font-size: 13px; color: var(--text-dim);
     }
 
-    /* ── Footer ─────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 64px 0 40px;
-      background: var(--bg-dark);
-    }
-    .footer-grid {
+    /* ── REVIEWS ── */
+    .reviews-section { background: var(--onyx); }
+    .reviews-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 48px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 64px;
     }
-    .footer-brand {
-      font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      font-weight: 800;
+    .review-card {
+      background: var(--onyx-2);
+      padding: 36px 32px;
+      border-top: 2px solid transparent;
+      transition: border-color 0.3s;
+    }
+    .review-card:hover { border-top-color: var(--gold); }
+    .review-stars {
+      display: flex; gap: 4px;
+      margin-bottom: 20px;
+    }
+    .star { color: var(--gold); font-size: 14px; }
+    .review-text {
+      font-size: 15px; line-height: 1.75;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 28px;
+    }
+    .review-author {
+      display: flex; align-items:center; gap: 12px;
+    }
+    .reviewer-avatar {
+      width: 40px; height: 40px;
+      background: var(--charcoal);
+      border-radius: 50%;
+      display: flex; align-items:center; justify-content:center;
+      font-size: 16px;
+    }
+    .reviewer-name {
+      font-size: 13px; font-weight: 600;
+      color: var(--cream);
+    }
+    .reviewer-source {
+      font-size: 11px; color: var(--text-dim);
+    }
+
+    /* ── VISIT / INFO ── */
+    .visit-section {
+      background: linear-gradient(180deg, var(--onyx-2), var(--onyx));
+    }
+    .visit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 64px;
+    }
+    .visit-card {
+      background: var(--charcoal);
+      padding: 40px 36px;
+      text-align: center;
+    }
+    .visit-icon {
+      font-size: 32px; margin-bottom: 20px;
+    }
+    .visit-card-label {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold);
       margin-bottom: 12px;
     }
-    .footer-desc {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.7;
-      max-width: 320px;
+    .visit-card-main {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700;
+      color: var(--cream);
+      line-height: 1.3;
+      margin-bottom: 8px;
     }
+    .visit-card-sub {
+      font-size: 13px; color: var(--text-dim);
+      line-height: 1.6;
+    }
+    .map-container {
+      margin-top: 2px;
+      width: 100%; height: 320px;
+      background: var(--onyx-3);
+      overflow: hidden;
+      position: relative;
+    }
+    .map-container iframe {
+      width:100%; height:100%;
+      border:none; filter: grayscale(60%) invert(90%) contrast(85%);
+    }
+    .map-overlay {
+      position:absolute; inset:0;
+      pointer-events:none;
+      background: linear-gradient(to right, rgba(13,13,13,0.3), transparent 30%, transparent 70%, rgba(13,13,13,0.3));
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--onyx);
+      border-top: 1px solid var(--border);
+      padding: 64px 48px 40px;
+    }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: 48px;
+      margin-bottom: 56px;
+    }
+    .footer-brand { font-family: 'Playfair Display', serif; font-size: 24px; font-weight:700; color: var(--cream); margin-bottom: 12px; }
+    .footer-tagline { font-size: 13px; line-height: 1.7; color: var(--text-dim); max-width: 240px; }
     .footer-heading {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
       color: var(--text-dim);
       margin-bottom: 20px;
     }
-    .footer-links {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    .footer-links { list-style:none; display:flex; flex-direction:column; gap:10px; }
     .footer-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.3s;
+      font-size: 13px; color: var(--text-muted);
+      text-decoration: none; transition: color 0.2s;
     }
-    .footer-links a:hover { color: var(--text); }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-info { display:flex; flex-direction:column; gap:12px; }
+    .footer-info-item {
+      display: flex; align-items:flex-start; gap: 10px;
+      font-size: 13px; color: var(--text-muted); line-height: 1.5;
+    }
+    .footer-info-item svg { color: var(--gold); flex-shrink:0; margin-top: 2px; }
     .footer-bottom {
-      margin-top: 48px;
-      padding-top: 24px;
+      display:flex; align-items:center; justify-content:space-between;
+      padding-top: 32px;
       border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      color: var(--text-dim);
+      font-size: 12px; color: var(--text-dim);
     }
-    .footer-bottom a {
-      color: var(--primary);
-      text-decoration: none;
-    }
-    .footer-bottom a:hover { text-decoration: underline; }
+    .footer-bottom a { color: var(--text-dim); text-decoration:none; }
+    .footer-bottom a:hover { color: var(--gold); }
 
-    /* ── Responsive ─────────────────────────────── */
-    @media (max-width: 768px) {
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-grid, .concierge-grid { grid-template-columns: 1fr; gap: 48px; }
+      .membership-grid { grid-template-columns: 1fr; }
+      .reviews-grid { grid-template-columns: 1fr; }
+      .visit-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+      nav { padding: 16px 24px; }
       .nav-links { display: none; }
-      .mobile-toggle { display: block; }
-      .hero h1 { font-size: 36px; }
-      .hero-stats { flex-direction: column; gap: 24px; }
-      .info-grid { grid-template-columns: 1fr; }
-      .contact-grid { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
-      .hero-actions { flex-direction: column; align-items: center; }
-      .section { padding: 64px 0; }
-      .rating-banner { flex-direction: column; gap: 12px; }
-      .age-gate-box { padding: 32px 24px; }
+      section { padding: 80px 24px; }
+    }
+    @media (max-width: 640px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-top { grid-template-columns: 1fr; }
+      .hero-headline { font-size: 44px; }
+      section { padding: 60px 20px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ═══ AGE VERIFICATION ═══ -->
-  <div id="age-gate" class="age-gate">
-    <div class="age-gate-box animate-up">
-      <div style="font-size: 48px; margin-bottom: 16px;">🔞</div>
-      <h2>Age Verification</h2>
-      <p>You must be 21 years or older to view this website. By entering, you confirm you meet the legal age requirement.</p>
-      <div class="age-gate-buttons">
-        <button class="btn btn-primary" onclick="document.getElementById('age-gate').style.display='none'">I'm 21+</button>
-        <button class="btn btn-outline" onclick="window.location='https://google.com'">Leave</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ NAVIGATION ═══ -->
-  <nav id="navbar">
-    <div class="nav-inner">
-      <a href="#" class="nav-brand">{{BUSINESS_NAME}}</a>
-      <ul class="nav-links">
-        <li><a href="#products">Products</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#reviews">Reviews</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="tel:{{PHONE_CLEAN}}" class="btn btn-primary nav-cta">📞 Call Now</a></li>
-      </ul>
-      <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu">
-        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-    </div>
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">{{BUSINESS_NAME}}</a>
+    <ul class="nav-links">
+      <li><a href="#products">Collections</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#concierge">Concierge</a></li>
+      <li><a href="#visit">Visit</a></li>
+    </ul>
+    <a href="tel:{{PHONE}}" class="nav-cta">Call Us</a>
   </nav>
 
-  <!-- Mobile Menu -->
-  <div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobile()"></div>
-  <div class="mobile-menu" id="mobile-menu">
-    <a href="#products" onclick="toggleMobile()">Products</a>
-    <a href="#about" onclick="toggleMobile()">About</a>
-    <a href="#reviews" onclick="toggleMobile()">Reviews</a>
-    <a href="#contact" onclick="toggleMobile()">Contact</a>
-    <a href="tel:{{PHONE_CLEAN}}" class="btn btn-primary" style="text-align:center;margin-top:16px;">📞 Call Now</a>
-  </div>
-
-  <!-- ═══ HERO ═══ -->
-  <section class="hero">
-    <div class="smoke-container">
-      <div class="smoke-particle"></div>
-      <div class="smoke-particle"></div>
-      <div class="smoke-particle"></div>
-      <div class="smoke-particle"></div>
-      <div class="smoke-particle"></div>
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-location fade-in d1">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      <span>{{CITY}}, {{STATE}}</span>
     </div>
-    <div class="container" style="position:relative;z-index:2;">
-      <div class="hero-badge animate-up">📍 {{CITY}}, {{STATE}}</div>
-      <h1 class="animate-up delay-1">
-        {{CITY}}'s Premier<br>
-        <span class="text-gradient">Smoke Shop</span>
-      </h1>
-      <p class="animate-up delay-2">
-        {{BUSINESS_NAME}} — your destination for premium glass, vaporizers, CBD, kratom, and smoking accessories. Expert staff, top brands, unbeatable prices.
-      </p>
-      <div class="hero-actions animate-up delay-3">
-        <a href="#contact" class="btn btn-primary">Visit Us Today</a>
-        <a href="tel:{{PHONE_CLEAN}}" class="btn btn-glass">📞 {{PHONE}}</a>
-      </div>
-      <div class="hero-stats animate-up delay-4">
-        <div>
-          <div class="hero-stat-value">{{RATING}}</div>
-          <div class="hero-stat-label">Google Rating</div>
-        </div>
-        <div>
-          <div class="hero-stat-value">{{REVIEW_COUNT}}</div>
-          <div class="hero-stat-label">Reviews</div>
-        </div>
-        <div>
-          <div class="hero-stat-value">500+</div>
-          <div class="hero-stat-label">Products</div>
-        </div>
-      </div>
+    <h1 class="hero-headline fade-up d2">
+      Your Hub for<br>
+      <em>Premium Glass</em><br>
+      &amp; Culture
+    </h1>
+    <div class="hero-dot fade-in d3"></div>
+    <p class="hero-sub fade-up d3">Discover curated collections of functional art, modern vaporizers, and artisanal accessories in our boutique gallery.</p>
+    <div class="hero-cta-group fade-up d4">
+      <span class="hero-cta-label">Explore</span>
+      <a href="#visit" class="btn-gold">Visit Us</a>
+      <p class="hero-hours">Open <span>{{HOURS}}</span></p>
+    </div>
+    <div class="hero-scroll">
+      <div class="hero-scroll-line"></div>
     </div>
   </section>
 
-  <!-- ═══ PRODUCTS ═══ -->
-  <section id="products" class="section" style="background: var(--bg-card);">
-    <div class="container">
-      <div class="section-label animate-up">What We Carry</div>
-      <div class="section-title animate-up delay-1">Premium Selection</div>
-      <div class="section-desc animate-up delay-2">Hand-picked products from the best brands. Our staff knows every piece we carry.</div>
-
-      <div class="products-grid">
-        <div class="product-card animate-up delay-1">
-          <div class="product-icon">🔮</div>
-          <h3>Premium Glass</h3>
-          <p>Hand-blown pipes, water pipes, rigs, and bubblers from top artists and brands. Every piece inspected for quality.</p>
-        </div>
-        <div class="product-card animate-up delay-2">
-          <div class="product-icon">💨</div>
-          <h3>Vaporizers</h3>
-          <p>The latest dry herb and concentrate vaporizers. Portable, desktop, and pen-style from Pax, Storz & Bickel, and more.</p>
-        </div>
-        <div class="product-card animate-up delay-3">
-          <div class="product-icon">🌿</div>
-          <h3>CBD & Delta</h3>
-          <p>Lab-tested CBD flower, gummies, tinctures, and delta products. Third-party verified for purity and potency.</p>
-        </div>
-        <div class="product-card animate-up delay-4">
-          <div class="product-icon">🍃</div>
-          <h3>Kratom</h3>
-          <p>Premium kratom powders, capsules, and extracts. Multiple strains available — our staff can guide your selection.</p>
-        </div>
-        <div class="product-card animate-up delay-5">
-          <div class="product-icon">🪝</div>
-          <h3>Hookah & Shisha</h3>
-          <p>Traditional and modern hookahs, premium shisha tobacco, coals, hoses, and accessories. Perfect for entertaining.</p>
-        </div>
-        <div class="product-card animate-up delay-5">
-          <div class="product-icon">⚡</div>
-          <h3>Accessories</h3>
-          <p>Grinders, papers, rolling trays, torches, cleaning kits, stash jars, and everything else to complete your setup.</p>
-        </div>
+  <!-- PRODUCTS -->
+  <section class="products-section" id="products">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="label fade-up">Featured Collections</span>
+        <h2 class="section-title fade-up d1">Curated for <em class="gold-em">Connoisseurs</em></h2>
+        <div class="gold-divider"></div>
+        <p class="section-sub fade-up d2">Where craftsmanship meets artistry. Discover functional art that elevates your experience.</p>
       </div>
-    </div>
-  </section>
-
-  <!-- ═══ ABOUT & HOURS ═══ -->
-  <section id="about" class="section">
-    <div class="container">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;">
-        <div>
-          <div class="section-label animate-up">Our Story</div>
-          <div class="section-title animate-up delay-1">{{CITY}}'s Friendliest<br>Smoke Shop</div>
-          <p style="color:var(--text-muted);line-height:1.8;margin:24px 0;" class="animate-up delay-2">
-            {{BUSINESS_NAME}} has been serving the {{CITY}} community with passion and expertise. We believe shopping for smoking accessories should be welcoming, not awkward — a place where you can ask questions and get honest answers.
-          </p>
-          <p style="color:var(--text-muted);line-height:1.8;margin-bottom:32px;" class="animate-up delay-3">
-            Our hand-picked inventory covers everything from artisan glass to the latest vaporizer technology. We work directly with manufacturers and local artists to bring you the best selection at fair prices.
-          </p>
-          <div style="display:flex;flex-direction:column;gap:12px;" class="animate-up delay-4">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="color:var(--primary);font-size:18px;">✓</span>
-              <span style="color:var(--text-muted);font-size:14px;">Locally owned and operated</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="color:var(--primary);font-size:18px;">✓</span>
-              <span style="color:var(--text-muted);font-size:14px;">Staff trained on every product we carry</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="color:var(--primary);font-size:18px;">✓</span>
-              <span style="color:var(--text-muted);font-size:14px;">Competitive pricing guaranteed</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="color:var(--primary);font-size:18px;">✓</span>
-              <span style="color:var(--text-muted);font-size:14px;">New products added weekly</span>
-            </div>
+      <div class="filter-tabs fade-up d2">
+        <button class="filter-tab active">All</button>
+        <button class="filter-tab">Glass &amp; Art Pieces</button>
+        <button class="filter-tab">Modern Vaporizers</button>
+        <button class="filter-tab">Artisanal Accessories</button>
+        <button class="filter-tab">Curated Collections</button>
+      </div>
+      <div class="product-grid">
+        <div class="product-card fade-up d1">
+          <div class="product-img-placeholder">🔬</div>
+          <div class="product-info">
+            <div class="product-brand">Functional Art</div>
+            <div class="product-name">Heady Glass Pieces</div>
           </div>
         </div>
-
-        <div class="info-grid" style="grid-template-columns:1fr;margin-top:0;">
-          <div class="info-card animate-up delay-2">
-            <h3>⏰ Store Hours</h3>
-            <div class="hours-row"><span class="hours-day">Monday – Saturday</span><span class="hours-time">{{HOURS}}</span></div>
-            <div class="hours-row"><span class="hours-day">Sunday</span><span class="hours-time">{{HOURS}}</span></div>
-            <div class="open-badge"><span class="open-dot"></span> Open Now</div>
+        <div class="product-card fade-up d2">
+          <div class="product-img-placeholder">💨</div>
+          <div class="product-info">
+            <div class="product-brand">Modern Vaporizers</div>
+            <div class="product-name">Premium Vape Devices</div>
           </div>
-          <div class="info-card animate-up delay-3">
-            <h3>📍 Find Us</h3>
-            <p style="color:var(--text);font-weight:600;margin-bottom:4px;">{{ADDRESS}}</p>
-            <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">{{CITY}}, {{STATE}}</p>
-            <a href="https://maps.google.com/?q={{ADDRESS_ENCODED}}" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px 24px;">
-              Get Directions
-            </a>
-            <div class="map-container">
-              <iframe src="https://maps.google.com/maps?q={{ADDRESS_ENCODED}}&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen loading="lazy"></iframe>
-            </div>
+        </div>
+        <div class="product-card fade-up d3">
+          <div class="product-img-placeholder">🌿</div>
+          <div class="product-info">
+            <div class="product-brand">Wellness</div>
+            <div class="product-name">CBD &amp; Kratom</div>
+          </div>
+        </div>
+        <div class="product-card fade-up d4">
+          <div class="product-img-placeholder">🪴</div>
+          <div class="product-info">
+            <div class="product-brand">Social Culture</div>
+            <div class="product-name">Hookah &amp; Shisha</div>
+          </div>
+        </div>
+        <div class="product-card fade-up d1">
+          <div class="product-img-placeholder">🧴</div>
+          <div class="product-info">
+            <div class="product-brand">Essentials</div>
+            <div class="product-name">Rolling &amp; Papers</div>
+          </div>
+        </div>
+        <div class="product-card fade-up d2">
+          <div class="product-img-placeholder">⚡</div>
+          <div class="product-info">
+            <div class="product-brand">Tech</div>
+            <div class="product-name">Lighters &amp; Torches</div>
+          </div>
+        </div>
+        <div class="product-card fade-up d3">
+          <div class="product-img-placeholder">💎</div>
+          <div class="product-info">
+            <div class="product-brand">Premium</div>
+            <div class="product-name">Dab Rigs &amp; Concentrates</div>
+          </div>
+        </div>
+        <div class="product-card fade-up d4">
+          <div class="product-img-placeholder">🎁</div>
+          <div class="product-info">
+            <div class="product-brand">Curations</div>
+            <div class="product-name">Gift Sets</div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ REVIEWS ═══ -->
-  <section id="reviews" class="section" style="background:var(--bg-card);">
-    <div class="container">
-      <div style="text-align:center;">
-        <div class="section-label animate-up">Customer Love</div>
-        <div class="section-title animate-up delay-1">What People Are Saying</div>
-        <div class="section-desc animate-up delay-2" style="margin:0 auto;">Don't take our word for it — here's what our customers think.</div>
+  <!-- ABOUT -->
+  <section class="about-section" id="about">
+    <div class="section-inner">
+      <div class="about-grid">
+        <div class="about-visual fade-up">
+          <div class="about-image-frame">🏪</div>
+          <div class="about-badge">
+            <span class="about-badge-num">★</span>
+            <span class="about-badge-label">Top Rated<br>Local Shop</span>
+          </div>
+        </div>
+        <div class="about-content">
+          <span class="label fade-up">Our Story</span>
+          <h2 class="section-title fade-up d1">{{BUSINESS_NAME}}</h2>
+          <div class="gold-divider gold-divider-left"></div>
+          <p class="about-text fade-up d2">Located in the heart of {{CITY}}, {{STATE}}, we are your premier destination for functional art, premium glass, and curated smoke culture accessories.</p>
+          <p class="about-text fade-up d2">Our knowledgeable staff is passionate about connecting connoisseurs with the finest pieces — from artisan glass to cutting-edge vaporizers.</p>
+          <ul class="about-features fade-up d3">
+            <li>Expert staff ready to guide your experience</li>
+            <li>Curated selection of premium brands</li>
+            <li>Competitive prices &amp; loyalty rewards</li>
+            <li>Clean, welcoming boutique environment</li>
+          </ul>
+          <a href="tel:{{PHONE}}" class="btn-gold fade-up d4">Call {{PHONE}}</a>
+        </div>
       </div>
+    </div>
+  </section>
 
+  <!-- AI CONCIERGE -->
+  <section class="concierge-section" id="concierge">
+    <div class="section-inner">
+      <div class="concierge-grid">
+        <div class="concierge-content">
+          <span class="label fade-up">Intelligent Assistance</span>
+          <h2 class="concierge-title fade-up d1">The Expert<br>Concierge</h2>
+          <p class="concierge-text fade-up d2">Get expert guidance on products, discover pieces tailored to your preferences, and enjoy a seamless boutique experience — in-store or online.</p>
+          <ul class="concierge-features fade-up d3">
+            <li>Real-time product recommendations</li>
+            <li>Expert guidance on glass art &amp; accessories</li>
+            <li>Personalized experience every visit</li>
+          </ul>
+        </div>
+        <div class="chat-widget fade-up d2">
+          <div class="chat-header">
+            <div class="chat-header-left">
+              <div class="chat-avatar">🎯</div>
+              <div>
+                <div class="chat-title">{{BUSINESS_NAME}}</div>
+                <div class="chat-role">Personal Shopper</div>
+              </div>
+            </div>
+            <div class="chat-status">
+              <span class="status-dot"></span>
+              <span>24/7 Available</span>
+            </div>
+          </div>
+          <div class="chat-label-row">TRY ASKING</div>
+          <div class="chat-chips">
+            <button class="chat-chip">What glass do you carry?</button>
+            <button class="chat-chip">Best vaporizers?</button>
+            <button class="chat-chip">I need a gift idea</button>
+            <button class="chat-chip">What are your hours?</button>
+          </div>
+          <div class="chat-messages">
+            <div class="chat-bubble">Welcome to {{BUSINESS_NAME}}. I'm here to help you discover the perfect piece, answer questions, or guide you through our collections. What can I help you find today?</div>
+          </div>
+          <button class="chat-human-link">Prefer to call us? <span class="gold-em" style="font-style:normal;">{{PHONE}} →</span></button>
+          <div class="chat-input-row">
+            <input class="chat-input" placeholder="Ask about a product, category, or our store..." />
+            <button class="chat-send" aria-label="Send message">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMBERSHIP -->
+  <section class="membership-section" id="membership">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="label fade-up">Exclusive Membership</span>
+        <h2 class="section-title fade-up d1">Join The <em class="gold-em">{{BUSINESS_NAME}}</em> Collective</h2>
+        <div class="gold-divider"></div>
+        <p class="section-sub fade-up d2">Become part of an exclusive community of connoisseurs. Unlock early access to new drops, member-only events, and personalized curator services.</p>
+      </div>
+      <div class="membership-grid">
+        <div class="tier-card fade-up d1">
+          <div class="tier-icon">☆</div>
+          <div class="tier-access">Join Free</div>
+          <div class="tier-name">Insider</div>
+          <div class="tier-tagline">Begin Your Journey</div>
+          <div class="tier-divider"></div>
+          <div class="tier-desc">Your invitation into a community of premium glass enthusiasts and culture connoisseurs.</div>
+          <ul class="tier-perks">
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Early Access to New Drops</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Birthday Rewards</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Members-Only Newsletter</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Welcome Gift</li>
+          </ul>
+        </div>
+        <div class="tier-card featured fade-up d2">
+          <div class="tier-badge">👑 MOST POPULAR</div>
+          <div class="tier-icon">👑</div>
+          <div class="tier-access">By Invitation</div>
+          <div class="tier-name">Icon</div>
+          <div class="tier-tagline">Elevated Status</div>
+          <div class="tier-divider"></div>
+          <div class="tier-desc">For the discerning collector who demands first access and exclusive experiences beyond retail.</div>
+          <ul class="tier-perks">
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 48-Hour First Access</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Exclusive Merchandise Drops</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Private Event Invitations</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Personal Curator Services</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Reserved Pieces Program</li>
+          </ul>
+        </div>
+        <div class="tier-card fade-up d3">
+          <div class="tier-icon">💎</div>
+          <div class="tier-access">By Referral Only</div>
+          <div class="tier-name">Luminary</div>
+          <div class="tier-tagline">The Pinnacle</div>
+          <div class="tier-divider"></div>
+          <div class="tier-desc">The highest echelon of the {{BUSINESS_NAME}} experience — reserved for those who live the art.</div>
+          <ul class="tier-perks">
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> First Access to All Releases</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Limited Edition Commissions</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> VIP Meet &amp; Greets</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Dedicated Concierge Line</li>
+            <li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Annual Appreciation Gift</li>
+          </ul>
+        </div>
+      </div>
+      <div class="membership-cta fade-up d3">
+        <a href="tel:{{PHONE}}" class="btn-gold">Become an Insider</a>
+        <p class="membership-cta-sub">Join thousands of members enjoying exclusive benefits</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews-section" id="reviews">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="label fade-up">Social Proof</span>
+        <h2 class="section-title fade-up d1">What People<br><em class="gold-em">Are Saying</em></h2>
+        <div class="gold-divider"></div>
+      </div>
       <div class="reviews-grid">
-        <div class="review-card animate-up delay-1">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Best smoke shop in {{CITY}}! Super knowledgeable staff and an amazing glass selection. Prices are very fair. This is my go-to spot."</div>
+        <div class="review-card fade-up d1">
+          <div class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          <p class="review-text">"Absolutely the best smoke shop in {{CITY}}. The staff is incredibly knowledgeable and the selection is unmatched. I won't go anywhere else."</p>
           <div class="review-author">
-            <div class="review-avatar">M</div>
+            <div class="reviewer-avatar">😊</div>
             <div>
-              <div class="review-name">Marcus T.</div>
-              <div class="review-date">2 weeks ago</div>
+              <div class="reviewer-name">{{REVIEW_AUTHOR_1}}</div>
+              <div class="reviewer-source">Google Review</div>
             </div>
           </div>
         </div>
-        <div class="review-card animate-up delay-2">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Clean, professional, and always stocked. I drive past 3 other shops to come here. Wouldn't go anywhere else. The staff is incredible."</div>
+        <div class="review-card fade-up d2">
+          <div class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          <p class="review-text">"{{REVIEW_TEXT_2}}"</p>
           <div class="review-author">
-            <div class="review-avatar">J</div>
+            <div class="reviewer-avatar">🙌</div>
             <div>
-              <div class="review-name">Jasmine L.</div>
-              <div class="review-date">1 month ago</div>
+              <div class="reviewer-name">{{REVIEW_AUTHOR_2}}</div>
+              <div class="reviewer-source">Google Review</div>
             </div>
           </div>
         </div>
-        <div class="review-card animate-up delay-3">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Found my new favorite spot. They carry everything I need and the vibe is totally welcoming. Staff really knows their stuff. Highly recommend."</div>
+        <div class="review-card fade-up d3">
+          <div class="review-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          <p class="review-text">"{{REVIEW_TEXT_3}}"</p>
           <div class="review-author">
-            <div class="review-avatar">D</div>
+            <div class="reviewer-avatar">🔥</div>
             <div>
-              <div class="review-name">Devon R.</div>
-              <div class="review-date">3 weeks ago</div>
+              <div class="reviewer-name">{{REVIEW_AUTHOR_3}}</div>
+              <div class="reviewer-source">Google Review</div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="rating-banner animate-up delay-4">
-        <div class="rating-number text-gradient">{{RATING}}</div>
-        <div>
-          <div class="rating-stars">{{STARS}}</div>
-          <div class="rating-source">Based on {{REVIEW_COUNT}} Google Reviews</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ CONTACT / CTA ═══ -->
-  <section id="contact" class="section cta-section">
-    <div class="container">
-      <div class="cta-box animate-up">
-        <div class="section-label">Come See Us</div>
-        <div class="section-title">Ready to Visit?</div>
-        <p style="color:var(--text-muted);font-size:16px;line-height:1.7;max-width:480px;margin:16px auto 0;">
-          Stop by {{BUSINESS_NAME}} and let our team help you find exactly what you're looking for. Open 7 days a week.
-        </p>
-
-        <div class="contact-grid">
-          <div class="contact-item">
-            <div class="contact-item-icon">📍</div>
-            <div class="contact-item-label">Address</div>
-            <div class="contact-item-value">{{ADDRESS}}<br>{{CITY}}, {{STATE}}</div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-item-icon">📞</div>
-            <div class="contact-item-label">Phone</div>
-            <div class="contact-item-value"><a href="tel:{{PHONE_CLEAN}}">{{PHONE}}</a></div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-item-icon">⏰</div>
-            <div class="contact-item-label">Hours</div>
-            <div class="contact-item-value">{{HOURS}}</div>
-          </div>
+  <!-- VISIT -->
+  <section class="visit-section" id="visit">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="label fade-up">Ready to Visit?</span>
+        <h2 class="section-title fade-up d1">Come Experience<br><em class="gold-em">{{BUSINESS_NAME}}</em></h2>
+        <div class="gold-divider"></div>
+      </div>
+      <div class="visit-grid">
+        <div class="visit-card fade-up d1">
+          <div class="visit-icon">📍</div>
+          <div class="visit-card-label">Our Location</div>
+          <div class="visit-card-main">{{ADDRESS}}</div>
+          <div class="visit-card-sub">{{CITY}}, {{STATE}}</div>
         </div>
-
-        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-          <a href="https://maps.google.com/?q={{ADDRESS_ENCODED}}" target="_blank" rel="noopener" class="btn btn-primary">📍 Get Directions</a>
-          <a href="tel:{{PHONE_CLEAN}}" class="btn btn-outline">📞 Call Now</a>
+        <div class="visit-card fade-up d2">
+          <div class="visit-icon">🕐</div>
+          <div class="visit-card-label">Hours</div>
+          <div class="visit-card-main">{{HOURS}}</div>
+          <div class="visit-card-sub">We look forward to seeing you</div>
+        </div>
+        <div class="visit-card fade-up d3">
+          <div class="visit-icon">📞</div>
+          <div class="visit-card-label">Call or Text</div>
+          <div class="visit-card-main"><a href="tel:{{PHONE}}" class="visit-phone-link">{{PHONE}}</a></div>
+          <div class="visit-card-sub">Speak with our expert staff</div>
         </div>
       </div>
-
-      <!-- Claim This Site Banner -->
-      <div class="claim-banner animate-up">
-        <div style="font-size:48px;margin-bottom:16px;">🚀</div>
-        <h3>This Website Was Built For <span class="text-gradient">{{BUSINESS_NAME}}</span></h3>
-        <p>This premium website is ready to go live for your smoke shop. Professional design, mobile-optimized, SEO-ready — all for just $200.</p>
-        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-          <a href="tel:+12813230450" class="btn btn-gold">💰 Claim For $200</a>
-          <a href="https://smokeshopgrowth.com" target="_blank" class="btn btn-outline">Learn More</a>
-        </div>
-        <p style="color:var(--text-dim);font-size:13px;margin-top:20px;margin-bottom:0;">
-          Questions? Call us at <a href="tel:+12813230450" style="color:var(--gold);text-decoration:none;">(281) 323-0450</a> or visit <a href="https://smokeshopgrowth.com" style="color:var(--gold);text-decoration:none;">smokeshopgrowth.com</a>
-        </p>
+      <div class="map-container fade-up d2">
+        <iframe
+          title="Store location map"
+          src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU3s_E&q={{ADDRESS}},{{CITY}},{{STATE}}"
+          allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin">
+        </iframe>
+        <div class="map-overlay"></div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ FOOTER ═══ -->
+  <!-- FOOTER -->
   <footer>
-    <div class="container">
-      <div class="footer-grid">
+    <div class="footer-inner">
+      <div class="footer-top">
         <div>
           <div class="footer-brand">{{BUSINESS_NAME}}</div>
-          <p class="footer-desc">{{CITY}}'s premier smoke shop. Knowledgeable staff, top brands, fair prices — a vibe that keeps customers coming back.</p>
+          <p class="footer-tagline">Your hub for premium glass &amp; culture in {{CITY}}, {{STATE}}.</p>
         </div>
         <div>
-          <div class="footer-heading">Quick Links</div>
+          <div class="footer-heading">Explore</div>
           <ul class="footer-links">
-            <li><a href="#products">Products</a></li>
+            <li><a href="#products">Collections</a></li>
             <li><a href="#about">About Us</a></li>
+            <li><a href="#concierge">Concierge</a></li>
+            <li><a href="#membership">Membership</a></li>
             <li><a href="#reviews">Reviews</a></li>
-            <li><a href="#contact">Contact</a></li>
           </ul>
         </div>
         <div>
-          <div class="footer-heading">Contact</div>
+          <div class="footer-heading">Visit Us</div>
           <ul class="footer-links">
-            <li><a href="tel:{{PHONE_CLEAN}}">{{PHONE}}</a></li>
-            <li><span style="color:var(--text-muted);font-size:14px;">{{ADDRESS}}</span></li>
-            <li><span style="color:var(--text-muted);font-size:14px;">{{CITY}}, {{STATE}}</span></li>
+            <li><a href="tel:{{PHONE}}">{{PHONE}}</a></li>
+            <li><a href="#">{{HOURS}}</a></li>
+            <li><a href="#">Get Directions</a></li>
           </ul>
+        </div>
+        <div>
+          <div class="footer-heading">Location</div>
+          <div class="footer-info">
+            <div class="footer-info-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+              <span>{{ADDRESS}}, {{CITY}}, {{STATE}}</span>
+            </div>
+            <div class="footer-info-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 010 2.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.06 6.06l1.27-1.37a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+              <span>{{PHONE}}</span>
+            </div>
+            <div class="footer-info-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>{{HOURS}}</span>
+            </div>
+          </div>
         </div>
       </div>
       <div class="footer-bottom">
-        <span>&copy; 2026 {{BUSINESS_NAME}}. All rights reserved.</span>
-        <span>Built by <a href="https://smokeshopgrowth.com" target="_blank">Smoke Shop Growth</a></span>
+        <span>© 2025 {{BUSINESS_NAME}}. All rights reserved.</span>
+        <span>Built by <a href="#">Smoke Shop Growth</a></span>
       </div>
     </div>
   </footer>
 
   <script>
-    // Navbar scroll effect
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
     });
 
-    // Mobile menu
-    function toggleMobile() {
-      document.getElementById('mobile-menu').classList.toggle('open');
-      document.getElementById('mobile-overlay').classList.toggle('open');
-    }
-
-    // Intersection Observer for animations
+    // Scroll-triggered animations
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.animationPlayState = 'running';
-          observer.unobserve(entry.target);
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.animate-up, .animate-in').forEach(el => {
-      el.style.animationPlayState = 'paused';
+    document.querySelectorAll('.fade-up, .fade-in').forEach(el => {
+      el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
       observer.observe(el);
     });
-  </script>
 
+    // Chat chips interaction
+    document.querySelectorAll('.chat-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelector('.chat-input').value = chip.textContent;
+        document.querySelector('.chat-input').focus();
+      });
+    });
+  </script>
 </body>
 </html>

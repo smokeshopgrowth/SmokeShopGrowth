@@ -1,0 +1,26 @@
+agent-orchestrator.yaml
+port: 3000
+
+defaults:
+  runtime: tmux
+  agent: claude-code
+  workspace: worktree
+  notifiers: [desktop]
+
+projects:
+  maps-scraper:
+    repo: roryulloa69/google-maps-lead-scraper
+    path: C:\Users\roryu\Build Google Maps Lead Scraper
+    defaultBranch: main
+    sessionPrefix: scraper-fix
+    reactions:
+      ci-failed:
+        auto: true
+        action: send-to-agent
+        retries: 2
+      changes-requested:
+        auto: true
+        action: send-to-agent
+      approved-and-green:
+        auto: false
+        action: notify

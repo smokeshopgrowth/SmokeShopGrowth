@@ -6,6 +6,41 @@ const fs = require('fs');
 const { makeJobId } = require('../services/sse');
 const { webhookLimiter } = require('../middleware/rate-limit');
 
+// GET /demos - Gallery page
+router.get('/demos', (req, res) => {
+    const demosDir = path.join(__dirname, '..', 'public', 'demos');
+    try {
+        const demos = fs.readdirSync(demosDir).filter(f => fs.statSync(path.join(demosDir, f)).isDirectory());
+        const html = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Demo Sites</title>
+                <style>
+                    body { font-family: sans-serif; background-color: #111; color: #eee; padding: 2rem; }
+                    h1 { margin-bottom: 2rem; color: #fff; }
+                    ul { list-style: none; padding: 0; }
+                    li { margin-bottom: 1rem; }
+                    a { color: #8b5cf6; text-decoration: none; font-size: 1.1rem; }
+                    a:hover { text-decoration: underline; }
+                </style>
+            </head>
+            <body>
+                <h1>Generated Demo Sites (${demos.length})</h1>
+                <ul>
+                    ${demos.map(demo => `<li><a href="/demos/${demo}/index.html" target="_blank">${demo}</a></li>`).join('')}
+                </ul>
+            </body>
+            </html>
+        `;
+        res.send(html);
+    } catch (err) {
+        res.status(500).send(`<h1>Error</h1><p>Could not read demos directory.</p><p>${err.message}</p><p>Did you run the generator script first?</p>`);
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 const templateSubmissions = [];
 

@@ -1,0 +1,7 @@
+[build]
+dockerfilePath = "Dockerfile.webhook"
+
+[deploy]
+startCommand = "sh -c 'exec gunicorn --chdir /app/src/python --bind 0.0.0.0:${PORT:-8080} --workers 2 --timeout 120 webhook:app'"
+healthcheckPath = "/health"
+restartPolicyType = "on_failure"

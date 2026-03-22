@@ -1,0 +1,26 @@
+# ─────────────────────────────────────────────────────────────────────
+# Dockerfile.webhook  —  Flask Webhook Service
+# Runs: Stripe, Vapi, email delivery, CRM updates
+# Does NOT need a browser / Playwright
+# ─────────────────────────────────────────────────────────────────────
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install Python packages
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source tree
+COPY . .
+
+# Set PYTHONPATH so that webhook.py can import its siblings (config, crm, logger, etc.)
+ENV PYTHONPATH=/app/src/python:/app/src/agents
+
+EXPOSE 8080
+
+# gunicorn runs webhook.py's Flask 'app' object
+# Railway injects $PORT at runtime
+CMD ["sh", "-c", "gunicorn --chdir /app/src/python --bind 0.0.0.0:${PORT:-8080} --workers 2 --timeout 120 webhook:app"]

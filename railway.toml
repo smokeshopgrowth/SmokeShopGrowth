@@ -1,9 +1,9 @@
 [build]
-      builder = "DOCKERFILE"
-      dockerfilePath = "Dockerfile"
-    
-    [deploy]
-      startCommand = "node server.js"
-      healthcheckPath = ""
-      restartPolicyType = "on_failure"
-      replicaCount = 1
+builder = "nixpacks"
+buildCommand = "npm install"
+
+[deploy]
+startCommand = "node server.js"
+healthcheckPath = "/health"
+restartPolicyType = "on_failure"
+replicaCount = 1

@@ -54,13 +54,31 @@ async function runPipeline(jobId) {
     const socialAuditedCount = await countCsvRows(job.files.socialAudited);
     pushLog(jobId, `✅ Social Audited ${socialAuditedCount} websites.`, 'success');
 
+    // Step 2.8: Firecrawl Enrichment
+    if (process.env.FIRECRAWL_API_KEY) {
+        pushLog(jobId, '🔥 Step 2.8 — Enriching leads with Firecrawl…', 'step');
+        job.step = 2.8;
+        await runChild(jobId, 'node', [
+            path.join(__dirname, '..', 'src', 'node', 'firecrawl_enrich.mjs'),
+            job.files.socialAudited,
+            job.files.enriched,
+        ]);
+        const enrichedCount = await countCsvRows(job.files.enriched);
+        pushLog(jobId, `✅ Firecrawl enriched ${enrichedCount} leads with products, hours, and branding.`, 'success');
+    } else {
+        pushLog(jobId, '⚠️  Step 2.8 skipped — FIRECRAWL_API_KEY not set.', 'warn');
+        // Fall back to copy social audited
+        fs.copyFileSync(job.files.socialAudited, job.files.enriched);
+    }
+
     // Step 3: Outreach
     if (process.env.OPENAI_API_KEY) {
         pushLog(jobId, '✍️  Step 3/3 — Generating outreach messages…', 'step');
         job.step = 3;
+        const outreachInput = fs.existsSync(job.files.enriched) ? job.files.enriched : job.files.socialAudited;
         await runChild(jobId, 'node', [
             path.join(__dirname, '..', 'src', 'node', 'generate_outreach.mjs'),
-            '--input', job.files.socialAudited,
+            '--input', outreachInput,
             '--output', job.files.outreach,
             '--base-url', job.baseUrl,
         ]);
@@ -75,7 +93,9 @@ async function runPipeline(jobId) {
     if (job.generateDemo) {
         pushLog(jobId, '🏗️  Step 4 — Generating demo sites from templates…', 'step');
         job.step = 4;
-        const demoInput = fs.existsSync(job.files.outreach) ? job.files.outreach : job.files.socialAudited;
+        const demoInput = fs.existsSync(job.files.outreach) ? job.files.outreach
+                        : fs.existsSync(job.files.enriched) ? job.files.enriched
+                        : job.files.socialAudited;
         await runChild(jobId, 'node', [
             path.join(__dirname, '..', 'src', 'node', 'generate-from-templates.mjs'),
             '--input', demoInput,
@@ -221,4 +241,116 @@ function countCsvRows(filePath) {
     });
 }
 
-module.exports = { runPipeline, runChild, countCsvRows };
+/**
+ * runSingleBusiness — runs Firecrawl → Outreach → Demo → Email → Call
+ * for a single pre-populated leads.csv (no scraping step).
+ */
+async function runSingleBusiness(jobId) {
+    const job = jobs.get(jobId);
+
+    pushLog(jobId, `🚀 Starting single-business pipeline for: ${job.city}`, 'step');
+
+    // Step 1: Copy leads as "audited" (skip scraper & auditor for single business)
+    fs.copyFileSync(job.files.leads, job.files.audited);
+    fs.copyFileSync(job.files.leads, job.files.socialAudited);
+    pushLog(jobId, '✅ Lead data ready — skipping scrape & audit for single business.', 'success');
+
+    // Step 2: Firecrawl Enrichment
+    if (process.env.FIRECRAWL_API_KEY) {
+        pushLog(jobId, '🔥 Enriching with Firecrawl…', 'step');
+        job.step = 2;
+        await runChild(jobId, 'node', [
+            path.join(__dirname, '..', 'src', 'node', 'firecrawl_enrich.mjs'),
+            job.files.socialAudited,
+            job.files.enriched,
+        ]);
+        pushLog(jobId, '✅ Firecrawl enrichment complete.', 'success');
+    } else {
+        fs.copyFileSync(job.files.socialAudited, job.files.enriched);
+        pushLog(jobId, '⚠️  Firecrawl skipped — FIRECRAWL_API_KEY not set.', 'warn');
+    }
+
+    // Step 3: Outreach
+    if (process.env.OPENAI_API_KEY) {
+        pushLog(jobId, '✍️  Generating personalized outreach…', 'step');
+        job.step = 3;
+        const outreachInput = fs.existsSync(job.files.enriched) ? job.files.enriched : job.files.socialAudited;
+        await runChild(jobId, 'node', [
+            path.join(__dirname, '..', 'src', 'node', 'generate_outreach.mjs'),
+            '--input', outreachInput,
+            '--output', job.files.outreach,
+            '--base-url', job.baseUrl,
+        ]);
+        pushLog(jobId, '✅ Outreach message generated.', 'success');
+    } else {
+        pushLog(jobId, '⚠️  Outreach skipped — OPENAI_API_KEY not set.', 'warn');
+    }
+
+    // Step 4: Demo Site
+    if (job.generateDemo) {
+        pushLog(jobId, '🏗️  Generating demo site…', 'step');
+        job.step = 4;
+        const demoInput = fs.existsSync(job.files.outreach) ? job.files.outreach
+                        : fs.existsSync(job.files.enriched) ? job.files.enriched
+                        : job.files.socialAudited;
+        await runChild(jobId, 'node', [
+            path.join(__dirname, '..', 'src', 'node', 'generate-from-templates.mjs'),
+            '--input', demoInput,
+            '--output', job.files.demos || path.join('public', 'demos'),
+        ]);
+        pushLog(jobId, '✅ Demo site generated.', 'success');
+    }
+
+    // Step 5: Send Email
+    if (job.sendEmail) {
+        const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+        const emailInput = fs.existsSync(job.files.outreach) ? job.files.outreach : null;
+        if (smtpConfigured && emailInput) {
+            pushLog(jobId, '📧 Sending outreach email…', 'step');
+            job.step = 5;
+            await runChild(jobId, 'node', [
+                path.join(__dirname, '..', 'src', 'node', 'send_emails.mjs'),
+                '--input', emailInput,
+                '--log', job.files.emailLog,
+            ]);
+            pushLog(jobId, '✅ Email sent.', 'success');
+        } else {
+            pushLog(jobId, '⚠️  Email skipped — SMTP not configured or no outreach data.', 'warn');
+        }
+    }
+
+    // Step 7: AI Call
+    if (job.makeCall) {
+        const vapiConfigured = process.env.VAPI_API_KEY && process.env.VAPI_ASSISTANT_ID && process.env.VAPI_PHONE_NUMBER_ID;
+        const callInput = fs.existsSync(job.files.outreach) ? job.files.outreach
+                        : fs.existsSync(job.files.enriched) ? job.files.enriched
+                        : job.files.leads;
+        if (vapiConfigured) {
+            pushLog(jobId, '📞 Placing AI call via Vapi…', 'step');
+            job.step = 7;
+            await runChild(jobId, 'node', [
+                path.join(__dirname, '..', 'src', 'node', 'make_calls.js'),
+                '--input', callInput,
+                '--log', job.files.callLog,
+                '--limit', '1',
+                '--delay', '0',
+            ]);
+            pushLog(jobId, '✅ AI call placed.', 'success');
+        } else {
+            pushLog(jobId, '⚠️  Call skipped — Vapi env vars not configured.', 'warn');
+        }
+    }
+
+    job.status = 'done';
+    job.step = 8;
+    pushLog(jobId, '🎉 Done! Single-business pipeline complete.', 'success');
+    broadcast(jobId, { type: 'done', status: 'done', files: job.files });
+
+    n8nService.notifyPipelineEvent('single_business_complete', {
+        jobId,
+        city: job.city,
+        files: job.files,
+    });
+}
+
+module.exports = { runPipeline, runSingleBusiness, runChild, countCsvRows };
