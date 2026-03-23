@@ -37,6 +37,19 @@ const webhookLimiter = rateLimit({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ──────────────────────────────────────────────
+// Route: frontend config (safe public values only)
+// The browser fetches this to get the Vapi public key for the Web SDK.
+// NEVER include server-side secrets here.
+// ──────────────────────────────────────────────
+app.get('/api/config', (req, res) => {
+    res.json({
+        vapiPublicKey: process.env.VAPI_PUBLIC_KEY || null,
+        vapiAssistantId: process.env.VAPI_ASSISTANT_ID || null,
+        demoBaeUrl: process.env.DEMO_BASE_URL || null,
+    });
+});
+
+// ──────────────────────────────────────────────
 // Persistent job store
 // Jobs are kept in memory for fast SSE access and flushed to disk so they
 // survive server restarts.  Only serialisable fields are persisted (clients
