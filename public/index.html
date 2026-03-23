@@ -4,221 +4,588 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lead Generator Dashboard</title>
+  <title>SmokeShop Growth Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
     :root {
-      --bg: #09090b;
-      --surface: rgba(255, 255, 255, 0.03);
-      --surface2: rgba(255, 255, 255, 0.06);
+      --bg: #0a0a0a;
+      --bg-secondary: #111111;
+      --surface: rgba(255, 255, 255, 0.02);
+      --surface-hover: rgba(255, 255, 255, 0.04);
       --border: rgba(255, 255, 255, 0.06);
       --border-hover: rgba(255, 255, 255, 0.12);
-      --accent: #6366f1;
-      --accent2: #8b5cf6;
-      --green: #10b981;
-      --yellow: #f59e0b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --green: #22c55e;
+      --green-dim: rgba(34, 197, 94, 0.12);
+      --yellow: #eab308;
+      --yellow-dim: rgba(234, 179, 8, 0.12);
       --red: #ef4444;
-      --text: #f0f0f3;
-      --muted: #71717a;
-      --radius: 16px;
-      --glow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+      --red-dim: rgba(239, 68, 68, 0.12);
+      --blue-dim: rgba(59, 130, 246, 0.12);
+      --text: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #52525b;
+      --radius: 12px;
+      --radius-lg: 16px;
     }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Layout */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      display: flex;
       align-items: center;
-      padding: 48px 20px 100px;
-      background-image:
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.12), transparent);
+      gap: 12px;
+      padding: 0 8px;
+      margin-bottom: 32px;
     }
 
-    /* ── Header ── */
-    .header {
-      text-align: center;
-      margin-bottom: 48px;
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
     }
 
-    .header h1 {
-      font-size: 2.25rem;
+    .logo-text {
       font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), var(--accent2), #c084fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size: 1.1rem;
       letter-spacing: -0.02em;
     }
 
-    .header p {
-      color: var(--muted);
-      margin-top: 10px;
-      font-size: 0.95rem;
-      font-weight: 400;
-    }
-
-    /* ── Layout ── */
-    .container {
-      width: 100%;
-      max-width: 880px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    /* ── Card ── */
-    .card {
-      background: var(--surface);
-      -webkit-backdrop-filter: blur(16px);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 32px;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-      border-color: var(--border-hover);
-      box-shadow: 0 0 40px -12px rgba(99, 102, 241, 0.08);
-    }
-
-    .card-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .nav-section {
       margin-bottom: 24px;
     }
 
-    /* ── Form ── */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
+    .nav-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 12px;
+      margin-bottom: 8px;
     }
 
-    .form-grid .full {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--muted);
-    }
-
-    label span {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="url"],
-    select {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.95rem;
-      padding: 11px 16px;
-      outline: none;
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-      width: 100%;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: var(--glow);
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    input::placeholder {
-      color: var(--muted);
-      opacity: 0.6;
-    }
-
-    /* Range slider */
-    .slider-wrap {
+    .nav-item {
       display: flex;
       align-items: center;
-      gap: 14px;
-    }
-
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      flex: 1;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
-      outline: none;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.15s ease;
+      text-decoration: none;
     }
 
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
+    .nav-item:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: var(--blue-dim);
+      color: var(--accent);
+    }
+
+    .nav-icon {
       width: 20px;
       height: 20px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      cursor: pointer;
-      box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
-      transition: box-shadow 0.2s;
+      opacity: 0.7;
     }
 
-    input[type="range"]::-webkit-slider-thumb:hover {
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.7);
+    .nav-item.active .nav-icon {
+      opacity: 1;
     }
 
-    .slider-val {
-      min-width: 48px;
-      text-align: center;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-size: 1rem;
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
     }
 
-    /* Toggle */
-    .toggle-row {
+    /* Main Content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Header */
+    .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
       gap: 12px;
     }
 
-    .toggle-label {
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: inherit;
       font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
       color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-hover);
+    }
+
+    .btn-success {
+      background: var(--green);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #16a34a;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Content Area */
+    .content {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      transition: all 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--border-hover);
+    }
+
+    .kpi-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .kpi-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
       font-weight: 500;
     }
 
+    .kpi-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .kpi-icon.blue { background: var(--blue-dim); }
+    .kpi-icon.green { background: var(--green-dim); }
+    .kpi-icon.yellow { background: var(--yellow-dim); }
+    .kpi-icon.red { background: var(--red-dim); }
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .kpi-change {
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kpi-change.positive { color: var(--green); }
+    .kpi-change.negative { color: var(--red); }
+
+    /* Charts Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .chart-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 240px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      padding: 4px;
+      border-radius: 10px;
+      width: fit-content;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+      background: transparent;
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.active {
+      background: var(--bg-secondary);
+      color: var(--text);
+    }
+
+    /* Section Cards */
+    .section-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .section-body {
+      padding: 24px;
+    }
+
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th.sortable:hover {
+      color: var(--text-secondary);
+    }
+
+    th .sort-icon {
+      margin-left: 4px;
+      opacity: 0.5;
+    }
+
+    td {
+      padding: 16px;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: var(--surface);
+    }
+
+    .lead-name {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .lead-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .badge.pending {
+      background: var(--yellow-dim);
+      color: var(--yellow);
+    }
+
+    .badge.contacted {
+      background: var(--blue-dim);
+      color: var(--accent);
+    }
+
+    .badge.converted {
+      background: var(--green-dim);
+      color: var(--green);
+    }
+
+    .badge.lost {
+      background: var(--red-dim);
+      color: var(--red);
+    }
+
+    /* Score indicator */
+    .score {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-bar {
+      width: 60px;
+      height: 6px;
+      background: var(--surface);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .score-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .score-fill.high { background: var(--green); }
+    .score-fill.medium { background: var(--yellow); }
+    .score-fill.low { background: var(--red); }
+
+    /* Form styles */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .form-grid.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .form-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Toggle */
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toggle-group:last-child {
+      border-bottom: none;
+    }
+
+    .toggle-info {
+      flex: 1;
+    }
+
+    .toggle-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
     .toggle-desc {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 3px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
     }
 
     .toggle {
@@ -237,10 +604,10 @@
     .toggle-track {
       position: absolute;
       inset: 0;
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--surface);
       border-radius: 24px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: background 0.2s ease;
     }
 
     .toggle-track::before {
@@ -250,190 +617,35 @@
       top: 3px;
       width: 18px;
       height: 18px;
-      background: white;
+      background: var(--text-muted);
       border-radius: 50%;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
     }
 
-    .toggle input:checked+.toggle-track {
+    .toggle input:checked + .toggle-track {
       background: var(--accent);
-      box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
     }
 
-    .toggle input:checked+.toggle-track::before {
+    .toggle input:checked + .toggle-track::before {
       transform: translateX(20px);
+      background: white;
     }
 
-    /* Sheets field — smooth show/hide */
-    #sheets-field {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin 0.3s ease;
-      margin-top: 0;
-    }
-
-    #sheets-field.visible {
-      max-height: 80px;
-      opacity: 1;
-      margin-top: 14px;
-    }
-
-    /* ── Buttons ── */
-    .btn-run {
-      width: 100%;
-      padding: 14px;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 600;
-      color: white;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: opacity 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
-      letter-spacing: 0.02em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .btn-run:hover {
-      opacity: 0.92;
-      box-shadow: 0 4px 24px rgba(99, 102, 241, 0.3);
-    }
-
-    .btn-run:active {
-      transform: scale(0.98);
-    }
-
-    .btn-run:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .btn-run .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* ── Progress Card — smooth show/hide ── */
-    #progress-card {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      padding: 0 32px;
-      border: none;
-      margin-top: -24px;
-      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.4s ease,
-                  padding 0.4s ease,
-                  margin 0.4s ease,
-                  border 0.4s ease;
-    }
-
-    #progress-card.visible {
-      max-height: 600px;
-      opacity: 1;
-      padding: 28px 32px;
+    /* Terminal */
+    .terminal {
+      background: var(--bg);
       border: 1px solid var(--border);
-      margin-top: 0;
-      overflow: visible;
-    }
-
-    .steps-track {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      position: relative;
-    }
-
-    .steps-track::before {
-      content: '';
-      position: absolute;
-      top: 15px;
-      left: 20px;
-      right: 20px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.06);
-      z-index: 0;
-    }
-
-    .step-dot {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      z-index: 1;
-    }
-
-    .dot {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 2px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      color: var(--muted);
-    }
-
-    .dot.active {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(99, 102, 241, 0.12);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    .dot.done {
-      background: var(--green);
-      border-color: var(--green);
-      color: white;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
-    }
-
-    .step-name {
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-align: center;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-    }
-
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
-    }
-
-    /* ── Log Terminal (macOS style) ── */
-    .terminal-wrap {
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
+      border-radius: var(--radius);
       overflow: hidden;
-      background: rgba(0, 0, 0, 0.4);
     }
 
-    .terminal-titlebar {
+    .terminal-header {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
     }
 
     .terminal-dot {
@@ -446,209 +658,178 @@
     .terminal-dot.yellow { background: #febc2e; }
     .terminal-dot.green { background: #28c840; }
 
-    .terminal-title-text {
+    .terminal-title {
       flex: 1;
       text-align: center;
-      font-size: 0.72rem;
-      color: var(--muted);
+      font-size: 0.75rem;
+      color: var(--text-muted);
       font-weight: 500;
-      letter-spacing: 0.04em;
     }
 
-    .log-terminal {
+    .terminal-body {
       padding: 16px;
-      height: 280px;
+      max-height: 300px;
       overflow-y: auto;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       line-height: 1.8;
-    }
-
-    .log-terminal::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    .log-terminal::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .log-terminal::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
     }
 
     .log-line {
       display: flex;
       gap: 12px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      transition: background 0.15s;
-    }
-
-    .log-line:nth-child(even) {
-      background: rgba(255, 255, 255, 0.015);
-    }
-
-    .log-line:hover {
-      background: rgba(255, 255, 255, 0.04);
+      padding: 2px 0;
     }
 
     .log-ts {
-      color: rgba(255, 255, 255, 0.2);
+      color: var(--text-muted);
       flex-shrink: 0;
-      font-size: 0.72rem;
     }
 
-    .log-msg.log { color: #9ca3af; }
-    .log-msg.step { color: #818cf8; font-weight: 600; }
-    .log-msg.success { color: var(--green); font-weight: 600; }
+    .log-msg { color: var(--text-secondary); }
+    .log-msg.step { color: var(--accent); font-weight: 500; }
+    .log-msg.success { color: var(--green); }
     .log-msg.warn { color: var(--yellow); }
-    .log-msg.error { color: var(--red); font-weight: 600; }
+    .log-msg.error { color: var(--red); }
 
-    /* ── Results Card — smooth show/hide ── */
-    #results-card {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      padding: 0 32px;
-      border: none;
-      margin-top: -24px;
-      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.4s ease,
-                  padding 0.4s ease,
-                  margin 0.4s ease,
-                  border 0.4s ease;
+    /* Progress Steps */
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-bottom: 24px;
     }
 
-    #results-card.visible {
-      max-height: 500px;
-      opacity: 1;
-      padding: 28px 32px;
-      border: 1px solid var(--border);
-      margin-top: 0;
-      overflow: visible;
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 32px;
+      right: 32px;
+      height: 2px;
+      background: var(--border);
     }
 
-    /* Skeleton rows */
-    .skeleton-row {
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .step-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    .skeleton-row:last-child { border-bottom: none; }
-
-    .skeleton-bar {
-      height: 14px;
-      border-radius: 6px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    .result-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      opacity: 0;
-      transform: translateY(8px);
-      animation: fadeUp 0.35s ease forwards;
-    }
-
-    .result-row:last-child { border-bottom: none; }
-    .result-row:nth-child(1) { animation-delay: 0.05s; }
-    .result-row:nth-child(2) { animation-delay: 0.1s; }
-    .result-row:nth-child(3) { animation-delay: 0.15s; }
-    .result-row:nth-child(4) { animation-delay: 0.2s; }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .result-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-      font-weight: 400;
-    }
-
-    .result-value {
-      font-size: 0.9rem;
+      justify-content: center;
+      font-size: 0.8rem;
       font-weight: 600;
-    }
-
-    .btn-dl {
-      padding: 8px 18px;
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text);
-      text-decoration: none;
-      transition: all 0.25s ease;
-      display: inline-block;
-    }
-
-    .btn-dl:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(99, 102, 241, 0.08);
-      box-shadow: 0 0 16px rgba(99, 102, 241, 0.1);
-    }
-
-    /* Status badge */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      color: var(--text-muted);
       transition: all 0.3s ease;
     }
 
-    .badge.running {
-      background: rgba(99, 102, 241, 0.12);
-      color: #818cf8;
+    .step.active .step-dot {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 0 4px var(--blue-dim);
     }
 
-    .badge.done {
-      background: rgba(16, 185, 129, 0.12);
-      color: var(--green);
+    .step.done .step-dot {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
     }
 
-    .badge.failed {
-      background: rgba(239, 68, 68, 0.12);
-      color: var(--red);
+    .step-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
     }
 
-    .dot-blink {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: currentColor;
-      animation: blink 1s ease-in-out infinite;
+    .step.active .step-label,
+    .step.done .step-label {
+      color: var(--text-secondary);
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.25; }
+    /* Search */
+    .search-box {
+      position: relative;
+      width: 280px;
     }
 
-    /* ── Toast System ── */
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      color: var(--text);
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .pagination-info {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .page-btn {
+      padding: 6px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: var(--surface-hover);
+      border-color: var(--border-hover);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Toast */
     .toast-container {
       position: fixed;
       top: 24px;
@@ -664,19 +845,17 @@
       pointer-events: auto;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 14px 20px;
-      border-radius: 12px;
-      font-size: 0.85rem;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
       font-weight: 500;
-      -webkit-backdrop-filter: blur(16px);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
       transform: translateX(120%);
       opacity: 0;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-      max-width: 380px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 400px;
     }
 
     .toast.show {
@@ -684,474 +863,793 @@
       opacity: 1;
     }
 
-    .toast.hide {
-      transform: translateX(120%);
-      opacity: 0;
-    }
+    .toast.success { background: var(--green-dim); color: var(--green); }
+    .toast.error { background: var(--red-dim); color: var(--red); }
+    .toast.info { background: var(--blue-dim); color: var(--accent); }
 
-    .toast.success {
-      background: rgba(16, 185, 129, 0.12);
-      color: #6ee7b7;
-      border-color: rgba(16, 185, 129, 0.15);
-    }
-
-    .toast.error {
-      background: rgba(239, 68, 68, 0.12);
-      color: #fca5a5;
-      border-color: rgba(239, 68, 68, 0.15);
-    }
-
-    .toast.info {
-      background: rgba(99, 102, 241, 0.12);
-      color: #a5b4fc;
-      border-color: rgba(99, 102, 241, 0.15);
-    }
-
-    .toast-icon {
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    /* ── Quick Call ── */
-    .btn-call {
-      width: 100%;
-      padding: 14px;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 600;
-      color: white;
-      background: linear-gradient(135deg, var(--green), #059669);
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: opacity 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
-      letter-spacing: 0.02em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .btn-call:hover {
-      opacity: 0.92;
-      box-shadow: 0 4px 24px rgba(16, 185, 129, 0.3);
-    }
-
-    .btn-call:active { transform: scale(0.98); }
-    .btn-call:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
-
-    .btn-call .spinner {
-      width: 18px;
-      height: 18px;
+    /* Spinner */
+    .spinner {
+      width: 16px;
+      height: 16px;
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-top-color: white;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
 
-    #qc-status {
-      transition: opacity 0.3s ease;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-    /* ── Utility classes (replaces inline styles) ── */
-    .mt-16 { margin-top: 16px; }
-    .mt-24 { margin-top: 24px; }
-    .qc-status-bar { margin-top: 16px; font-size: 0.85rem; color: var(--muted); text-align: center; }
-    .card-title--row { display: flex; justify-content: space-between; align-items: center; }
-    .terminal-spacer { width: 36px; }
-    .sk-100 { width: 100px; }
-    .sk-120 { width: 120px; }
-    .sk-140 { width: 140px; }
-    .sk-150 { width: 150px; }
-    .sk-160 { width: 160px; }
+    /* Tab panels */
+    .tab-panel {
+      display: none;
+    }
 
-    /* ── Responsive ── */
-    @media (max-width: 640px) {
-      body { padding: 28px 14px 60px; }
+    .tab-panel.active {
+      display: block;
+    }
 
-      .header h1 { font-size: 1.6rem; }
-
-      .form-grid { grid-template-columns: 1fr; }
-
-      .card { padding: 22px 18px; }
-
-      #progress-card.visible { padding: 22px 18px; }
-      #results-card.visible { padding: 22px 18px; }
-
-      .dot {
-        width: 24px;
-        height: 24px;
-        font-size: 0.65rem;
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
 
-      .step-name { font-size: 0.62rem; }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
-      .toast-container {
-        top: 12px;
-        right: 12px;
-        left: 12px;
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
       }
 
-      .toast { max-width: 100%; }
+      .content {
+        padding: 20px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header {
+        padding: 16px 20px;
+      }
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    /* Action buttons in table */
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      padding: 6px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .action-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+
+    /* Quick stat */
+    .quick-stats {
+      display: flex;
+      gap: 24px;
+    }
+
+    .quick-stat {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quick-stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .quick-stat-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .quick-stat-value {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Mobile menu button */
+    .mobile-menu-btn {
+      display: none;
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-btn {
+        display: block;
+      }
+    }
+
+    /* Collapsible content field */
+    .collapsible-field {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: all 0.3s ease;
+      margin-top: 0;
+    }
+
+    .collapsible-field.visible {
+      max-height: 100px;
+      opacity: 1;
+      margin-top: 12px;
     }
   </style>
 </head>
 
 <body>
-
-  <!-- Toast container -->
   <div class="toast-container" id="toast-container"></div>
 
-  <div class="header">
-    <h1>Lead Generator</h1>
-    <p>Scrape Google Maps &rarr; Audit websites &rarr; Generate outreach &rarr; Export to Sheets</p>
-  </div>
-
-  <div class="container">
-
-    <!-- ── Leads & Conversions Card ── -->
-    <div class="card mt-16" id="leads-section">
-      <div class="card-title--row">
-        <div class="card-title" style="margin-bottom:0">Recent Leads & Conversions</div>
-        <button class="btn-dl" onclick="refreshLeads()" style="padding: 6px 14px">Refresh</button>
-      </div>
-      <div id="leads-container" class="mt-24">
-        <div class="skeleton-row"><div class="skeleton-bar sk-150"></div><div class="skeleton-bar sk-100"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar sk-150"></div><div class="skeleton-bar sk-100"></div></div>
-      </div>
-    </div>
-
-    <!-- ── Search Form ── -->
-    <div class="card">
-      <div class="card-title">Search Settings</div>
-      <form id="pipeline-form">
-        <div class="form-grid">
-
-          <label>
-            <span>City</span>
-            <input type="text" id="city" placeholder="e.g. Houston TX" required />
-          </label>
-
-          <label>
-            <span>Business Type</span>
-            <input type="text" id="bizType" value="smoke shop" placeholder="e.g. vape shop, dispensary" />
-          </label>
-
-          <!-- Toggles -->
-          <label class="full">
-            <div class="toggle-row">
-              <div>
-                <div class="toggle-label">Skip Lighthouse Audit</div>
-                <div class="toggle-desc">Faster — uses basic Axios + Cheerio checks instead</div>
-              </div>
-              <label class="toggle">
-                <input type="checkbox" id="skipLighthouse" checked aria-label="Skip Lighthouse Audit" />
-                <div class="toggle-track"></div>
-              </label>
-            </div>
-          </label>
-
-          <label class="full" id="demo-toggle">
-            <div class="toggle-row">
-              <div>
-                <div class="toggle-label">Generate Demo Videos</div>
-                <div class="toggle-desc">Uses Minimax T2V to create website previews (Requires API Key)</div>
-              </div>
-              <label class="toggle">
-                <input type="checkbox" id="generateDemo" checked aria-label="Generate Demo Videos" />
-                <div class="toggle-track"></div>
-              </label>
-            </div>
-          </label>
-
-          <label class="full" id="sheets-toggle">
-            <div class="toggle-row">
-              <div>
-                <div class="toggle-label">Export to Google Sheets</div>
-                <div class="toggle-desc">Requires credentials.json in project root</div>
-              </div>
-              <label class="toggle">
-                <input type="checkbox" id="exportSheets" checked aria-label="Export to Google Sheets"
-                  onchange="document.getElementById('sheets-field').classList.toggle('visible', this.checked)" />
-                <div class="toggle-track"></div>
-              </label>
-            </div>
-            <div id="sheets-field" class="visible">
-              <input type="text" id="sheetsId" value="1cCWHElqtVl8sE7lIfOxoGqfkmr8aE5tkcsyoF8RGmTU"
-                placeholder="Google Spreadsheet ID (from the URL)" />
-            </div>
-          </label>
-
-        </div>
-
-        <div class="mt-24">
-          <button type="submit" class="btn-run" id="run-btn">
-            <span id="run-btn-text">Run Pipeline</span>
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <!-- ── Quick Call Agent ── -->
-    <div class="card">
-      <div class="card-title">Quick Call Agent</div>
-      <form id="quick-call-form">
-        <label>
-          <span>Phone Number</span>
-          <input type="text" id="qc-phone" placeholder="e.g. +1 555 123 4567" required />
-        </label>
-
-        <div class="form-grid mt-16">
-          <label>
-            <span>Business Name (Optional)</span>
-            <input type="text" id="qc-biz" placeholder="e.g. Acme Corp" />
-          </label>
-          <label>
-            <span>City (Optional)</span>
-            <input type="text" id="qc-city" placeholder="e.g. Austin TX" />
-          </label>
-        </div>
-
-        <div class="mt-24">
-          <button type="submit" class="btn-call" id="qc-btn">
-            <span id="qc-btn-text">Call Now (ElevenLabs)</span>
-          </button>
-        </div>
-        <div id="qc-status" class="qc-status-bar">
-        </div>
-      </form>
-    </div>
-
-    <!-- ── Single Business ── -->
-    <div class="card">
-      <div class="card-title">🎯 Run on Single Business</div>
-      <form id="single-biz-form">
-        <label>
-          <span>Business Name <span style="color:var(--red)">*</span></span>
-          <input type="text" id="sb-name" placeholder="e.g. Cloud Nine Smoke Shop" required />
-        </label>
-        <div class="form-grid mt-16">
-          <label>
-            <span>Website</span>
-            <input type="text" id="sb-website" placeholder="e.g. cloudninesmoke.com" />
-          </label>
-          <label>
-            <span>Phone</span>
-            <input type="text" id="sb-phone" placeholder="e.g. +15121234567" />
-          </label>
-        </div>
-        <div class="form-grid mt-16">
-          <label>
-            <span>City</span>
-            <input type="text" id="sb-city" placeholder="e.g. Austin TX" />
-          </label>
-          <label style="padding-top:24px;">
-            <label class="toggle-label">
-              <input type="checkbox" id="sb-call" class="toggle-input" />
-              <span class="toggle-track"></span>
-              <span>Place AI Call</span>
-            </label>
-          </label>
-        </div>
-        <div class="mt-24">
-          <button type="submit" class="btn-run" id="sb-btn" style="background:linear-gradient(135deg,#7c3aed,#db2777);">
-            <span id="sb-btn-text">🔥 Enrich + Generate Demo</span>
-          </button>
-        </div>
-        <div id="sb-status" class="qc-status-bar"></div>
-      </form>
-    </div>
-
-    <!-- ── Live Pipeline Log ── -->
-    <div class="card" id="live-log-card" style="display:none;">
-      <div class="card-title card-title--row">
-        <span>📡 Live Pipeline Log</span>
-        <button onclick="document.getElementById('live-log-card').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;">✕</button>
-      </div>
-      <div id="live-log-steps" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
-      <div id="live-log-output" style="
-        background:var(--bg);border:1px solid var(--border);border-radius:8px;
-        padding:12px;height:280px;overflow-y:auto;font-family:monospace;font-size:0.78rem;
-        color:var(--text-dim);line-height:1.6;
-      ">
-        <div style="color:var(--muted);text-align:center;padding:40px 0;">Waiting for pipeline events…</div>
-      </div>
-    </div>
-
-    <!-- ── Progress ── -->
-    <div class="card" id="progress-card">
-      <div class="card-title card-title--row">
-        <span>Pipeline Progress</span>
-        <span id="status-badge" class="badge running"><span class="dot-blink"></span> Running</span>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">S</div>
+        <span class="logo-text">SmokeShop Growth</span>
       </div>
 
-      <div class="steps-track">
-        <div class="step-dot">
-          <div class="dot" id="dot-1">1</div>
-          <div class="step-name">Scrape</div>
+      <nav>
+        <div class="nav-section">
+          <div class="nav-label">Overview</div>
+          <a href="#" class="nav-item active" data-tab="dashboard">
+            <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            Dashboard
+          </a>
+          <a href="#" class="nav-item" data-tab="leads">
+            <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            Leads
+          </a>
         </div>
-        <div class="step-dot">
-          <div class="dot" id="dot-2">2</div>
-          <div class="step-name">Audit</div>
+
+        <div class="nav-section">
+          <div class="nav-label">Tools</div>
+          <a href="#" class="nav-item" data-tab="pipeline">
+            <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Pipeline
+          </a>
+          <a href="#" class="nav-item" data-tab="calls">
+            <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+            AI Calls
+          </a>
+          <a href="#" class="nav-item" data-tab="social">
+            <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+            </svg>
+            Social Media
+          </a>
+          <a href="#" class="nav-item" data-tab="single">
+            <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+            </svg>
+            Single Business
+          </a>
         </div>
-        <div class="step-dot">
-          <div class="dot" id="dot-3">3</div>
-          <div class="step-name">Outreach</div>
+
+        <div class="nav-section">
+          <div class="nav-label">Settings</div>
+          <a href="#" class="nav-item" data-tab="settings">
+            <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Settings
+          </a>
         </div>
-        <div class="step-dot">
-          <div class="dot" id="dot-4">4</div>
-          <div class="step-name">Demo</div>
-        </div>
-        <div class="step-dot">
-          <div class="dot" id="dot-5">&#10003;</div>
-          <div class="step-name">Done</div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="nav-item">
+          <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Help & Support
         </div>
       </div>
+    </aside>
 
-      <div class="terminal-wrap">
-        <div class="terminal-titlebar">
-          <div class="terminal-dot red"></div>
-          <div class="terminal-dot yellow"></div>
-          <div class="terminal-dot green"></div>
-          <div class="terminal-title-text">pipeline &mdash; live output</div>
-          <div class="terminal-spacer"></div>
-        </div>
-        <div class="log-terminal" id="log-terminal"></div>
-      </div>
-    </div>
-
-    <!-- ── Results ── -->
-    <div class="card" id="results-card">
-      <div class="card-title">Results</div>
-      <div id="result-rows">
-        <!-- skeleton placeholder -->
-        <div class="skeleton-row"><div class="skeleton-bar sk-120"></div><div class="skeleton-bar sk-100"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar sk-140"></div><div class="skeleton-bar sk-100"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar sk-150"></div><div class="skeleton-bar sk-100"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar sk-160"></div><div class="skeleton-bar sk-100"></div></div>
-      </div>
-    </div>
-
-    <!-- ── Social Media Manager ── -->
-    <div class="card" id="social-card">
-      <div class="card-title card-title--row">
-        <div class="card-title" style="margin-bottom:0">📱 Social Media Manager</div>
-        <span class="badge" style="background:rgba(139,92,246,0.12);color:#a78bfa">Buffer + Instagram</span>
-      </div>
-
-      <!-- Step 1: Generate Content Calendar -->
-      <div style="margin-top:20px">
-        <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Step 1 — Generate Content Calendar</div>
-        <div class="form-grid">
-          <label>
-            <span>Business Name</span>
-            <input type="text" id="soc-biz" placeholder="e.g. Cloud 9 Smoke Shop" />
-          </label>
-          <label>
-            <span>City</span>
-            <input type="text" id="soc-city" placeholder="e.g. Houston TX" />
-          </label>
-          <label>
-            <span>Instagram Handle (optional)</span>
-            <input type="text" id="soc-ig" placeholder="e.g. cloud9smokeshop" />
-          </label>
-          <label>
-            <span>Specialty</span>
-            <input type="text" id="soc-specialty" value="smoke shop products" placeholder="smoke shop products, vapes" />
-          </label>
-        </div>
-        <div class="mt-16">
-          <button class="btn-run" id="soc-gen-btn" onclick="generateCalendar()" type="button" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">
-            <span id="soc-gen-text">✨ Generate 30-Day Calendar (GPT-4o)</span>
-          </button>
-        </div>
-        <div id="soc-calendar-preview" style="margin-top:14px;display:none">
-          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px">Preview (first 3 posts):</div>
-          <div id="soc-preview-rows" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.8;background:rgba(0,0,0,0.3);border-radius:8px;padding:12px 16px;color:#9ca3af;white-space:pre-wrap"></div>
-        </div>
-      </div>
-
-      <!-- Step 2: Schedule to Buffer -->
-      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
-        <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Step 2 — Schedule to Buffer</div>
-        <div class="form-grid">
-          <label>
-            <span>Buffer Profile ID</span>
-            <input type="text" id="soc-profile" placeholder="Run --list-profiles to find yours" />
-          </label>
-          <label style="align-self:end">
-            <button class="btn-dl" onclick="listBufferProfiles()" type="button" style="width:100%;padding:11px 16px;text-align:center">📋 List My Profiles</button>
-          </label>
-        </div>
-        <div class="mt-16">
-          <button class="btn-run" id="soc-sched-btn" onclick="scheduleCalendar()" type="button" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)" disabled>
-            <span id="soc-sched-text">📅 Schedule All 30 Posts to Buffer</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 3: DM Outreach -->
-      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
-        <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Step 3 — Instagram DM Outreach</div>
-        <div class="form-grid">
-          <label>
-            <span>Input CSV (with instagram column)</span>
-            <input type="text" id="soc-outreach-file" value="social_audited.csv" placeholder="social_audited.csv" />
-          </label>
-          <label>
-            <span>Max DMs per Day</span>
-            <input type="number" id="soc-dm-limit" value="20" min="5" max="50" />
-          </label>
-        </div>
-        <div class="mt-16" style="display:flex;gap:12px">
-          <button class="btn-dl" onclick="dryRunOutreach()" type="button" style="flex:1;padding:12px;text-align:center;font-weight:600">
-            🔍 Dry Run (Preview)
-          </button>
-          <button class="btn-run" onclick="runOutreach()" type="button" style="flex:2;background:linear-gradient(135deg,#059669,#10b981)">
-            <span>📨 Start DM Outreach</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Social Status log -->
-      <div id="soc-log" style="margin-top:16px;display:none">
-        <div class="terminal-wrap">
-          <div class="terminal-titlebar">
-            <div class="terminal-dot red"></div>
-            <div class="terminal-dot yellow"></div>
-            <div class="terminal-dot green"></div>
-            <div class="terminal-title-text">social manager — output</div>
-            <div class="terminal-spacer"></div>
+    <!-- Main Content -->
+    <main class="main">
+      <header class="header">
+        <button class="mobile-menu-btn" aria-label="Menu">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <h1 class="header-title" id="page-title">Dashboard</h1>
+        <div class="header-actions">
+          <div class="search-box">
+            <svg class="search-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" class="search-input" placeholder="Search..." id="global-search" />
           </div>
-          <div class="log-terminal" id="soc-terminal" style="height:160px"></div>
+          <button class="btn btn-primary" id="quick-run-btn">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Run Pipeline
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- Dashboard Tab -->
+        <div class="tab-panel active" id="panel-dashboard">
+          <!-- KPI Cards -->
+          <div class="kpi-grid" id="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Total Leads</span>
+                <div class="kpi-icon blue">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpi-total">--</div>
+              <span class="kpi-change positive" id="kpi-total-change">+0 this week</span>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Contacted</span>
+                <div class="kpi-icon yellow">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpi-contacted">--</div>
+              <span class="kpi-change positive" id="kpi-contacted-pct">0% of total</span>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Conversions</span>
+                <div class="kpi-icon green">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpi-converted">--</div>
+              <span class="kpi-change positive" id="kpi-conversion-rate">0% rate</span>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Avg. Score</span>
+                <div class="kpi-icon red">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="kpi-avg-score">--</div>
+              <span class="kpi-change" id="kpi-score-label">Lead quality score</span>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Leads Over Time</h3>
+                <div class="quick-stats" id="chart-stats">
+                  <div class="quick-stat">
+                    <div class="quick-stat-dot" style="background: var(--accent);"></div>
+                    <span class="quick-stat-label">New</span>
+                    <span class="quick-stat-value" id="stat-new">0</span>
+                  </div>
+                  <div class="quick-stat">
+                    <div class="quick-stat-dot" style="background: var(--green);"></div>
+                    <span class="quick-stat-label">Converted</span>
+                    <span class="quick-stat-value" id="stat-converted">0</span>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="leads-chart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Lead Status</h3>
+              </div>
+              <div class="chart-container">
+                <canvas id="status-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Leads Table -->
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">Recent Leads</h3>
+              <button class="btn btn-secondary" onclick="refreshLeads()">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </button>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="sortable" data-sort="name">Business Name</th>
+                    <th class="sortable" data-sort="city">Location</th>
+                    <th class="sortable" data-sort="score">Score</th>
+                    <th class="sortable" data-sort="status">Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="leads-table-body">
+                  <tr>
+                    <td colspan="5">
+                      <div class="empty-state">
+                        <div class="empty-state-icon">&#128269;</div>
+                        <div class="empty-state-title">No leads yet</div>
+                        <p>Run the pipeline to start generating leads</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="leads-pagination" style="display: none;">
+              <span class="pagination-info">Showing <span id="page-start">1</span>-<span id="page-end">10</span> of <span id="total-leads">0</span></span>
+              <div class="pagination-controls">
+                <button class="page-btn" id="prev-page" disabled>&larr; Previous</button>
+                <button class="page-btn" id="next-page">Next &rarr;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leads Tab -->
+        <div class="tab-panel" id="panel-leads">
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">All Leads</h3>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <select class="form-input" id="status-filter" style="width: auto;">
+                  <option value="">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="contacted">Contacted</option>
+                  <option value="converted">Converted</option>
+                  <option value="lost">Lost</option>
+                </select>
+                <button class="btn btn-secondary" onclick="exportLeads()">
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Export CSV
+                </button>
+              </div>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Business</th>
+                    <th>Contact</th>
+                    <th>Website</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="all-leads-table">
+                  <tr>
+                    <td colspan="6">
+                      <div class="empty-state">
+                        <div class="empty-state-icon">&#128269;</div>
+                        <div class="empty-state-title">No leads found</div>
+                        <p>Run the pipeline to generate leads</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline Tab -->
+        <div class="tab-panel" id="panel-pipeline">
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">Run Pipeline</h3>
+              <span class="badge contacted">Scrape &rarr; Audit &rarr; Outreach &rarr; Demo</span>
+            </div>
+            <div class="section-body">
+              <form id="pipeline-form">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input type="text" class="form-input" id="city" placeholder="e.g. Houston TX" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Business Type</label>
+                    <input type="text" class="form-input" id="bizType" value="smoke shop" placeholder="e.g. vape shop, dispensary" />
+                  </div>
+                </div>
+
+                <div style="margin-top: 24px;">
+                  <div class="toggle-group">
+                    <div class="toggle-info">
+                      <div class="toggle-label">Skip Lighthouse Audit</div>
+                      <div class="toggle-desc">Faster - uses basic Axios + Cheerio checks instead</div>
+                    </div>
+                    <label class="toggle">
+                      <input type="checkbox" id="skipLighthouse" checked />
+                      <div class="toggle-track"></div>
+                    </label>
+                  </div>
+                  <div class="toggle-group">
+                    <div class="toggle-info">
+                      <div class="toggle-label">Generate Demo Videos</div>
+                      <div class="toggle-desc">Uses Minimax T2V to create website previews</div>
+                    </div>
+                    <label class="toggle">
+                      <input type="checkbox" id="generateDemo" checked />
+                      <div class="toggle-track"></div>
+                    </label>
+                  </div>
+                  <div class="toggle-group">
+                    <div class="toggle-info">
+                      <div class="toggle-label">Export to Google Sheets</div>
+                      <div class="toggle-desc">Requires credentials.json in project root</div>
+                    </div>
+                    <label class="toggle">
+                      <input type="checkbox" id="exportSheets" checked onchange="document.getElementById('sheets-field').classList.toggle('visible', this.checked)" />
+                      <div class="toggle-track"></div>
+                    </label>
+                  </div>
+                  <div id="sheets-field" class="collapsible-field visible">
+                    <input type="text" class="form-input" id="sheetsId" value="1cCWHElqtVl8sE7lIfOxoGqfkmr8aE5tkcsyoF8RGmTU" placeholder="Google Spreadsheet ID" />
+                  </div>
+                </div>
+
+                <div style="margin-top: 24px;">
+                  <button type="submit" class="btn btn-primary" id="run-btn" style="width: 100%; padding: 14px;">
+                    <span id="run-btn-text">Run Pipeline</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Progress Card -->
+          <div class="section-card" id="progress-card" style="display: none;">
+            <div class="section-header">
+              <h3 class="section-title">Pipeline Progress</h3>
+              <span class="badge contacted" id="status-badge">Running</span>
+            </div>
+            <div class="section-body">
+              <div class="progress-steps">
+                <div class="step" id="step-1">
+                  <div class="step-dot">1</div>
+                  <span class="step-label">Scrape</span>
+                </div>
+                <div class="step" id="step-2">
+                  <div class="step-dot">2</div>
+                  <span class="step-label">Audit</span>
+                </div>
+                <div class="step" id="step-3">
+                  <div class="step-dot">3</div>
+                  <span class="step-label">Outreach</span>
+                </div>
+                <div class="step" id="step-4">
+                  <div class="step-dot">4</div>
+                  <span class="step-label">Demo</span>
+                </div>
+                <div class="step" id="step-5">
+                  <div class="step-dot">&#10003;</div>
+                  <span class="step-label">Done</span>
+                </div>
+              </div>
+
+              <div class="terminal">
+                <div class="terminal-header">
+                  <div class="terminal-dot red"></div>
+                  <div class="terminal-dot yellow"></div>
+                  <div class="terminal-dot green"></div>
+                  <span class="terminal-title">pipeline - live output</span>
+                </div>
+                <div class="terminal-body" id="log-terminal"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Card -->
+          <div class="section-card" id="results-card" style="display: none;">
+            <div class="section-header">
+              <h3 class="section-title">Results</h3>
+            </div>
+            <div class="section-body" id="result-rows"></div>
+          </div>
+        </div>
+
+        <!-- AI Calls Tab -->
+        <div class="tab-panel" id="panel-calls">
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">Quick Call Agent</h3>
+              <span class="badge converted">ElevenLabs AI</span>
+            </div>
+            <div class="section-body">
+              <form id="quick-call-form">
+                <div class="form-group">
+                  <label class="form-label">Phone Number</label>
+                  <input type="text" class="form-input" id="qc-phone" placeholder="e.g. +1 555 123 4567" required />
+                </div>
+                <div class="form-grid" style="margin-top: 16px;">
+                  <div class="form-group">
+                    <label class="form-label">Business Name (Optional)</label>
+                    <input type="text" class="form-input" id="qc-biz" placeholder="e.g. Acme Corp" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">City (Optional)</label>
+                    <input type="text" class="form-input" id="qc-city" placeholder="e.g. Austin TX" />
+                  </div>
+                </div>
+                <div style="margin-top: 24px;">
+                  <button type="submit" class="btn btn-success" id="qc-btn" style="width: 100%; padding: 14px;">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span id="qc-btn-text">Call Now</span>
+                  </button>
+                </div>
+                <div id="qc-status" style="margin-top: 16px; text-align: center; font-size: 0.875rem; color: var(--text-secondary);"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Media Tab -->
+        <div class="tab-panel" id="panel-social">
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">Social Media Manager</h3>
+              <span class="badge" style="background: rgba(168, 85, 247, 0.12); color: #a855f7;">Buffer + Instagram</span>
+            </div>
+            <div class="section-body">
+              <!-- Step 1 -->
+              <div style="margin-bottom: 32px;">
+                <h4 style="font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px;">Step 1 - Generate Content Calendar</h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Business Name</label>
+                    <input type="text" class="form-input" id="soc-biz" placeholder="e.g. Cloud 9 Smoke Shop" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input type="text" class="form-input" id="soc-city" placeholder="e.g. Houston TX" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Instagram Handle</label>
+                    <input type="text" class="form-input" id="soc-ig" placeholder="e.g. cloud9smokeshop" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Specialty</label>
+                    <input type="text" class="form-input" id="soc-specialty" value="smoke shop products" />
+                  </div>
+                </div>
+                <button class="btn btn-primary" id="soc-gen-btn" onclick="generateCalendar()" type="button" style="margin-top: 16px; background: linear-gradient(135deg, #7c3aed, #a855f7);">
+                  <span id="soc-gen-text">Generate 30-Day Calendar</span>
+                </button>
+                <div id="soc-calendar-preview" style="margin-top: 16px; display: none;">
+                  <div class="terminal">
+                    <div class="terminal-header">
+                      <div class="terminal-dot red"></div>
+                      <div class="terminal-dot yellow"></div>
+                      <div class="terminal-dot green"></div>
+                      <span class="terminal-title">calendar preview</span>
+                    </div>
+                    <div class="terminal-body" id="soc-preview-rows" style="height: 160px;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div style="padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 32px;">
+                <h4 style="font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px;">Step 2 - Schedule to Buffer</h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Buffer Profile ID</label>
+                    <input type="text" class="form-input" id="soc-profile" placeholder="Run --list-profiles to find yours" />
+                  </div>
+                  <div class="form-group" style="align-self: end;">
+                    <button class="btn btn-secondary" onclick="listBufferProfiles()" type="button" style="width: 100%;">List My Profiles</button>
+                  </div>
+                </div>
+                <button class="btn btn-primary" id="soc-sched-btn" onclick="scheduleCalendar()" type="button" style="margin-top: 16px; background: linear-gradient(135deg, #0ea5e9, #3b82f6);" disabled>
+                  <span id="soc-sched-text">Schedule All 30 Posts</span>
+                </button>
+              </div>
+
+              <!-- Step 3 -->
+              <div style="padding-top: 24px; border-top: 1px solid var(--border);">
+                <h4 style="font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px;">Step 3 - Instagram DM Outreach</h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Input CSV</label>
+                    <input type="text" class="form-input" id="soc-outreach-file" value="social_audited.csv" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Max DMs per Day</label>
+                    <input type="number" class="form-input" id="soc-dm-limit" value="20" min="5" max="50" />
+                  </div>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                  <button class="btn btn-secondary" onclick="dryRunOutreach()" type="button" style="flex: 1;">Dry Run (Preview)</button>
+                  <button class="btn btn-success" onclick="runOutreach()" type="button" style="flex: 2;">Start DM Outreach</button>
+                </div>
+              </div>
+
+              <!-- Social Log -->
+              <div id="soc-log" style="margin-top: 24px; display: none;">
+                <div class="terminal">
+                  <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <span class="terminal-title">social manager - output</span>
+                  </div>
+                  <div class="terminal-body" id="soc-terminal" style="height: 160px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Single Business Tab -->
+        <div class="tab-panel" id="panel-single">
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">Run on Single Business</h3>
+              <span class="badge" style="background: rgba(236, 72, 153, 0.12); color: #ec4899;">Enrich + Demo</span>
+            </div>
+            <div class="section-body">
+              <form id="single-biz-form">
+                <div class="form-group">
+                  <label class="form-label">Business Name <span style="color: var(--red);">*</span></label>
+                  <input type="text" class="form-input" id="sb-name" placeholder="e.g. Cloud Nine Smoke Shop" required />
+                </div>
+                <div class="form-grid" style="margin-top: 16px;">
+                  <div class="form-group">
+                    <label class="form-label">Website</label>
+                    <input type="text" class="form-input" id="sb-website" placeholder="e.g. cloudninesmoke.com" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-input" id="sb-phone" placeholder="e.g. +15121234567" />
+                  </div>
+                </div>
+                <div class="form-grid" style="margin-top: 16px;">
+                  <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input type="text" class="form-input" id="sb-city" placeholder="e.g. Austin TX" />
+                  </div>
+                  <div class="form-group" style="align-self: end;">
+                    <div class="toggle-group" style="border: none; padding: 0;">
+                      <div class="toggle-info">
+                        <div class="toggle-label">Place AI Call</div>
+                      </div>
+                      <label class="toggle">
+                        <input type="checkbox" id="sb-call" />
+                        <div class="toggle-track"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top: 24px;">
+                  <button type="submit" class="btn btn-primary" id="sb-btn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #7c3aed, #db2777);">
+                    <span id="sb-btn-text">Enrich + Generate Demo</span>
+                  </button>
+                </div>
+                <div id="sb-status" style="margin-top: 16px; text-align: center; font-size: 0.875rem; color: var(--text-secondary);"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-panel" id="panel-settings">
+          <div class="section-card">
+            <div class="section-header">
+              <h3 class="section-title">API Configuration</h3>
+            </div>
+            <div class="section-body">
+              <div class="form-group">
+                <label class="form-label">API Key</label>
+                <input type="password" class="form-input" id="settings-api-key" placeholder="Enter your API key" />
+              </div>
+              <button class="btn btn-primary" style="margin-top: 16px;" onclick="saveApiKey()">Save API Key</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
+    </main>
   </div>
 
   <script>
     // ── Toast System ──
     function showToast(message, variant = 'info') {
       const container = document.getElementById('toast-container');
-      const icons = { success: '\u2713', error: '\u2717', info: '\u24D8' };
       const toast = document.createElement('div');
       toast.className = `toast ${variant}`;
-      toast.innerHTML = `<span class="toast-icon">${icons[variant] || icons.info}</span><span>${message}</span>`;
+      toast.innerHTML = `<span>${message}</span>`;
       container.appendChild(toast);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => toast.classList.add('show'));
       });
       setTimeout(() => {
         toast.classList.remove('show');
-        toast.classList.add('hide');
-        setTimeout(() => toast.remove(), 400);
+        setTimeout(() => toast.remove(), 300);
       }, 4000);
     }
 
-    // ── Authenticated fetch helper ──
-    // All API calls go through this to include the x-api-key header.
-    // The key is read from a prompt on first use and cached in sessionStorage.
+    // ── API Key Management ──
     function getApiKey() {
       let key = sessionStorage.getItem('ssg-api-key');
       if (!key) {
@@ -1159,6 +1657,14 @@
         if (key) sessionStorage.setItem('ssg-api-key', key);
       }
       return key || '';
+    }
+
+    function saveApiKey() {
+      const key = document.getElementById('settings-api-key').value;
+      if (key) {
+        sessionStorage.setItem('ssg-api-key', key);
+        showToast('API key saved', 'success');
+      }
     }
 
     async function apiFetch(url, options = {}) {
@@ -1169,6 +1675,300 @@
       return fetch(url, { ...options, headers });
     }
 
+    // ── Tab Navigation ──
+    const navItems = document.querySelectorAll('.nav-item[data-tab]');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    const pageTitle = document.getElementById('page-title');
+
+    const tabTitles = {
+      dashboard: 'Dashboard',
+      leads: 'Leads',
+      pipeline: 'Pipeline',
+      calls: 'AI Calls',
+      social: 'Social Media',
+      single: 'Single Business',
+      settings: 'Settings'
+    };
+
+    function switchTab(tabId) {
+      navItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.tab === tabId);
+      });
+      tabPanels.forEach(panel => {
+        panel.classList.toggle('active', panel.id === `panel-${tabId}`);
+      });
+      pageTitle.textContent = tabTitles[tabId] || 'Dashboard';
+    }
+
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchTab(item.dataset.tab);
+      });
+    });
+
+    // Quick run button
+    document.getElementById('quick-run-btn').addEventListener('click', () => {
+      switchTab('pipeline');
+    });
+
+    // ── Charts ──
+    let leadsChart, statusChart;
+
+    function initCharts() {
+      const leadsCtx = document.getElementById('leads-chart').getContext('2d');
+      leadsChart = new Chart(leadsCtx, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'New Leads',
+            data: [0, 0, 0, 0, 0, 0, 0],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+          }, {
+            label: 'Conversions',
+            data: [0, 0, 0, 0, 0, 0, 0],
+            borderColor: '#22c55e',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#52525b' }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#52525b' },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      const statusCtx = document.getElementById('status-chart').getContext('2d');
+      statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Pending', 'Contacted', 'Converted', 'Lost'],
+          datasets: [{
+            data: [0, 0, 0, 0],
+            backgroundColor: ['#eab308', '#3b82f6', '#22c55e', '#ef4444'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#a1a1aa', padding: 16 }
+            }
+          }
+        }
+      });
+    }
+
+    // ── Data Loading ──
+    let allLeads = [];
+    let currentPage = 1;
+    const pageSize = 10;
+
+    async function refreshLeads() {
+      try {
+        const res = await apiFetch('/api/leads');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        allLeads = data.leads || [];
+        updateKPIs(data);
+        updateCharts(data);
+        renderLeadsTable();
+        renderAllLeadsTable();
+      } catch (err) {
+        console.error('Failed to load leads:', err);
+      }
+    }
+
+    function updateKPIs(data) {
+      const total = data.leads?.length || 0;
+      const contacted = data.leads?.filter(l => l.status === 'contacted').length || 0;
+      const converted = data.leads?.filter(l => l.status === 'converted').length || 0;
+      const avgScore = total > 0 ? Math.round(data.leads.reduce((sum, l) => sum + (l.score || 0), 0) / total) : 0;
+
+      document.getElementById('kpi-total').textContent = total;
+      document.getElementById('kpi-contacted').textContent = contacted;
+      document.getElementById('kpi-converted').textContent = converted;
+      document.getElementById('kpi-avg-score').textContent = avgScore;
+
+      document.getElementById('kpi-contacted-pct').textContent = total > 0 ? `${Math.round(contacted / total * 100)}% of total` : '0% of total';
+      document.getElementById('kpi-conversion-rate').textContent = contacted > 0 ? `${Math.round(converted / contacted * 100)}% rate` : '0% rate';
+    }
+
+    function updateCharts(data) {
+      const weekData = [0, 0, 0, 0, 0, 0, 0];
+      const convData = [0, 0, 0, 0, 0, 0, 0];
+      
+      // Simple distribution for demo
+      const total = data.leads?.length || 0;
+      if (total > 0) {
+        weekData[6] = total;
+        convData[6] = data.leads?.filter(l => l.status === 'converted').length || 0;
+      }
+
+      leadsChart.data.datasets[0].data = weekData;
+      leadsChart.data.datasets[1].data = convData;
+      leadsChart.update();
+
+      const pending = data.leads?.filter(l => l.status === 'pending' || !l.status).length || 0;
+      const contacted = data.leads?.filter(l => l.status === 'contacted').length || 0;
+      const converted = data.leads?.filter(l => l.status === 'converted').length || 0;
+      const lost = data.leads?.filter(l => l.status === 'lost').length || 0;
+
+      statusChart.data.datasets[0].data = [pending, contacted, converted, lost];
+      statusChart.update();
+
+      document.getElementById('stat-new').textContent = total;
+      document.getElementById('stat-converted').textContent = converted;
+    }
+
+    function renderLeadsTable() {
+      const tbody = document.getElementById('leads-table-body');
+      const recent = allLeads.slice(0, 5);
+
+      if (recent.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-state-icon">&#128269;</div>
+                <div class="empty-state-title">No leads yet</div>
+                <p>Run the pipeline to start generating leads</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = recent.map(lead => `
+        <tr>
+          <td>
+            <div class="lead-name">${escHtml(lead.name || 'Unknown')}</div>
+            <div class="lead-meta">${escHtml(lead.phone || '')}</div>
+          </td>
+          <td>${escHtml(lead.city || '-')}</td>
+          <td>
+            <div class="score">
+              <div class="score-bar">
+                <div class="score-fill ${getScoreClass(lead.score)}" style="width: ${lead.score || 0}%"></div>
+              </div>
+              <span>${lead.score || 0}</span>
+            </div>
+          </td>
+          <td><span class="badge ${lead.status || 'pending'}">${capitalize(lead.status || 'pending')}</span></td>
+          <td>
+            <div class="action-btns">
+              <button class="action-btn" onclick="viewLead('${lead.id}')">View</button>
+              ${lead.demo_url ? `<a class="action-btn" href="${lead.demo_url}" target="_blank">Demo</a>` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAllLeadsTable() {
+      const tbody = document.getElementById('all-leads-table');
+      const filter = document.getElementById('status-filter').value;
+      const filtered = filter ? allLeads.filter(l => l.status === filter) : allLeads;
+      const start = (currentPage - 1) * pageSize;
+      const pageLeads = filtered.slice(start, start + pageSize);
+
+      if (pageLeads.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-state-icon">&#128269;</div>
+                <div class="empty-state-title">No leads found</div>
+                <p>Run the pipeline to generate leads</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = pageLeads.map(lead => `
+        <tr>
+          <td>
+            <div class="lead-name">${escHtml(lead.name || 'Unknown')}</div>
+            <div class="lead-meta">${escHtml(lead.city || '')}</div>
+          </td>
+          <td>
+            <div>${escHtml(lead.phone || '-')}</div>
+            <div class="lead-meta">${escHtml(lead.email || '')}</div>
+          </td>
+          <td>${lead.website ? `<a href="${lead.website}" target="_blank" style="color: var(--accent);">${escHtml(lead.website)}</a>` : '-'}</td>
+          <td>
+            <div class="score">
+              <div class="score-bar">
+                <div class="score-fill ${getScoreClass(lead.score)}" style="width: ${lead.score || 0}%"></div>
+              </div>
+              <span>${lead.score || 0}</span>
+            </div>
+          </td>
+          <td><span class="badge ${lead.status || 'pending'}">${capitalize(lead.status || 'pending')}</span></td>
+          <td>
+            <div class="action-btns">
+              <button class="action-btn" onclick="viewLead('${lead.id}')">View</button>
+              <button class="action-btn" onclick="updateStatus('${lead.id}')">Update</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function getScoreClass(score) {
+      if (score >= 70) return 'high';
+      if (score >= 40) return 'medium';
+      return 'low';
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function viewLead(id) {
+      showToast('Lead details coming soon', 'info');
+    }
+
+    function updateStatus(id) {
+      showToast('Status update coming soon', 'info');
+    }
+
+    function exportLeads() {
+      window.location.href = '/api/export/leads';
+    }
+
+    // ── Pipeline ──
     let currentJobId = null;
 
     const form = document.getElementById('pipeline-form');
@@ -1179,15 +1979,13 @@
     const terminal = document.getElementById('log-terminal');
     const badge = document.getElementById('status-badge');
 
-    const dots = [null, ...Array.from({ length: 5 }, (_, i) => document.getElementById(`dot-${i + 1}`))];
-
     function setStep(step) {
-      dots.forEach((dot, i) => {
-        if (!dot) return;
-        dot.classList.remove('active', 'done');
-        if (i < step) dot.classList.add('done');
-        if (i === step) dot.classList.add('active');
-      });
+      for (let i = 1; i <= 5; i++) {
+        const stepEl = document.getElementById(`step-${i}`);
+        stepEl.classList.remove('active', 'done');
+        if (i < step) stepEl.classList.add('done');
+        if (i === step) stepEl.classList.add('active');
+      }
     }
 
     function appendLog({ type, message, ts }) {
@@ -1200,54 +1998,30 @@
       terminal.scrollTop = terminal.scrollHeight;
     }
 
-    function escHtml(str) {
-      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
     function setRunLoading(loading) {
       runBtn.disabled = loading;
       if (loading) {
-        runBtnText.textContent = 'Running\u2026';
-        if (!runBtn.querySelector('.spinner')) {
-          const sp = document.createElement('span');
-          sp.className = 'spinner';
-          runBtn.insertBefore(sp, runBtnText);
-        }
+        runBtnText.innerHTML = '<span class="spinner"></span> Running...';
       } else {
         runBtnText.textContent = 'Run Pipeline';
-        const sp = runBtn.querySelector('.spinner');
-        if (sp) sp.remove();
       }
-    }
-
-    function showSkeletonResults() {
-      const rows = document.getElementById('result-rows');
-      rows.innerHTML = `
-        <div class="skeleton-row"><div class="skeleton-bar" style="width:120px"></div><div class="skeleton-bar" style="width:100px"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar" style="width:140px"></div><div class="skeleton-bar" style="width:100px"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar" style="width:150px"></div><div class="skeleton-bar" style="width:100px"></div></div>
-        <div class="skeleton-row"><div class="skeleton-bar" style="width:160px"></div><div class="skeleton-bar" style="width:100px"></div></div>
-      `;
-      resultsCard.classList.add('visible');
     }
 
     function showResults(files, jobId) {
       const rows = document.getElementById('result-rows');
       const items = [
-        { label: 'Raw Leads', key: 'leads', file: 'leads' },
-        { label: 'Audited Leads', key: 'audited', file: 'audited' },
-        { label: 'Outreach Messages', key: 'outreach', file: 'outreach' },
-        { label: 'Demo Videos (Links)', key: 'demo', file: 'demo' },
+        { label: 'Raw Leads', file: 'leads' },
+        { label: 'Audited Leads', file: 'audited' },
+        { label: 'Outreach Messages', file: 'outreach' },
+        { label: 'Demo Videos', file: 'demo' },
       ];
       rows.innerHTML = items.map(({ label, file }) => `
-      <div class="result-row">
-        <span class="result-label">${label}</span>
-        <a class="btn-dl" href="/api/download/${jobId}/${file}" download>
-          Download CSV
-        </a>
-      </div>
-    `).join('');
-      resultsCard.classList.add('visible');
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border);">
+          <span style="color: var(--text-secondary);">${label}</span>
+          <a class="btn btn-secondary" href="/api/download/${jobId}/${file}" download>Download CSV</a>
+        </div>
+      `).join('');
+      resultsCard.style.display = 'block';
     }
 
     form.addEventListener('submit', async (e) => {
@@ -1255,34 +2029,30 @@
 
       const city = document.getElementById('city').value.trim();
       const bizType = document.getElementById('bizType').value.trim() || 'smoke shop';
-      const maxResults = parseInt(document.getElementById('maxResults').value);
       const skipLighthouse = document.getElementById('skipLighthouse').checked;
       const generateDemo = document.getElementById('generateDemo').checked;
       const exportSheets = document.getElementById('exportSheets').checked;
       const sheetsId = document.getElementById('sheetsId').value.trim();
 
-      // Reset UI
       terminal.innerHTML = '';
-      resultsCard.classList.remove('visible');
-      progCard.classList.add('visible');
+      resultsCard.style.display = 'none';
+      progCard.style.display = 'block';
       setRunLoading(true);
-      badge.className = 'badge running';
-      badge.innerHTML = '<span class="dot-blink"></span> Running';
+      badge.className = 'badge contacted';
+      badge.textContent = 'Running';
       setStep(1);
-      showToast('Pipeline started \u2014 scraping leads\u2026', 'info');
+      showToast('Pipeline started - scraping leads...', 'info');
 
-      // Start job
       let jobId;
       try {
         const resp = await apiFetch('/api/run', {
           method: 'POST',
-          body: JSON.stringify({ city, bizType, maxResults, skipLighthouse, generateDemo, exportSheets, sheetsId }),
+          body: JSON.stringify({ city, bizType, maxResults: 20, skipLighthouse, generateDemo, exportSheets, sheetsId }),
         });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Server error');
         jobId = data.jobId;
         currentJobId = jobId;
-        startLiveLog(jobId);
       } catch (err) {
         appendLog({ type: 'error', message: `Failed to start: ${err.message}`, ts: Date.now() });
         showToast(`Pipeline error: ${err.message}`, 'error');
@@ -1290,10 +2060,6 @@
         return;
       }
 
-      // Show skeleton results
-      showSkeletonResults();
-
-      // Stream SSE
       const es = new EventSource(`/api/status/${jobId}`);
       es.onmessage = ({ data }) => {
         const msg = JSON.parse(data);
@@ -1303,41 +2069,39 @@
           setRunLoading(false);
 
           if (msg.status === 'done') {
-            badge.className = 'badge done';
-            badge.textContent = '\u2713 Complete';
-            setStep(6);
+            badge.className = 'badge converted';
+            badge.textContent = 'Complete';
+            setStep(5);
             showResults(msg.files, jobId);
-            showToast('Pipeline complete \u2014 results ready!', 'success');
-            refreshLeads(); // Refresh leads after pipeline completion
+            showToast('Pipeline completed successfully!', 'success');
+            refreshLeads();
           } else {
-            badge.className = 'badge failed';
-            badge.textContent = '\u2717 Failed';
-            showToast('Pipeline failed \u2014 check logs for details.', 'error');
+            badge.className = 'badge lost';
+            badge.textContent = 'Failed';
+            showToast('Pipeline failed', 'error');
           }
           return;
         }
 
-        // Update step dots based on log messages
-        if (msg.type === 'step') {
-          if (msg.message.includes('Step 1')) setStep(1);
-          else if (msg.message.includes('Step 2')) setStep(2);
-          else if (msg.message.includes('Step 3')) setStep(3);
-          else if (msg.message.includes('Step 4')) setStep(4);
-          else if (msg.message.includes('Step 5') || msg.message.includes('Exporting')) setStep(4);
-        }
-
         appendLog(msg);
+
+        if (msg.type === 'step') {
+          const stepMap = { 'Scraping': 1, 'Auditing': 2, 'Outreach': 3, 'Demo': 4 };
+          const stepNum = Object.keys(stepMap).find(k => msg.message.includes(k));
+          if (stepNum) setStep(stepMap[stepNum]);
+        }
       };
 
       es.onerror = () => {
         es.close();
-        appendLog({ type: 'warn', message: 'Connection to server lost.', ts: Date.now() });
-        showToast('Lost connection to server.', 'error');
         setRunLoading(false);
+        badge.className = 'badge lost';
+        badge.textContent = 'Error';
+        showToast('Connection lost', 'error');
       };
     });
 
-    // ── Quick Call Logic ──
+    // ── Quick Call ──
     const qcForm = document.getElementById('quick-call-form');
     const qcBtn = document.getElementById('qc-btn');
     const qcBtnText = document.getElementById('qc-btn-text');
@@ -1345,48 +2109,33 @@
 
     qcForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const phone = document.getElementById('qc-phone').value.trim();
-      const business_name = document.getElementById('qc-biz').value.trim();
+      const biz = document.getElementById('qc-biz').value.trim();
       const city = document.getElementById('qc-city').value.trim();
 
       qcBtn.disabled = true;
-      qcBtnText.textContent = 'Calling\u2026';
-      if (!qcBtn.querySelector('.spinner')) {
-        const sp = document.createElement('span');
-        sp.className = 'spinner';
-        qcBtn.insertBefore(sp, qcBtnText);
-      }
-      qcStatus.textContent = '';
-      qcStatus.style.color = 'var(--muted)';
+      qcBtnText.innerHTML = '<span class="spinner"></span> Calling...';
+      qcStatus.textContent = 'Initiating call...';
 
       try {
-        const resp = await apiFetch('/webhook/call', {
+        const res = await apiFetch('/api/call', {
           method: 'POST',
-          body: JSON.stringify({ phone, business_name, city }),
+          body: JSON.stringify({ phone, businessName: biz, city }),
         });
-
-        const data = await resp.json();
-
-        if (!resp.ok) {
-          throw new Error(data.error || 'Server error');
-        }
-
-        qcStatus.textContent = `Call initiated! (Conv ID: ${data.conversation_id})`;
-        qcStatus.style.color = 'var(--green)';
-        showToast('Call initiated successfully!', 'success');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Call failed');
+        qcStatus.textContent = `Call initiated! ID: ${data.callId}`;
+        showToast('Call initiated successfully', 'success');
       } catch (err) {
-        qcStatus.textContent = err.message;
-        qcStatus.style.color = 'var(--red)';
+        qcStatus.textContent = `Error: ${err.message}`;
         showToast(`Call failed: ${err.message}`, 'error');
       } finally {
         qcBtn.disabled = false;
-        qcBtnText.textContent = 'Call Now (ElevenLabs)';
-        const sp = qcBtn.querySelector('.spinner');
-        if (sp) sp.remove();
+        qcBtnText.textContent = 'Call Now';
       }
     });
-    // ── Single Business Logic ──
+
+    // ── Single Business ──
     const sbForm = document.getElementById('single-biz-form');
     const sbBtn = document.getElementById('sb-btn');
     const sbBtnText = document.getElementById('sb-btn-text');
@@ -1394,306 +2143,135 @@
 
     sbForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const businessName = document.getElementById('sb-name').value.trim();
+      const name = document.getElementById('sb-name').value.trim();
       const website = document.getElementById('sb-website').value.trim();
       const phone = document.getElementById('sb-phone').value.trim();
       const city = document.getElementById('sb-city').value.trim();
-      const makeCall = document.getElementById('sb-call').checked;
+      const placeCall = document.getElementById('sb-call').checked;
 
       sbBtn.disabled = true;
-      sbBtnText.textContent = 'Starting…';
-      sbStatus.textContent = '';
+      sbBtnText.innerHTML = '<span class="spinner"></span> Processing...';
+      sbStatus.textContent = 'Processing business...';
 
       try {
-        const resp = await apiFetch('/api/run-single', {
+        const res = await apiFetch('/api/single', {
           method: 'POST',
-          body: JSON.stringify({ businessName, website, phone, city, makeCall, generateDemo: true }),
+          body: JSON.stringify({ name, website, phone, city, placeCall }),
         });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || 'Server error');
-
-        sbStatus.textContent = `✅ Pipeline started! Job: ${data.jobId}`;
-        sbStatus.style.color = 'var(--green)';
-        showToast(`Pipeline started for "${businessName}"`, 'success');
-        startLiveLog(data.jobId);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        sbStatus.innerHTML = `Done! <a href="${data.demoUrl}" target="_blank" style="color: var(--accent);">View Demo</a>`;
+        showToast('Business processed successfully', 'success');
+        refreshLeads();
       } catch (err) {
-        sbStatus.textContent = `❌ ${err.message}`;
-        sbStatus.style.color = 'var(--red)';
-        showToast(`Error: ${err.message}`, 'error');
+        sbStatus.textContent = `Error: ${err.message}`;
+        showToast(`Failed: ${err.message}`, 'error');
       } finally {
         sbBtn.disabled = false;
-        sbBtnText.textContent = '🔥 Enrich + Generate Demo';
+        sbBtnText.textContent = 'Enrich + Generate Demo';
       }
     });
 
-    // ── Live Pipeline Log (SSE) ──
-    let liveLogEs = null;
-    const STEP_LABELS = ['Scrape','Audit','Enrich','Outreach','Demo','Email','Calls','Done'];
-
-    function startLiveLog(jobId) {
-      const card = document.getElementById('live-log-card');
-      const output = document.getElementById('live-log-output');
-      const steps = document.getElementById('live-log-steps');
-
-      card.style.display = 'block';
-      output.innerHTML = '';
-      steps.innerHTML = STEP_LABELS.map((l, i) =>
-        `<span id="step-${i}" style="padding:2px 8px;border-radius:4px;font-size:0.72rem;background:var(--border);color:var(--muted)">${l}</span>`
-      ).join('');
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      if (liveLogEs) liveLogEs.close();
-      liveLogEs = new EventSource(`/api/status/${jobId}`);
-
-      liveLogEs.onmessage = (e) => {
-        try {
-          const msg = JSON.parse(e.data);
-          if (msg.type === 'log' || msg.type === 'step' || msg.type === 'success' || msg.type === 'warn' || msg.type === 'error') {
-            const color = msg.type === 'success' ? '#22c55e'
-                        : msg.type === 'step'    ? '#60a5fa'
-                        : msg.type === 'warn'    ? '#f59e0b'
-                        : msg.type === 'error'   ? '#ef4444'
-                        : 'var(--text-dim)';
-            const line = document.createElement('div');
-            line.style.color = color;
-            line.textContent = `[${new Date().toLocaleTimeString()}] ${msg.message || msg.data || JSON.stringify(msg)}`;
-            output.appendChild(line);
-            output.scrollTop = output.scrollHeight;
-          }
-          if (msg.step !== undefined) {
-            document.querySelectorAll('#live-log-steps span').forEach((s, i) => {
-              s.style.background = i < msg.step ? '#22c55e33' : i === msg.step ? '#60a5fa33' : 'var(--border)';
-              s.style.color = i <= msg.step ? 'var(--text)' : 'var(--muted)';
-            });
-          }
-          if (msg.type === 'done') {
-            liveLogEs.close();
-            const line = document.createElement('div');
-            line.style.color = '#22c55e';
-            line.style.fontWeight = 'bold';
-            line.textContent = '🎉 Pipeline complete!';
-            output.appendChild(line);
-          }
-        } catch {}
-      };
-
-      liveLogEs.onerror = () => {
-        liveLogEs.close();
-      };
-    }
-
-    // ── Lead Management Logic ──
-    async function refreshLeads() {
-      const container = document.getElementById('leads-container');
-      try {
-        const res = await apiFetch('/api/leads');
-        const data = await res.json();
-        
-        if (!data.leads || data.leads.length === 0) {
-          container.innerHTML = '<p style="color:var(--muted); text-align:center; padding: 20px;">No leads captured yet.</p>';
-          return;
-        }
-
-        container.innerHTML = data.leads.reverse().map(lead => `
-          <div class="result-row">
-            <div>
-              <div style="font-weight:600; color:var(--text)">${lead.business || lead.business_name || 'Prospect'}</div>
-              <div style="font-size:0.75rem; color:var(--muted)">${lead.contact_name} | ${lead.email} | ${lead.tier || 'Starter'}</div>
-            </div>
-            <div style="display:flex; gap:10px; align-items:center">
-              <span style="font-size:0.7rem; color:var(--muted)">${new Date(lead.date).toLocaleDateString()}</span>
-              <button class="btn-dl" onclick="deploySite('${lead.business || lead.business_name}', '${lead.email}', '${lead.tier}')">
-                Deliver Site
-              </button>
-            </div>
-          </div>
-        `).join('');
-      } catch (err) {
-        showToast('Failed to load leads', 'error');
-      }
-    }
-
-    async function deploySite(business, email, tier) {
-      showToast(`Building site for ${business}...`, 'info');
-      try {
-        const res = await apiFetch('/api/deploy-site', {
-          method: 'POST',
-          body: JSON.stringify({ business, email, tier })
-        });
-        const data = await res.json();
-        if (data.success) {
-          showToast(`✅ Site ready in: /deployments/${data.folder}`, 'success');
-          window.open(data.url, '_blank');
-        } else {
-          showToast(data.error || 'Deployment failed', 'error');
-        }
-      } catch (err) {
-        showToast('Deployment error', 'error');
-      }
-    }
-
-    // Initial load
-    refreshLeads();
-
-    // ── Social Media Manager Logic ──
-    let currentCalendar = null;
-    let currentCalendarBiz = null;
-
-    function socLog(msg, type = 'log') {
-      const terminal = document.getElementById('soc-terminal');
-      const log = document.getElementById('soc-log');
-      log.style.display = 'block';
-      const line = document.createElement('div');
-      line.className = 'log-line';
-      const now = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      line.innerHTML = `<span class="log-ts">${now}</span><span class="log-msg ${type}">${escHtml(msg)}</span>`;
-      terminal.appendChild(line);
-      terminal.scrollTop = terminal.scrollHeight;
-    }
+    // ── Social Media Functions ──
+    let calendarData = null;
 
     async function generateCalendar() {
-      const biz = document.getElementById('soc-biz').value.trim();
-      const city = document.getElementById('soc-city').value.trim();
-      const ig = document.getElementById('soc-ig').value.trim();
-      const specialty = document.getElementById('soc-specialty').value.trim();
-      if (!biz) { showToast('Enter a business name first', 'error'); return; }
-
       const btn = document.getElementById('soc-gen-btn');
-      const btnText = document.getElementById('soc-gen-text');
-      btn.disabled = true;
-      btnText.textContent = 'Generating…';
-      if (!btn.querySelector('.spinner')) {
-        const sp = document.createElement('span'); sp.className = 'spinner';
-        btn.insertBefore(sp, btnText);
-      }
+      const text = document.getElementById('soc-gen-text');
+      const preview = document.getElementById('soc-calendar-preview');
+      const rows = document.getElementById('soc-preview-rows');
 
-      socLog(`Generating 30-day calendar for "${biz}" via GPT-4o…`, 'step');
+      btn.disabled = true;
+      text.innerHTML = '<span class="spinner"></span> Generating...';
 
       try {
-        const res = await apiFetch('/api/social/generate-calendar', {
+        const res = await apiFetch('/api/social/calendar', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ business_name: biz, city, instagram: ig, specialty }),
+          body: JSON.stringify({
+            businessName: document.getElementById('soc-biz').value,
+            city: document.getElementById('soc-city').value,
+            instagram: document.getElementById('soc-ig').value,
+            specialty: document.getElementById('soc-specialty').value,
+          }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-
-        currentCalendar = data.posts;
-        currentCalendarBiz = biz;
-
-        // Show preview
-        const preview = document.getElementById('soc-calendar-preview');
-        const previewRows = document.getElementById('soc-preview-rows');
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        calendarData = data.calendar;
+        rows.textContent = data.calendar.slice(0, 3).map(p => `${p.date}: ${p.caption}`).join('\n\n');
         preview.style.display = 'block';
-        previewRows.innerHTML = data.posts.slice(0, 3).map(p =>
-          `Day ${p.day} [${p.post_type}] ${p.platform} @ ${p.best_time}\n${p.caption.substring(0, 90)}…`
-        ).join('\n\n');
-
-        // Enable scheduler
         document.getElementById('soc-sched-btn').disabled = false;
-
-        socLog(`✅ ${data.posts.length} posts generated! Preview shown above.`, 'success');
-        showToast(`30-day calendar ready for ${biz}!`, 'success');
+        showToast('Calendar generated!', 'success');
       } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
         showToast(`Failed: ${err.message}`, 'error');
       } finally {
         btn.disabled = false;
-        btnText.textContent = '✨ Generate 30-Day Calendar (GPT-4o)';
-        const sp = btn.querySelector('.spinner');
-        if (sp) sp.remove();
+        text.textContent = 'Generate 30-Day Calendar';
       }
     }
 
     async function listBufferProfiles() {
-      socLog('Fetching Buffer profiles…', 'step');
       try {
-        const res = await apiFetch('/api/social/buffer-profiles');
+        const res = await apiFetch('/api/social/profiles');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-        data.profiles.forEach(p => {
-          socLog(`  ${p.service} | ${p.formatted_username} | ID: ${p.id}`, 'log');
-        });
-        showToast('Profiles listed in log below', 'info');
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        showToast(`Found ${data.profiles?.length || 0} profiles`, 'info');
       } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
         showToast(`Failed: ${err.message}`, 'error');
       }
     }
 
     async function scheduleCalendar() {
-      if (!currentCalendar) { showToast('Generate a calendar first', 'error'); return; }
-      const profileId = document.getElementById('soc-profile').value.trim();
-      if (!profileId) { showToast('Enter a Buffer Profile ID', 'error'); return; }
-
+      if (!calendarData) return;
       const btn = document.getElementById('soc-sched-btn');
-      const btnText = document.getElementById('soc-sched-text');
-      btn.disabled = true;
-      btnText.textContent = 'Scheduling…';
+      const text = document.getElementById('soc-sched-text');
 
-      socLog(`Scheduling ${currentCalendar.length} posts to Buffer profile ${profileId}…`, 'step');
+      btn.disabled = true;
+      text.innerHTML = '<span class="spinner"></span> Scheduling...';
 
       try {
         const res = await apiFetch('/api/social/schedule', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ posts: currentCalendar, profileId, businessName: currentCalendarBiz }),
+          body: JSON.stringify({
+            profileId: document.getElementById('soc-profile').value,
+            calendar: calendarData,
+          }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-        socLog(`✅ Scheduled! ${data.success} posted, ${data.failed} failed.`, 'success');
-        showToast(`${data.success} posts scheduled to Buffer!`, 'success');
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        showToast('Posts scheduled!', 'success');
       } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
         showToast(`Failed: ${err.message}`, 'error');
       } finally {
         btn.disabled = false;
-        btnText.textContent = '📅 Schedule All 30 Posts to Buffer';
+        text.textContent = 'Schedule All 30 Posts';
       }
     }
 
     async function dryRunOutreach() {
-      const inputFile = document.getElementById('soc-outreach-file').value.trim();
-      const limit = document.getElementById('soc-dm-limit').value;
-      socLog('Running DM outreach dry-run (preview only)…', 'step');
-      try {
-        const res = await apiFetch('/api/social/outreach-preview', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inputFile, limit }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-        data.preview.forEach(p => socLog(`  @${p.handle}: "${p.message.substring(0, 60)}…"`, 'log'));
-        showToast(`Preview: ${data.preview.length} DMs would be sent`, 'info');
-      } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
-      }
+      showToast('Dry run feature coming soon', 'info');
     }
 
     async function runOutreach() {
-      const inputFile = document.getElementById('soc-outreach-file').value.trim();
-      const limit = document.getElementById('soc-dm-limit').value;
-      if (!confirm(`Send up to ${limit} Instagram DMs? This will open a browser and run for ~${Math.round(limit * 67 / 60)} minutes.`)) return;
-      socLog(`Starting DM outreach (${limit}/day limit)…`, 'step');
-      try {
-        const res = await apiFetch('/api/social/outreach-run', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inputFile, limit }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Server error');
-        socLog(`✅ Outreach started as background job.`, 'success');
-        showToast('DM outreach running in background!', 'success');
-      } catch (err) {
-        socLog(`Error: ${err.message}`, 'error');
-        showToast(`Failed: ${err.message}`, 'error');
-      }
+      showToast('DM outreach feature coming soon', 'info');
     }
 
-    // Initial load
-    refreshLeads();
+    // ── Initialize ──
+    document.addEventListener('DOMContentLoaded', () => {
+      initCharts();
+      refreshLeads();
+
+      // Load saved API key
+      const savedKey = sessionStorage.getItem('ssg-api-key');
+      if (savedKey) {
+        document.getElementById('settings-api-key').value = savedKey;
+      }
+
+      // Status filter
+      document.getElementById('status-filter').addEventListener('change', () => {
+        currentPage = 1;
+        renderAllLeadsTable();
+      });
+    });
   </script>
 </body>
 

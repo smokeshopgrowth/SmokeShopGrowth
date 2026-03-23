@@ -755,6 +755,30 @@
     </div>
   </section>
 
+  <!-- ── Stats Counter Section ──────────────────────────────────────────────── -->
+  <section>
+    <div class="section-inner">
+      <div class="stat-counter gs-reveal">
+        <div class="stat-item">
+          <div class="stat-value" data-count="500">0</div>
+          <div class="stat-label">Websites Built</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" data-count="97">0</div>
+          <div class="stat-label">% Customer Satisfaction</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" data-count="48">0</div>
+          <div class="stat-label">Hour Delivery</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" data-count="24">0</div>
+          <div class="stat-label">/7 Support</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ── Guarantee Section ──────────────────────────────────────────────────── -->
   <div class="guarantee-section gs-reveal">
     <div class="guarantee-badge">
@@ -940,6 +964,23 @@
     <span class="live-dot"></span>
     <span><strong id="visitor-count">3</strong> people viewing this page</span>
   </div>
+
+  <!-- ── Recent Purchase Notification ─────────────────────────────────────── -->
+  <div class="recent-purchase" id="recent-purchase">
+    <button class="recent-purchase-close" onclick="dismissPurchase()" aria-label="Close">&times;</button>
+    <div class="recent-purchase-avatar" id="purchase-avatar">J</div>
+    <div class="recent-purchase-content">
+      <div class="recent-purchase-title" id="purchase-title">John from Austin</div>
+      <div class="recent-purchase-meta" id="purchase-meta">Just purchased Growth Package</div>
+      <div class="recent-purchase-time">
+        <span>&#9679;</span>
+        <span id="purchase-time">2 minutes ago</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Scroll Progress Bar ─────────────────────────────────────────────── -->
+  <div class="progress-bar" id="progress-bar"></div>
 
   <!-- ── Floating Action Button ────────────────────────────────────────────── -->
   <button class="fab-contact" onclick="scrollToContact()" aria-label="Contact us">
@@ -1313,6 +1354,103 @@
       });
       
       updateToggle();
+    })();
+    
+    // ── Scroll Progress Bar ──
+    (function scrollProgress() {
+      const progressBar = document.getElementById('progress-bar');
+      if (!progressBar) return;
+      
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = (scrollTop / docHeight) * 100;
+        progressBar.style.width = scrollPercent + '%';
+      });
+    })();
+    
+    // ── Recent Purchase Notifications ──
+    (function recentPurchases() {
+      const notification = document.getElementById('recent-purchase');
+      if (!notification) return;
+      
+      const purchases = [
+        { name: 'John', city: 'Austin', package: 'Growth Package', time: '2 minutes ago' },
+        { name: 'Sarah', city: 'Houston', package: 'Starter Package', time: '5 minutes ago' },
+        { name: 'Mike', city: 'Dallas', package: 'Pro Package', time: '8 minutes ago' },
+        { name: 'Emily', city: 'San Antonio', package: 'Growth Package', time: '12 minutes ago' },
+        { name: 'David', city: 'Phoenix', package: 'Starter Package', time: '15 minutes ago' },
+        { name: 'Jessica', city: 'Denver', package: 'Growth Package', time: '18 minutes ago' },
+      ];
+      
+      let currentIndex = 0;
+      let dismissed = false;
+      
+      function showPurchase() {
+        if (dismissed || sessionStorage.getItem('purchaseDismissed')) return;
+        
+        const purchase = purchases[currentIndex];
+        document.getElementById('purchase-avatar').textContent = purchase.name.charAt(0);
+        document.getElementById('purchase-title').textContent = purchase.name + ' from ' + purchase.city;
+        document.getElementById('purchase-meta').textContent = 'Just purchased ' + purchase.package;
+        document.getElementById('purchase-time').textContent = purchase.time;
+        
+        notification.classList.add('visible');
+        
+        setTimeout(() => {
+          notification.classList.remove('visible');
+          currentIndex = (currentIndex + 1) % purchases.length;
+        }, 5000);
+      }
+      
+      window.dismissPurchase = function() {
+        dismissed = true;
+        sessionStorage.setItem('purchaseDismissed', 'true');
+        notification.classList.remove('visible');
+      };
+      
+      // Show first notification after 8 seconds
+      setTimeout(showPurchase, 8000);
+      // Then show every 45 seconds
+      setInterval(() => {
+        if (!dismissed) showPurchase();
+      }, 45000);
+    })();
+    
+    // ── Animated Counter ──
+    (function animatedCounters() {
+      const counters = document.querySelectorAll('.stat-value[data-count]');
+      if (!counters.length) return;
+      
+      const animateCounter = (el) => {
+        const target = parseInt(el.dataset.count, 10);
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+        
+        const updateCounter = () => {
+          current += step;
+          if (current < target) {
+            el.textContent = Math.floor(current);
+            requestAnimationFrame(updateCounter);
+          } else {
+            el.textContent = target;
+          }
+        };
+        
+        updateCounter();
+      };
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateCounter(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+      
+      counters.forEach(counter => observer.observe(counter));
     })();
   </script>
 

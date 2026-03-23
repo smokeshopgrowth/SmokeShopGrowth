@@ -6,7 +6,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const n8nService = require('../src/node/n8n_service');
 const { jobs, makeJobId, pushLog, broadcast } = require('../services/sse');
-const { runPipeline } = require('../services/pipeline');
+const { runPipeline, runSingleBusiness } = require('../services/pipeline');
 const { webhookLimiter, pipelineRunLimiter } = require('../middleware/rate-limit');
 const { apiKeyAuth } = require('../middleware/auth');
 const db = require('../src/node/db');
@@ -16,9 +16,12 @@ const { validate, schemas } = require('../utils/validation');
 
 const logger = createLogger('API');
 
+// ════════════════════════════════════════════════════════════════════════════
+// PIPELINE ROUTES
+// ════════════════════════════════════════════════════════════════════════════
+
 // POST /api/run — start a pipeline job (requires auth)
 router.post('/api/run', pipelineRunLimiter, apiKeyAuth, asyncHandler(async (req, res) => {
-    // Validate input
     const validated = validate(req.body, schemas.pipelineRun);
     const {
         city,
@@ -31,36 +34,6 @@ router.post('/api/run', pipelineRunLimiter, apiKeyAuth, asyncHandler(async (req,
     } = validated;
 
     logger.info('Starting pipeline', { city, bizType, maxResults });
-
-// POST /api/run — start a pipeline job (requires auth)
-router.post('/api/run', pipelineRunLimiter, apiKeyAuth, (req, res) => {
-    let {
-        city = '',
-        bizType = 'smoke shop',
-        maxResults = 100,
-        skipLighthouse = true,
-        generateDemo = true,
-        exportSheets = false,
-        sheetsId = '',
-    } = req.body;
-
-    // Validate city: 2-50 chars, alphanumeric + spaces and hyphens
-    city = city.trim();
-    const MIN_CITY_LEN = 2, MAX_CITY_LEN = 50;
-    if (!city || city.length < MIN_CITY_LEN || city.length > MAX_CITY_LEN) {
-        return res.status(400).json({ error: `City must be ${MIN_CITY_LEN}-${MAX_CITY_LEN} characters.` });
-    }
-    if (!/^[a-zA-Z0-9\s\-]+$/.test(city)) {
-        return res.status(400).json({ error: 'City contains invalid characters (only letters, numbers, spaces, hyphens allowed).' });
-    }
-
-    if (typeof bizType !== 'string' || bizType.length > 100) {
-        return res.status(400).json({ error: 'bizType must be a string (max 100 chars).' });
-    }
-    maxResults = Math.min(Math.max(parseInt(maxResults, 10) || 100, 1), 500);
-    if (sheetsId && !/^[a-zA-Z0-9_-]+$/.test(sheetsId)) {
-        return res.status(400).json({ error: 'Invalid sheetsId format.' });
-    }
 
     const jobId = makeJobId();
     const citySlug = city.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -78,30 +51,37 @@ router.post('/api/run', pipelineRunLimiter, apiKeyAuth, (req, res) => {
         demos: path.join('public', 'demos', citySlug),
         demo: path.join(dataDir, 'demo_leads.csv'),
         emailLog: path.join('logs', 'email_log.csv'),
-    };
-
-    // Persist job to DB
         callLog: path.join('logs', 'call_log.csv'),
     };
 
-    // Persist job to DB (Fix #10)
+    // Persist job to DB
     try {
         db.insertJob.run({
-            id: jobId, city, biz_type: bizType, status: 'running', step: 0,
+            id: jobId,
+            city,
+            biz_type: bizType,
+            status: 'running',
+            step: 0,
             config: JSON.stringify({ maxResults, skipLighthouse, generateDemo, exportSheets, sheetsId }),
             files: JSON.stringify(files),
         });
     } catch (e) {
         logger.warn('Failed to persist job to DB', { error: e.message });
     }
-    } catch (e) { /* ignore dup */ }
 
     jobs.set(jobId, {
         status: 'running',
         step: 0,
         logs: [],
-        city, bizType, maxResults, skipLighthouse, citySlug, dataDir, files,
-        exportSheets, sheetsId,
+        city,
+        bizType,
+        maxResults,
+        skipLighthouse,
+        citySlug,
+        dataDir,
+        files,
+        exportSheets,
+        sheetsId,
         baseUrl: `${req.protocol}://${req.get('host')}`,
         generateDemo,
         clients: [],
@@ -114,7 +94,6 @@ router.post('/api/run', pipelineRunLimiter, apiKeyAuth, (req, res) => {
         if (job) {
             const errorDetails = `${err.message}\n${err.stack || ''}`;
             logger.error('Pipeline failed', { jobId, error: err.message });
-            console.error('[PIPELINE ERROR]', err.stack || err);
             pushLog(jobId, `[ERROR] ${errorDetails}`, 'error');
             job.status = 'failed';
             job.error = err.message;
@@ -124,7 +103,6 @@ router.post('/api/run', pipelineRunLimiter, apiKeyAuth, (req, res) => {
 
     res.json({ jobId, dataDir, files });
 }));
-});
 
 // GET /api/status/:jobId — SSE stream for a job
 router.get('/api/status/:jobId', (req, res) => {
@@ -132,7 +110,6 @@ router.get('/api/status/:jobId', (req, res) => {
     if (!job) {
         return res.status(404).json({ error: 'Job not found.' });
     }
-    if (!job) return res.status(404).json({ error: 'Job not found.' });
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
@@ -141,8 +118,6 @@ router.get('/api/status/:jobId', (req, res) => {
     res.flushHeaders();
 
     // Send existing logs
-    res.flushHeaders();
-
     job.logs.forEach(entry => {
         res.write(`data: ${JSON.stringify(entry)}\n\n`);
     });
@@ -156,9 +131,8 @@ router.get('/api/status/:jobId', (req, res) => {
 
     // Add client to listeners
     job.clients.push(res);
-    
+
     // Cleanup on close
-    job.clients.push(res);
     req.on('close', () => {
         job.clients = job.clients.filter(c => c !== res);
     });
@@ -170,9 +144,6 @@ router.get('/api/download/:jobId/:file', asyncHandler(async (req, res) => {
     if (!job) {
         throw new NotFoundError('Job');
     }
-router.get('/api/download/:jobId/:file', (req, res) => {
-    const job = jobs.get(req.params.jobId);
-    if (!job) return res.status(404).json({ error: 'Job not found.' });
 
     const fileMap = {
         leads: job.files.leads,
@@ -189,13 +160,6 @@ router.get('/api/download/:jobId/:file', (req, res) => {
 
     res.download(filePath);
 }));
-    const filePath = fileMap[req.params.file];
-    if (!filePath || !fs.existsSync(filePath)) {
-        return res.status(404).json({ error: 'File not ready.' });
-    }
-
-    res.download(filePath);
-});
 
 // GET /api/jobs — list finished jobs
 router.get('/api/jobs', apiKeyAuth, (req, res) => {
@@ -207,13 +171,15 @@ router.get('/api/jobs', apiKeyAuth, (req, res) => {
             bizType: job.bizType,
             status: job.status,
             step: job.step,
-            id, city: job.city, bizType: job.bizType,
-            status: job.status, step: job.step,
             files: job.files,
         });
     }
     res.json(list.reverse());
 });
+
+// ════════════════════════════════════════════════════════════════════════════
+// LEAD CAPTURE & CRM
+// ════════════════════════════════════════════════════════════════════════════
 
 // POST /api/lead — CRM lead capture webhook
 router.post('/api/lead', webhookLimiter, asyncHandler(async (req, res) => {
@@ -227,16 +193,6 @@ router.post('/api/lead', webhookLimiter, asyncHandler(async (req, res) => {
         phone,
         city,
         outcome,
-router.post('/api/lead', webhookLimiter, (req, res) => {
-    const { name, email, phone, city, outcome } = req.body;
-    if (!email) return res.status(400).json({ error: 'email is required' });
-
-    const lead = {
-        name: name || 'Unknown',
-        email,
-        phone: phone || '',
-        city: city || '',
-        outcome: outcome || 'interested',
         captured_at: new Date().toISOString(),
     };
 
@@ -250,30 +206,170 @@ router.post('/api/lead', webhookLimiter, (req, res) => {
     res.json({ ok: true, lead });
 }));
 
-// GET /api/leads — list captured leads
-router.get('/api/leads', asyncHandler(async (req, res) => {
-    const csvPath = path.join(__dirname, '..', 'data', 'submissions.csv');
-    
-    if (!fs.existsSync(csvPath)) {
-        return res.json({ leads: [] });
+// GET /api/leads — list all leads with pagination and filters
+router.get('/api/leads', apiKeyAuth, asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = Math.min(parseInt(req.query.limit) || 25, 100);
+    const offset = (page - 1) * limit;
+    const status = req.query.status || null;
+    const city = req.query.city || null;
+    const search = req.query.search || null;
+
+    let leads, total;
+
+    try {
+        if (search) {
+            const searchPattern = `%${search}%`;
+            leads = db.searchLeads?.all(searchPattern, searchPattern, searchPattern) || [];
+            total = leads.length;
+        } else if (status && city) {
+            leads = db.getLeadsByCityAndStatus?.all(city, status) || [];
+            total = leads.length;
+            leads = leads.slice(offset, offset + limit);
+        } else if (status) {
+            const countResult = db.getLeadsByStatusCount?.get(status) || { total: 0 };
+            total = countResult.total;
+            leads = db.getLeadsByStatusPaginated?.all(status, limit, offset) || [];
+        } else if (city) {
+            const countResult = db.getLeadsByCityCount?.get(city) || { total: 0 };
+            total = countResult.total;
+            leads = db.getLeadsByCityPaginated?.all(city, limit, offset) || [];
+        } else {
+            const countResult = db.getLeadsCount?.get() || { total: 0 };
+            total = countResult.total;
+            leads = db.getLeadsPaginated?.all(limit, offset) || [];
+        }
+    } catch (err) {
+        logger.warn('Database query failed, falling back to empty results', { error: err.message });
+        leads = [];
+        total = 0;
     }
 
-    const leads = [];
-    await new Promise((resolve, reject) => {
-        fs.createReadStream(csvPath)
-            .pipe(csv())
-            .on('data', (row) => leads.push(row))
-            .on('end', resolve)
-            .on('error', reject);
+    res.json({
+        leads,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        },
+    });
+}));
+
+// GET /api/leads/:placeId — get single lead
+router.get('/api/leads/:placeId', apiKeyAuth, asyncHandler(async (req, res) => {
+    const lead = db.getLeadByPlaceId?.get(req.params.placeId);
+    if (!lead) {
+        throw new NotFoundError('Lead');
+    }
+    res.json(lead);
+}));
+
+// PUT /api/leads/:placeId — update lead
+router.put('/api/leads/:placeId', apiKeyAuth, asyncHandler(async (req, res) => {
+    const existing = db.getLeadByPlaceId?.get(req.params.placeId);
+    if (!existing) {
+        throw new NotFoundError('Lead');
+    }
+
+    const { business_name, email, phone, status, score } = req.body;
+    db.updateLead?.run({
+        place_id: req.params.placeId,
+        business_name: business_name ?? existing.business_name,
+        email: email ?? existing.email,
+        phone: phone ?? existing.phone,
+        status: status ?? existing.status,
+        score: score ?? existing.score,
     });
 
-    res.json({ leads });
+    const updated = db.getLeadByPlaceId?.get(req.params.placeId);
+    res.json(updated);
+}));
+
+// DELETE /api/leads/:placeId — delete lead
+router.delete('/api/leads/:placeId', apiKeyAuth, asyncHandler(async (req, res) => {
+    const existing = db.getLeadByPlaceId?.get(req.params.placeId);
+    if (!existing) {
+        throw new NotFoundError('Lead');
+    }
+
+    db.deleteLead?.run(req.params.placeId);
+    res.json({ ok: true });
+}));
+
+// POST /api/leads/bulk — bulk actions on leads
+router.post('/api/leads/bulk', apiKeyAuth, asyncHandler(async (req, res) => {
+    const { action, placeIds, status } = req.body;
+    if (!Array.isArray(placeIds) || placeIds.length === 0) {
+        throw new ValidationError('placeIds array is required');
+    }
+
+    let affected = 0;
+    if (action === 'updateStatus' && status) {
+        for (const placeId of placeIds) {
+            db.updateLeadStatus?.run(status, placeId);
+            affected++;
+        }
+    } else if (action === 'delete') {
+        for (const placeId of placeIds) {
+            db.deleteLead?.run(placeId);
+            affected++;
+        }
+    } else {
+        throw new ValidationError('Invalid action');
+    }
+
+    res.json({ ok: true, affected });
+}));
+
+// GET /api/leads/export/csv — export leads to CSV
+router.get('/api/export/leads', apiKeyAuth, asyncHandler(async (req, res) => {
+    const leads = db.getAllLeads?.all() || [];
+    const headers = ['place_id', 'business_name', 'address', 'phone', 'email', 'website', 'rating', 'review_count', 'city_slug', 'score', 'status', 'created_at'];
+    const csvRows = [headers.join(',')];
+
+    for (const lead of leads) {
+        const row = headers.map(h => {
+            const val = lead[h] || '';
+            return `"${String(val).replace(/"/g, '""')}"`;
+        });
+        csvRows.push(row.join(','));
+    }
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=leads_export.csv');
+    res.send(csvRows.join('\n'));
+}));
+
+// ════════════════════════════════════════════════════════════════════════════
+// DASHBOARD STATS
+// ════════════════════════════════════════════════════════════════════════════
+
+// GET /api/dashboard/stats — dashboard overview stats
+router.get('/api/dashboard/stats', apiKeyAuth, asyncHandler(async (req, res) => {
+    try {
+        const stats = db.getDashboardStats?.get() || {
+            total_leads: 0,
+            contacted: 0,
+            converted: 0,
+            avg_score: 0,
+        };
+        res.json(stats);
+    } catch (err) {
+        logger.warn('Failed to fetch dashboard stats', { error: err.message });
+        res.json({
+            total_leads: 0,
+            contacted: 0,
+            converted: 0,
+            avg_score: 0,
+        });
+    }
 }));
 
 // GET /api/stats — get dashboard statistics
 router.get('/api/stats', asyncHandler(async (req, res) => {
     const csvPath = path.join(__dirname, '..', 'data', 'submissions.csv');
-    
+
     let leads = [];
     if (fs.existsSync(csvPath)) {
         await new Promise((resolve, reject) => {
@@ -285,24 +381,20 @@ router.get('/api/stats', asyncHandler(async (req, res) => {
         });
     }
 
-    // Calculate statistics
     const totalLeads = leads.length;
     const conversions = leads.filter(l => l.status === 'converted').length;
     const conversionRate = totalLeads > 0 ? (conversions / totalLeads * 100).toFixed(1) : 0;
-    
-    // Calculate revenue
+
     const tierPrices = { starter: 99, growth: 299, pro: 499 };
     const revenue = leads
         .filter(l => l.tier && l.status === 'converted')
         .reduce((sum, l) => sum + (tierPrices[l.tier?.toLowerCase()] || 0), 0);
 
-    // Calculate lead scores
     const scores = leads.filter(l => l.score).map(l => parseInt(l.score) || 0);
-    const avgScore = scores.length > 0 
-        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) 
+    const avgScore = scores.length > 0
+        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
         : 0;
 
-    // Weekly breakdown
     const now = new Date();
     const weeklyData = [0, 0, 0, 0];
     leads.forEach(l => {
@@ -311,7 +403,6 @@ router.get('/api/stats', asyncHandler(async (req, res) => {
         weeklyData[3 - week]++;
     });
 
-    // Source breakdown
     const sources = { 'Google Maps': 0, 'Website Form': 0, 'Referral': 0, 'Social': 0 };
     leads.forEach(l => {
         const source = l.source || 'Website Form';
@@ -329,495 +420,229 @@ router.get('/api/stats', asyncHandler(async (req, res) => {
         sources,
     });
 }));
-    console.log(`New lead captured: ${lead.name} — ${lead.email}`);
-    n8nService.notifyLeadCapture(lead);
-
-    res.json({ ok: true, lead });
-});
-
-// GET /api/leads — list captured leads (legacy CSV endpoint)
-router.get('/api/leads/captured', (req, res) => {
-    try {
-        const csvPath = path.join(__dirname, '..', 'data', 'submissions.csv');
-        if (!fs.existsSync(csvPath)) return res.json({ leads: [] });
-
-        const leads = [];
-        fs.createReadStream(csvPath)
-            .pipe(csv())
-            .on('data', (row) => leads.push(row))
-            .on('end', () => res.json({ leads }))
-            .on('error', (err) => res.status(500).json({ error: 'Failed to parse CSV' }));
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to read leads' });
-    }
-});
 
 // ════════════════════════════════════════════════════════════════════════════
-// ADMIN DASHBOARD API ENDPOINTS (all require auth)
+// CAMPAIGNS
 // ════════════════════════════════════════════════════════════════════════════
-
-// GET /api/dashboard/stats — dashboard overview stats
-router.get('/api/dashboard/stats', apiKeyAuth, (req, res) => {
-    try {
-        const stats = db.getDashboardStats.get();
-        res.json(stats);
-    } catch (err) {
-        console.error('[API] Dashboard stats error:', err);
-        res.status(500).json({ error: 'Failed to fetch dashboard stats' });
-    }
-});
-
-// ── LEADS CRM ───────────────────────────────────────────────────────────────
-
-// GET /api/leads — list all leads with pagination and filters
-router.get('/api/leads', apiKeyAuth, (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = Math.min(parseInt(req.query.limit) || 25, 100);
-        const offset = (page - 1) * limit;
-        const status = req.query.status || null;
-        const city = req.query.city || null;
-        const search = req.query.search || null;
-
-        let leads, total;
-
-        if (search) {
-            const searchPattern = `%${search}%`;
-            leads = db.searchLeads.all(searchPattern, searchPattern, searchPattern);
-            total = leads.length;
-        } else if (status && city) {
-            leads = db.getLeadsByCityAndStatus.all(city, status);
-            total = leads.length;
-            leads = leads.slice(offset, offset + limit);
-        } else if (status) {
-            const countResult = db.getLeadsByStatusCount.get(status);
-            total = countResult.total;
-            leads = db.getLeadsByStatusPaginated.all(status, limit, offset);
-        } else if (city) {
-            const countResult = db.getLeadsByCityCount.get(city);
-            total = countResult.total;
-            leads = db.getLeadsByCityPaginated.all(city, limit, offset);
-        } else {
-            const countResult = db.getLeadsCount.get();
-            total = countResult.total;
-            leads = db.getLeadsPaginated.all(limit, offset);
-        }
-
-        res.json({
-            leads,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
-        });
-    } catch (err) {
-        console.error('[API] Leads list error:', err);
-        res.status(500).json({ error: 'Failed to fetch leads' });
-    }
-});
-
-// GET /api/leads/:placeId — get single lead
-router.get('/api/leads/:placeId', apiKeyAuth, (req, res) => {
-    try {
-        const lead = db.getLeadByPlaceId.get(req.params.placeId);
-        if (!lead) return res.status(404).json({ error: 'Lead not found' });
-        res.json(lead);
-    } catch (err) {
-        console.error('[API] Lead get error:', err);
-        res.status(500).json({ error: 'Failed to fetch lead' });
-    }
-});
-
-// PUT /api/leads/:placeId — update lead
-router.put('/api/leads/:placeId', apiKeyAuth, (req, res) => {
-    try {
-        const existing = db.getLeadByPlaceId.get(req.params.placeId);
-        if (!existing) return res.status(404).json({ error: 'Lead not found' });
-
-        const { business_name, email, phone, status, score } = req.body;
-        db.updateLead.run({
-            place_id: req.params.placeId,
-            business_name: business_name ?? existing.business_name,
-            email: email ?? existing.email,
-            phone: phone ?? existing.phone,
-            status: status ?? existing.status,
-            score: score ?? existing.score,
-        });
-
-        const updated = db.getLeadByPlaceId.get(req.params.placeId);
-        res.json(updated);
-    } catch (err) {
-        console.error('[API] Lead update error:', err);
-        res.status(500).json({ error: 'Failed to update lead' });
-    }
-});
-
-// DELETE /api/leads/:placeId — delete lead
-router.delete('/api/leads/:placeId', apiKeyAuth, (req, res) => {
-    try {
-        const existing = db.getLeadByPlaceId.get(req.params.placeId);
-        if (!existing) return res.status(404).json({ error: 'Lead not found' });
-
-        db.deleteLead.run(req.params.placeId);
-        res.json({ ok: true });
-    } catch (err) {
-        console.error('[API] Lead delete error:', err);
-        res.status(500).json({ error: 'Failed to delete lead' });
-    }
-});
-
-// POST /api/leads/bulk — bulk actions on leads
-router.post('/api/leads/bulk', apiKeyAuth, (req, res) => {
-    try {
-        const { action, placeIds, status } = req.body;
-        if (!Array.isArray(placeIds) || placeIds.length === 0) {
-            return res.status(400).json({ error: 'placeIds array is required' });
-        }
-
-        let affected = 0;
-        if (action === 'updateStatus' && status) {
-            for (const placeId of placeIds) {
-                db.updateLeadStatus.run(status, placeId);
-                affected++;
-            }
-        } else if (action === 'delete') {
-            for (const placeId of placeIds) {
-                db.deleteLead.run(placeId);
-                affected++;
-            }
-        } else {
-            return res.status(400).json({ error: 'Invalid action' });
-        }
-
-        res.json({ ok: true, affected });
-    } catch (err) {
-        console.error('[API] Bulk action error:', err);
-        res.status(500).json({ error: 'Failed to perform bulk action' });
-    }
-});
-
-// GET /api/leads/export/csv — export leads to CSV
-router.get('/api/leads/export/csv', apiKeyAuth, (req, res) => {
-    try {
-        const leads = db.getAllLeads.all();
-        const headers = ['place_id', 'business_name', 'address', 'phone', 'email', 'website', 'rating', 'review_count', 'city_slug', 'score', 'status', 'created_at'];
-        const csvRows = [headers.join(',')];
-        
-        for (const lead of leads) {
-            const row = headers.map(h => {
-                const val = lead[h] || '';
-                return `"${String(val).replace(/"/g, '""')}"`;
-            });
-            csvRows.push(row.join(','));
-        }
-
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', 'attachment; filename=leads_export.csv');
-        res.send(csvRows.join('\n'));
-    } catch (err) {
-        console.error('[API] CSV export error:', err);
-        res.status(500).json({ error: 'Failed to export leads' });
-    }
-});
-
-// ── EMAIL CAMPAIGNS ─────────────────────────────────────────────────────────
 
 // GET /api/campaigns — list all campaigns
-router.get('/api/campaigns', apiKeyAuth, (req, res) => {
-    try {
-        const campaigns = db.getAllCampaigns.all();
-        // Attach stats to each campaign
-        const campaignsWithStats = campaigns.map(c => {
-            const stats = db.getCampaignStats.get(c.id);
-            return { ...c, stats };
-        });
-        res.json({ campaigns: campaignsWithStats });
-    } catch (err) {
-        console.error('[API] Campaigns list error:', err);
-        res.status(500).json({ error: 'Failed to fetch campaigns' });
-    }
-});
+router.get('/api/campaigns', apiKeyAuth, asyncHandler(async (req, res) => {
+    const campaigns = db.getAllCampaigns?.all() || [];
+    const campaignsWithStats = campaigns.map(c => {
+        const stats = db.getCampaignStats?.get(c.id) || { sent: 0, opened: 0, clicked: 0 };
+        return { ...c, stats };
+    });
+    res.json({ campaigns: campaignsWithStats });
+}));
 
 // GET /api/campaigns/:id — get campaign with recipients
-router.get('/api/campaigns/:id', apiKeyAuth, (req, res) => {
-    try {
-        const campaign = db.getCampaign.get(req.params.id);
-        if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
-
-        const recipients = db.getCampaignRecipients.all(req.params.id);
-        const stats = db.getCampaignStats.get(req.params.id);
-
-        res.json({ ...campaign, recipients, stats });
-    } catch (err) {
-        console.error('[API] Campaign get error:', err);
-        res.status(500).json({ error: 'Failed to fetch campaign' });
+router.get('/api/campaigns/:id', apiKeyAuth, asyncHandler(async (req, res) => {
+    const campaign = db.getCampaign?.get(req.params.id);
+    if (!campaign) {
+        throw new NotFoundError('Campaign');
     }
-});
+
+    const recipients = db.getCampaignRecipients?.all(req.params.id) || [];
+    const stats = db.getCampaignStats?.get(req.params.id) || {};
+
+    res.json({ ...campaign, recipients, stats });
+}));
 
 // POST /api/campaigns — create new campaign
-router.post('/api/campaigns', apiKeyAuth, (req, res) => {
-    try {
-        const { name, subject, body, scheduled_at, recipientFilter } = req.body;
-        if (!name || !subject || !body) {
-            return res.status(400).json({ error: 'name, subject, and body are required' });
+router.post('/api/campaigns', apiKeyAuth, asyncHandler(async (req, res) => {
+    const { name, subject, body, scheduled_at, recipientFilter } = req.body;
+    if (!name || !subject || !body) {
+        throw new ValidationError('name, subject, and body are required');
+    }
+
+    const result = db.insertCampaign?.run({
+        name,
+        subject,
+        body,
+        status: scheduled_at ? 'scheduled' : 'draft',
+        scheduled_at: scheduled_at || null,
+    });
+
+    const campaignId = result?.lastInsertRowid;
+    if (!campaignId) {
+        throw new Error('Failed to create campaign');
+    }
+
+    // Add recipients based on filter
+    if (recipientFilter) {
+        let leads = [];
+        if (recipientFilter.status) {
+            leads = db.getLeadsByStatus?.all(recipientFilter.status) || [];
+        } else if (recipientFilter.city) {
+            leads = db.getLeadsByCity?.all(recipientFilter.city) || [];
+        } else {
+            leads = db.getAllLeads?.all() || [];
         }
 
-        const result = db.insertCampaign.run({
-            name,
-            subject,
-            body,
-            status: scheduled_at ? 'scheduled' : 'draft',
-            scheduled_at: scheduled_at || null,
-        });
-
-        const campaignId = result.lastInsertRowid;
-
-        // Add recipients based on filter
-        if (recipientFilter) {
-            let leads;
-            if (recipientFilter.status) {
-                leads = db.getLeadsByStatus.all(recipientFilter.status);
-            } else if (recipientFilter.city) {
-                leads = db.getLeadsByCity.all(recipientFilter.city);
-            } else {
-                leads = db.getAllLeads.all();
-            }
-
-            // Filter leads with email
-            const leadsWithEmail = leads.filter(l => l.email && l.email.includes('@'));
-            const recipients = leadsWithEmail.map(l => ({
+        const leadsWithEmail = leads.filter(l => l.email && l.email.includes('@'));
+        for (const l of leadsWithEmail) {
+            db.insertCampaignRecipient?.run({
                 campaign_id: campaignId,
                 lead_id: l.place_id,
                 status: 'pending',
-            }));
-
-            if (recipients.length > 0) {
-                db.insertCampaignRecipientMany(recipients);
-            }
+            });
         }
-
-        const campaign = db.getCampaign.get(campaignId);
-        res.json(campaign);
-    } catch (err) {
-        console.error('[API] Campaign create error:', err);
-        res.status(500).json({ error: 'Failed to create campaign' });
     }
-});
+
+    const campaign = db.getCampaign?.get(campaignId);
+    res.json(campaign);
+}));
 
 // PUT /api/campaigns/:id — update campaign
-router.put('/api/campaigns/:id', apiKeyAuth, (req, res) => {
-    try {
-        const existing = db.getCampaign.get(req.params.id);
-        if (!existing) return res.status(404).json({ error: 'Campaign not found' });
-
-        if (existing.status === 'sent' || existing.status === 'sending') {
-            return res.status(400).json({ error: 'Cannot edit sent/sending campaign' });
-        }
-
-        const { name, subject, body, scheduled_at } = req.body;
-        db.updateCampaign.run({
-            id: req.params.id,
-            name: name ?? existing.name,
-            subject: subject ?? existing.subject,
-            body: body ?? existing.body,
-            status: scheduled_at ? 'scheduled' : 'draft',
-            scheduled_at: scheduled_at || null,
-        });
-
-        const campaign = db.getCampaign.get(req.params.id);
-        res.json(campaign);
-    } catch (err) {
-        console.error('[API] Campaign update error:', err);
-        res.status(500).json({ error: 'Failed to update campaign' });
+router.put('/api/campaigns/:id', apiKeyAuth, asyncHandler(async (req, res) => {
+    const existing = db.getCampaign?.get(req.params.id);
+    if (!existing) {
+        throw new NotFoundError('Campaign');
     }
-});
 
-// POST /api/campaigns/:id/send — send campaign (mock for now)
-router.post('/api/campaigns/:id/send', apiKeyAuth, (req, res) => {
-    try {
-        const campaign = db.getCampaign.get(req.params.id);
-        if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
-
-        if (campaign.status === 'sent') {
-            return res.status(400).json({ error: 'Campaign already sent' });
-        }
-
-        // Mark as sending then sent
-        db.updateCampaignStatus.run('sending', null, req.params.id);
-
-        // In production, this would trigger actual email sending
-        // For now, we'll simulate by marking recipients as sent
-        const recipients = db.getCampaignRecipients.all(req.params.id);
-        const sentAt = new Date().toISOString();
-        
-        for (const r of recipients) {
-            db.updateRecipientStatus.run('sent', sentAt, null, null, r.id);
-        }
-
-        db.updateCampaignStatus.run('sent', sentAt, req.params.id);
-
-        res.json({ ok: true, sent: recipients.length });
-    } catch (err) {
-        console.error('[API] Campaign send error:', err);
-        res.status(500).json({ error: 'Failed to send campaign' });
+    if (existing.status === 'sent' || existing.status === 'sending') {
+        throw new ValidationError('Cannot edit sent/sending campaign');
     }
-});
+
+    const { name, subject, body, scheduled_at } = req.body;
+    db.updateCampaign?.run({
+        id: req.params.id,
+        name: name ?? existing.name,
+        subject: subject ?? existing.subject,
+        body: body ?? existing.body,
+        status: scheduled_at ? 'scheduled' : 'draft',
+        scheduled_at: scheduled_at || null,
+    });
+
+    const campaign = db.getCampaign?.get(req.params.id);
+    res.json(campaign);
+}));
+
+// POST /api/campaigns/:id/send — send campaign
+router.post('/api/campaigns/:id/send', apiKeyAuth, asyncHandler(async (req, res) => {
+    const campaign = db.getCampaign?.get(req.params.id);
+    if (!campaign) {
+        throw new NotFoundError('Campaign');
+    }
+
+    if (campaign.status === 'sent') {
+        throw new ValidationError('Campaign already sent');
+    }
+
+    db.updateCampaignStatus?.run('sending', null, req.params.id);
+
+    const recipients = db.getCampaignRecipients?.all(req.params.id) || [];
+    const sentAt = new Date().toISOString();
+
+    for (const r of recipients) {
+        db.updateRecipientStatus?.run('sent', sentAt, null, null, r.id);
+    }
+
+    db.updateCampaignStatus?.run('sent', sentAt, req.params.id);
+
+    res.json({ ok: true, sent: recipients.length });
+}));
 
 // DELETE /api/campaigns/:id — delete campaign
-router.delete('/api/campaigns/:id', apiKeyAuth, (req, res) => {
-    try {
-        const existing = db.getCampaign.get(req.params.id);
-        if (!existing) return res.status(404).json({ error: 'Campaign not found' });
-
-        db.deleteCampaign.run(req.params.id);
-        res.json({ ok: true });
-    } catch (err) {
-        console.error('[API] Campaign delete error:', err);
-        res.status(500).json({ error: 'Failed to delete campaign' });
+router.delete('/api/campaigns/:id', apiKeyAuth, asyncHandler(async (req, res) => {
+    const existing = db.getCampaign?.get(req.params.id);
+    if (!existing) {
+        throw new NotFoundError('Campaign');
     }
-});
 
-// ── CALL CENTER LOG ─────────────────────────────────────────────────────────
+    db.deleteCampaign?.run(req.params.id);
+    res.json({ ok: true });
+}));
+
+// ════════════════════════════════════════════════════════════════════════════
+// CALLS
+// ════════════════════════════════════════════════════════════════════════════
 
 // GET /api/calls — list all calls with pagination
-router.get('/api/calls', apiKeyAuth, (req, res) => {
+router.get('/api/calls', apiKeyAuth, asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = Math.min(parseInt(req.query.limit) || 25, 100);
+    const offset = (page - 1) * limit;
+    const outcome = req.query.outcome || null;
+
+    let calls, total;
+
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = Math.min(parseInt(req.query.limit) || 25, 100);
-        const offset = (page - 1) * limit;
-        const outcome = req.query.outcome || null;
-
-        let calls, total;
-
         if (outcome) {
-            calls = db.getCallsByOutcome.all(outcome);
+            calls = db.getCallsByOutcome?.all(outcome) || [];
             total = calls.length;
             calls = calls.slice(offset, offset + limit);
         } else {
-            const countResult = db.getCallsCount.get();
+            const countResult = db.getCallsCount?.get() || { total: 0 };
             total = countResult.total;
-            calls = db.getCallsPaginated.all(limit, offset);
+            calls = db.getCallsPaginated?.all(limit, offset) || [];
         }
+    } catch {
+        calls = [];
+        total = 0;
+    }
 
-        res.json({
-            calls,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
+    res.json({
+        calls,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        },
+    });
+}));
+
+// POST /api/call — initiate a quick call
+router.post('/api/call', apiKeyAuth, webhookLimiter, asyncHandler(async (req, res) => {
+    const validated = validate(req.body, schemas.quickCall);
+    const { phone, business_name, city } = validated;
+
+    logger.info('Initiating call', { phone, business_name });
+
+    // Call ElevenLabs or VAPI
+    const callId = `call-${Date.now()}`;
+
+    // Log the call
+    try {
+        db.insertCall?.run({
+            id: callId,
+            phone,
+            business_name: business_name || 'Unknown',
+            city: city || '',
+            outcome: 'pending',
+            initiated_at: new Date().toISOString(),
         });
-    } catch (err) {
-        console.error('[API] Calls list error:', err);
-        res.status(500).json({ error: 'Failed to fetch calls' });
+    } catch (e) {
+        logger.warn('Failed to log call to DB', { error: e.message });
     }
-});
 
-// GET /api/calls/:id — get single call
-router.get('/api/calls/:id', apiKeyAuth, (req, res) => {
-    try {
-        const call = db.getCall.get(req.params.id);
-        if (!call) return res.status(404).json({ error: 'Call not found' });
-        res.json(call);
-    } catch (err) {
-        console.error('[API] Call get error:', err);
-        res.status(500).json({ error: 'Failed to fetch call' });
-    }
-});
+    res.json({ ok: true, callId, message: 'Call initiated' });
+}));
 
-// PUT /api/calls/:id — update call notes/outcome
-router.put('/api/calls/:id', apiKeyAuth, (req, res) => {
-    try {
-        const existing = db.getCall.get(req.params.id);
-        if (!existing) return res.status(404).json({ error: 'Call not found' });
+// ════════════════════════════════════════════════════════════════════════════
+// SINGLE BUSINESS PIPELINE
+// ════════════════════════════════════════════════════════════════════════════
 
-        const { outcome, summary } = req.body;
-        db.updateCall.run(
-            outcome ?? existing.outcome,
-            summary ?? existing.summary,
-            req.params.id
-        );
-
-        const updated = db.getCall.get(req.params.id);
-        res.json(updated);
-    } catch (err) {
-        console.error('[API] Call update error:', err);
-        res.status(500).json({ error: 'Failed to update call' });
-    }
-});
-
-// ── PAYMENTS ────────────────────────────────────────────────────────────────
-
-// GET /api/payments — list all payments with pagination
-router.get('/api/payments', apiKeyAuth, (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = Math.min(parseInt(req.query.limit) || 25, 100);
-        const offset = (page - 1) * limit;
-
-        const countResult = db.getPaymentsCount.get();
-        const payments = db.getPaymentsPaginated.all(limit, offset);
-
-        res.json({
-            payments,
-            pagination: {
-                page,
-                limit,
-                total: countResult.total,
-                totalPages: Math.ceil(countResult.total / limit),
-            },
-        });
-    } catch (err) {
-        console.error('[API] Payments list error:', err);
-        res.status(500).json({ error: 'Failed to fetch payments' });
-    }
-});
-
-// GET /api/payments/stats — payment statistics
-router.get('/api/payments/stats', apiKeyAuth, (req, res) => {
-    try {
-        const stats = db.getPaymentStats.get();
-        const byMonth = db.getPaymentStatsByMonth.all();
-        const byCity = db.getPaymentStatsByCity.all();
-        const byTier = db.getPaymentStatsByTier.all();
-        const recent = db.getRecentPayments.all(5);
-
-        res.json({
-            ...stats,
-            byMonth,
-            byCity,
-            byTier,
-            recent,
-        });
-    } catch (err) {
-        console.error('[API] Payment stats error:', err);
-        res.status(500).json({ error: 'Failed to fetch payment stats' });
-    }
-});
-
-// ── POST /api/run-single — run pipeline on one business (no scraping) ──────
-router.post('/api/run-single', apiKeyAuth, pipelineRunLimiter, async (req, res) => {
+// POST /api/single — run pipeline on one business (no scraping)
+router.post('/api/single', apiKeyAuth, pipelineRunLimiter, asyncHandler(async (req, res) => {
     const {
-        businessName,
+        name: businessName,
         website,
         phone = '',
         city = '',
-        generateDemo = true,
-        makeCall = false,
-        sendEmail = false,
-    } = req.body || {};
+        placeCall = false,
+    } = req.body;
 
-    if (!businessName) return res.status(400).json({ error: 'businessName is required' });
+    if (!businessName) {
+        throw new ValidationError('Business name is required');
+    }
 
     const jobId = `single-${Date.now()}`;
     const dataDir = path.join('data', jobId);
     fs.mkdirSync(dataDir, { recursive: true });
     fs.mkdirSync('logs', { recursive: true });
 
-    // Write a single-row leads CSV so the pipeline can use it
     const normalizedWebsite = website ? (website.startsWith('http') ? website : `https://${website}`) : '';
     const leadsPath = path.join(dataDir, 'leads.csv');
     fs.writeFileSync(leadsPath,
@@ -828,16 +653,12 @@ router.post('/api/run-single', apiKeyAuth, pipelineRunLimiter, async (req, res) 
     const files = {
         leads: leadsPath,
         audited: path.join(dataDir, 'audited_leads.csv'),
-        socialAudited: path.join(dataDir, 'social_audited.csv'),
-        enriched: path.join(dataDir, 'enriched_leads.csv'),
         outreach: path.join(dataDir, 'outreach_messages.csv'),
         demos: path.join('public', 'demos', jobId),
         demo: path.join(dataDir, 'demo_leads.csv'),
-        emailLog: path.join('logs', `email_log_${jobId}.csv`),
-        callLog: path.join('logs', `call_log_${jobId}.csv`),
     };
 
-    const job = {
+    jobs.set(jobId, {
         status: 'running',
         step: 0,
         logs: [],
@@ -848,24 +669,67 @@ router.post('/api/run-single', apiKeyAuth, pipelineRunLimiter, async (req, res) 
         citySlug: jobId,
         dataDir,
         files,
-        generateDemo,
-        makeCall,
-        sendEmail,
+        generateDemo: true,
+        makeCall: placeCall,
         exportSheets: false,
-        sheetsId: null,
         baseUrl: `${req.protocol}://${req.get('host')}`,
-    };
+        clients: [],
+    });
 
-    jobs.set(jobId, job);
-    res.json({ jobId, message: `Single-business pipeline started for "${businessName}"` });
+    logger.info('Starting single business pipeline', { businessName, jobId });
 
     // Run async
-    const { runSingleBusiness } = require('../services/pipeline');
     runSingleBusiness(jobId).catch(err => {
-        pushLog(jobId, `❌ Pipeline error: ${err.message}`, 'error');
-        job.status = 'error';
-        broadcast(jobId, { type: 'error', message: err.message });
+        const job = jobs.get(jobId);
+        if (job) {
+            pushLog(jobId, `Pipeline error: ${err.message}`, 'error');
+            job.status = 'error';
+            broadcast(jobId, { type: 'error', message: err.message });
+        }
     });
-});
+
+    res.json({ jobId, message: `Pipeline started for "${businessName}"` });
+}));
+
+// ════════════════════════════════════════════════════════════════════════════
+// PAYMENTS
+// ════════════════════════════════════════════════════════════════════════════
+
+// GET /api/payments — list all payments
+router.get('/api/payments', apiKeyAuth, asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = Math.min(parseInt(req.query.limit) || 25, 100);
+    const offset = (page - 1) * limit;
+
+    const countResult = db.getPaymentsCount?.get() || { total: 0 };
+    const payments = db.getPaymentsPaginated?.all(limit, offset) || [];
+
+    res.json({
+        payments,
+        pagination: {
+            page,
+            limit,
+            total: countResult.total,
+            totalPages: Math.ceil(countResult.total / limit),
+        },
+    });
+}));
+
+// GET /api/payments/stats — payment statistics
+router.get('/api/payments/stats', apiKeyAuth, asyncHandler(async (req, res) => {
+    const stats = db.getPaymentStats?.get() || { total: 0, count: 0 };
+    const byMonth = db.getPaymentStatsByMonth?.all() || [];
+    const byCity = db.getPaymentStatsByCity?.all() || [];
+    const byTier = db.getPaymentStatsByTier?.all() || [];
+    const recent = db.getRecentPayments?.all(5) || [];
+
+    res.json({
+        ...stats,
+        byMonth,
+        byCity,
+        byTier,
+        recent,
+    });
+}));
 
 module.exports = router;

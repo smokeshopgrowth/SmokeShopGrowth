@@ -13,260 +13,117 @@
 require('dotenv').config();
 
 const express = require('express');
-const { spawn } = require('child_process');
 const path = require('path');
-const fs = require('fs');
-const { mkdirSync } = require('fs');
-const { google } = require('googleapis');
-const csv = require('csv-parser');
+const helmet = require('helmet');
+const cors = require('cors');
+const { createLogger } = require('./utils/logger');
+const { errorHandler } = require('./utils/errors');
 
-const rateLimit = require('express-rate-limit');
-
+const logger = createLogger('Server');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+// Security middleware
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "cdn.jsdelivr.net"],
+            fontSrc: ["'self'", "fonts.gstatic.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"],
+            imgSrc: ["'self'", "data:", "images.unsplash.com", "*.unsplash.com"],
+            connectSrc: ["'self'", "*.stripe.com"],
+        },
+    },
+    crossOriginEmbedderPolicy: false,
+}));
 
-const webhookLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { error: 'Too many requests, please try again later.' },
-});
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization'],
+}));
 
-// ──────────────────────────────────────────────
-// Persistent job store
-// Jobs are kept in memory for fast SSE access and flushed to disk so they
-// survive server restarts.  Only serialisable fields are persisted (clients
-// array is ephemeral and is always re-initialised to []).
-// ──────────────────────────────────────────────
-const JOBS_FILE = path.join(__dirname, 'data', 'jobs.json');
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-function _loadJobsFromDisk() {
-    try {
-        if (fs.existsSync(JOBS_FILE)) {
-            const raw = JSON.parse(fs.readFileSync(JOBS_FILE, 'utf8'));
-            const map = new Map();
-            for (const [id, job] of Object.entries(raw)) {
-                map.set(id, { ...job, clients: [] }); // clients are always fresh on restart
-            }
-            console.log(`[Jobs] Loaded ${map.size} job(s) from disk.`);
-            return map;
-        }
-    } catch (e) {
-        console.warn(`[Jobs] Could not load jobs.json: ${e.message}`);
-    }
-    return new Map();
-}
-
-function _saveJobsToDisk() {
-    try {
-        mkdirSync(path.dirname(JOBS_FILE), { recursive: true });
-        const obj = {};
-        for (const [id, job] of jobs.entries()) {
-            const { clients, ...serialisable } = job; // omit non-serialisable SSE clients
-            obj[id] = serialisable;
-        }
-        fs.writeFileSync(JOBS_FILE, JSON.stringify(obj, null, 2));
-    } catch (e) {
-        console.warn(`[Jobs] Could not save jobs.json: ${e.message}`);
-    }
-}
-
-const jobs = _loadJobsFromDisk(); // jobId → { status, logs, city, type, files, clients }
-
-function makeJobId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-}
-
-// ──────────────────────────────────────────────
-// Route: start a pipeline job
-// ──────────────────────────────────────────────
-app.post('/api/run', (req, res) => {
-    let {
-        city = '',
-        bizType = 'smoke shop',
-        maxResults = 100,
-        skipLighthouse = true,
-        generateDemo = true,
-        exportSheets = false,
-        sheetsId = '',
-    } = req.body;
-
-    if (!city.trim()) {
-        return res.status(400).json({ error: 'City is required.' });
-    }
-
-    // Input validation
-    if (typeof bizType !== 'string' || bizType.length > 100) {
-        return res.status(400).json({ error: 'bizType must be a string (max 100 chars).' });
-    }
-    maxResults = Math.min(Math.max(parseInt(maxResults, 10) || 100, 1), 500);
-    if (sheetsId && !/^[a-zA-Z0-9_-]+$/.test(sheetsId)) {
-        return res.status(400).json({ error: 'Invalid sheetsId format.' });
-    }
-
-    const jobId = makeJobId();
-    const citySlug = city.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const dataDir = path.join('data', citySlug);
-    mkdirSync(dataDir, { recursive: true });
-    mkdirSync('logs', { recursive: true });
-
-    const files = {
-        leads: path.join(dataDir, 'leads.csv'),
-        audited: path.join(dataDir, 'audited_leads.csv'),
-        outreach: path.join(dataDir, 'outreach_messages.csv'),
-        demo: path.join(dataDir, 'demo_leads.csv'),
-        emailLog: path.join('logs', 'email_log.csv'),
-    };
-
-    jobs.set(jobId, {
-        status: 'running',
-        step: 0,
-        logs: [],
-        city, bizType, maxResults, citySlug, dataDir, files,
-        exportSheets, sheetsId, generateDemo,
-        clients: [], // SSE subscribers
-    });
-
-    // Start pipeline asynchronously
-    runPipeline(jobId).catch(err => {
-        const job = jobs.get(jobId);
-        if (job) {
-            pushLog(jobId, `[ERROR] ${err.message}`, 'error');
-            job.status = 'failed';
-            broadcast(jobId, { type: 'done', status: 'failed' });
+// Request logging
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        if (req.path !== '/api/ping' && !req.path.startsWith('/api/status/')) {
+            logger.info(`${req.method} ${req.path}`, {
+                status: res.statusCode,
+                duration: `${duration}ms`,
+            });
         }
     });
-
-    res.json({ jobId, dataDir, files });
+    next();
 });
 
-// ──────────────────────────────────────────────
-// Route: SSE stream for a job
-// ──────────────────────────────────────────────
-app.get('/api/status/:jobId', (req, res) => {
-    const job = jobs.get(req.params.jobId);
-    if (!job) return res.status(404).json({ error: 'Job not found.' });
+// Static files
+app.use(express.static(path.join(__dirname, 'public'), {
+    maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
+    etag: true,
+}));
 
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.flushHeaders();
+// Demo sites
+app.use('/demos', express.static(path.join(__dirname, 'public', 'demos'), {
+    maxAge: '7d',
+}));
 
-    // Replay history
-    job.logs.forEach(entry => {
-        res.write(`data: ${JSON.stringify(entry)}\n\n`);
-    });
-
-    // If already done, send close event
-    if (job.status !== 'running') {
-        res.write(`data: ${JSON.stringify({ type: 'done', status: job.status })}\n\n`);
-        res.end();
-        return;
-    }
-
-    job.clients.push(res);
-    req.on('close', () => {
-        job.clients = job.clients.filter(c => c !== res);
-    });
-});
+// API routes
+const apiRouter = require('./routes/api');
+app.use(apiRouter);
 
 // Health check
 app.get('/api/ping', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// ──────────────────────────────────────────────
-// Route: list finished jobs
-// ──────────────────────────────────────────────
-app.get('/api/jobs', (req, res) => {
-    const list = [];
-    for (const [id, job] of jobs.entries()) {
-        list.push({
-            id, city: job.city, bizType: job.bizType,
-            status: job.status, step: job.step,
-            files: job.files,
-        });
-    }
-    res.json(list.reverse());
-});
-
-// ──────────────────────────────────────────────
-// Route: Zapier webhook → trigger ElevenLabs call
-// ──────────────────────────────────────────────
-// Zapier POSTs: { business_name, phone, city, agent_name? }
-app.post('/webhook/call', webhookLimiter, async (req, res) => {
-    const requiredKey = process.env.API_KEY;
-    if (!requiredKey || req.headers['x-api-key'] !== requiredKey) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-// ── Global error handler ────────────────────────────────────────────────────
-// Must be defined AFTER all routes
-app.use((err, req, res, _next) => {
-    console.error('[ERROR]', err.stack || err.message || err);
-    const status = err.status || err.statusCode || 500;
-    res.status(status).json({
-        error: process.env.NODE_ENV === 'production'
-            ? 'Internal server error'
-            : err.message || 'Internal server error',
+    res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
     });
+});
+
+// Catch-all for SPA routing (if needed)
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        return next();
+    }
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Global error handler
+app.use(errorHandler);
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    logger.info('SIGTERM received. Shutting down gracefully...');
+    process.exit(0);
+});
+
+process.on('SIGINT', () => {
+    logger.info('SIGINT received. Shutting down...');
+    process.exit(0);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Promise Rejection', { reason: String(reason) });
+});
+
+process.on('uncaughtException', (error) => {
+    logger.error('Uncaught Exception', { error: error.message, stack: error.stack });
+    process.exit(1);
 });
 
 // Start server
 if (require.main === module) {
     app.listen(PORT, () => {
-        console.log(`\n🚀 Dashboard running at http://localhost:${PORT}\n`);
+        logger.info(`Dashboard running at http://localhost:${PORT}`);
     });
 }
 
-// ──────────────────────────────────────────────
-// Template Form Submission Endpoint
-// ──────────────────────────────────────────────
-const templateSubmissions = [];
-
-app.post('/api/template-submission', webhookLimiter, async (req, res) => {
-    try {
-        const { shopName, city, phone, email } = req.body;
-
-        if (!shopName || !city || !phone || !email) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-
-        const submission = {
-            id: makeJobId(),
-            shopName: shopName.trim(),
-            city: city.trim(),
-            phone: phone.trim(),
-            email: email.trim(),
-            timestamp: new Date().toISOString()
-        };
-
-        templateSubmissions.push(submission);
-        console.log(`✓ Form received: ${submission.shopName} (${submission.city})`);
-
-        res.status(200).json({
-            success: true,
-            message: 'Thank you! We\'ll contact you shortly.',
-            submissionId: submission.id
-        });
-    } catch (err) {
-        console.error('Form submission error:', err.message);
-        res.status(500).json({ error: 'Failed to process submission' });
-    }
-});
-
-app.get('/api/template-submissions', (req, res) => {
-    res.json({
-        count: templateSubmissions.length,
-        submissions: templateSubmissions
-    });
-});
-
-// ──────────────────────────────────────────────
-app.listen(PORT, () => {
-    console.log(`\n🚀 Dashboard running at http://localhost:${PORT}\n`);
-});
+module.exports = app;
