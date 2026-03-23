@@ -198,7 +198,7 @@ router.get('/api/download/:jobId/:file', (req, res) => {
 });
 
 // GET /api/jobs — list finished jobs
-router.get('/api/jobs', (req, res) => {
+router.get('/api/jobs', apiKeyAuth, (req, res) => {
     const list = [];
     for (const [id, job] of jobs.entries()) {
         list.push({
@@ -353,11 +353,11 @@ router.get('/api/leads/captured', (req, res) => {
 });
 
 // ════════════════════════════════════════════════════════════════════════════
-// ADMIN DASHBOARD API ENDPOINTS
+// ADMIN DASHBOARD API ENDPOINTS (all require auth)
 // ════════════════════════════════════════════════════════════════════════════
 
 // GET /api/dashboard/stats — dashboard overview stats
-router.get('/api/dashboard/stats', (req, res) => {
+router.get('/api/dashboard/stats', apiKeyAuth, (req, res) => {
     try {
         const stats = db.getDashboardStats.get();
         res.json(stats);
@@ -370,7 +370,7 @@ router.get('/api/dashboard/stats', (req, res) => {
 // ── LEADS CRM ───────────────────────────────────────────────────────────────
 
 // GET /api/leads — list all leads with pagination and filters
-router.get('/api/leads', (req, res) => {
+router.get('/api/leads', apiKeyAuth, (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = Math.min(parseInt(req.query.limit) || 25, 100);
@@ -419,7 +419,7 @@ router.get('/api/leads', (req, res) => {
 });
 
 // GET /api/leads/:placeId — get single lead
-router.get('/api/leads/:placeId', (req, res) => {
+router.get('/api/leads/:placeId', apiKeyAuth, (req, res) => {
     try {
         const lead = db.getLeadByPlaceId.get(req.params.placeId);
         if (!lead) return res.status(404).json({ error: 'Lead not found' });
@@ -431,7 +431,7 @@ router.get('/api/leads/:placeId', (req, res) => {
 });
 
 // PUT /api/leads/:placeId — update lead
-router.put('/api/leads/:placeId', (req, res) => {
+router.put('/api/leads/:placeId', apiKeyAuth, (req, res) => {
     try {
         const existing = db.getLeadByPlaceId.get(req.params.placeId);
         if (!existing) return res.status(404).json({ error: 'Lead not found' });
@@ -455,7 +455,7 @@ router.put('/api/leads/:placeId', (req, res) => {
 });
 
 // DELETE /api/leads/:placeId — delete lead
-router.delete('/api/leads/:placeId', (req, res) => {
+router.delete('/api/leads/:placeId', apiKeyAuth, (req, res) => {
     try {
         const existing = db.getLeadByPlaceId.get(req.params.placeId);
         if (!existing) return res.status(404).json({ error: 'Lead not found' });
@@ -469,7 +469,7 @@ router.delete('/api/leads/:placeId', (req, res) => {
 });
 
 // POST /api/leads/bulk — bulk actions on leads
-router.post('/api/leads/bulk', (req, res) => {
+router.post('/api/leads/bulk', apiKeyAuth, (req, res) => {
     try {
         const { action, placeIds, status } = req.body;
         if (!Array.isArray(placeIds) || placeIds.length === 0) {
@@ -499,7 +499,7 @@ router.post('/api/leads/bulk', (req, res) => {
 });
 
 // GET /api/leads/export/csv — export leads to CSV
-router.get('/api/leads/export/csv', (req, res) => {
+router.get('/api/leads/export/csv', apiKeyAuth, (req, res) => {
     try {
         const leads = db.getAllLeads.all();
         const headers = ['place_id', 'business_name', 'address', 'phone', 'email', 'website', 'rating', 'review_count', 'city_slug', 'score', 'status', 'created_at'];
@@ -525,7 +525,7 @@ router.get('/api/leads/export/csv', (req, res) => {
 // ── EMAIL CAMPAIGNS ─────────────────────────────────────────────────────────
 
 // GET /api/campaigns — list all campaigns
-router.get('/api/campaigns', (req, res) => {
+router.get('/api/campaigns', apiKeyAuth, (req, res) => {
     try {
         const campaigns = db.getAllCampaigns.all();
         // Attach stats to each campaign
@@ -541,7 +541,7 @@ router.get('/api/campaigns', (req, res) => {
 });
 
 // GET /api/campaigns/:id — get campaign with recipients
-router.get('/api/campaigns/:id', (req, res) => {
+router.get('/api/campaigns/:id', apiKeyAuth, (req, res) => {
     try {
         const campaign = db.getCampaign.get(req.params.id);
         if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
@@ -557,7 +557,7 @@ router.get('/api/campaigns/:id', (req, res) => {
 });
 
 // POST /api/campaigns — create new campaign
-router.post('/api/campaigns', (req, res) => {
+router.post('/api/campaigns', apiKeyAuth, (req, res) => {
     try {
         const { name, subject, body, scheduled_at, recipientFilter } = req.body;
         if (!name || !subject || !body) {
@@ -607,7 +607,7 @@ router.post('/api/campaigns', (req, res) => {
 });
 
 // PUT /api/campaigns/:id — update campaign
-router.put('/api/campaigns/:id', (req, res) => {
+router.put('/api/campaigns/:id', apiKeyAuth, (req, res) => {
     try {
         const existing = db.getCampaign.get(req.params.id);
         if (!existing) return res.status(404).json({ error: 'Campaign not found' });
@@ -635,7 +635,7 @@ router.put('/api/campaigns/:id', (req, res) => {
 });
 
 // POST /api/campaigns/:id/send — send campaign (mock for now)
-router.post('/api/campaigns/:id/send', (req, res) => {
+router.post('/api/campaigns/:id/send', apiKeyAuth, (req, res) => {
     try {
         const campaign = db.getCampaign.get(req.params.id);
         if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
@@ -666,7 +666,7 @@ router.post('/api/campaigns/:id/send', (req, res) => {
 });
 
 // DELETE /api/campaigns/:id — delete campaign
-router.delete('/api/campaigns/:id', (req, res) => {
+router.delete('/api/campaigns/:id', apiKeyAuth, (req, res) => {
     try {
         const existing = db.getCampaign.get(req.params.id);
         if (!existing) return res.status(404).json({ error: 'Campaign not found' });
@@ -682,7 +682,7 @@ router.delete('/api/campaigns/:id', (req, res) => {
 // ── CALL CENTER LOG ─────────────────────────────────────────────────────────
 
 // GET /api/calls — list all calls with pagination
-router.get('/api/calls', (req, res) => {
+router.get('/api/calls', apiKeyAuth, (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = Math.min(parseInt(req.query.limit) || 25, 100);
@@ -717,7 +717,7 @@ router.get('/api/calls', (req, res) => {
 });
 
 // GET /api/calls/:id — get single call
-router.get('/api/calls/:id', (req, res) => {
+router.get('/api/calls/:id', apiKeyAuth, (req, res) => {
     try {
         const call = db.getCall.get(req.params.id);
         if (!call) return res.status(404).json({ error: 'Call not found' });
@@ -729,7 +729,7 @@ router.get('/api/calls/:id', (req, res) => {
 });
 
 // PUT /api/calls/:id — update call notes/outcome
-router.put('/api/calls/:id', (req, res) => {
+router.put('/api/calls/:id', apiKeyAuth, (req, res) => {
     try {
         const existing = db.getCall.get(req.params.id);
         if (!existing) return res.status(404).json({ error: 'Call not found' });
@@ -752,7 +752,7 @@ router.put('/api/calls/:id', (req, res) => {
 // ── PAYMENTS ────────────────────────────────────────────────────────────────
 
 // GET /api/payments — list all payments with pagination
-router.get('/api/payments', (req, res) => {
+router.get('/api/payments', apiKeyAuth, (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = Math.min(parseInt(req.query.limit) || 25, 100);
@@ -777,7 +777,7 @@ router.get('/api/payments', (req, res) => {
 });
 
 // GET /api/payments/stats — payment statistics
-router.get('/api/payments/stats', (req, res) => {
+router.get('/api/payments/stats', apiKeyAuth, (req, res) => {
     try {
         const stats = db.getPaymentStats.get();
         const byMonth = db.getPaymentStatsByMonth.all();

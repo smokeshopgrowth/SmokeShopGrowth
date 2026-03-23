@@ -10,7 +10,11 @@ import { createReadStream, createWriteStream } from 'fs';
 import { parse } from 'csv-parse';
 import { stringify } from 'csv-stringify';
 
-const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY || 'fc-57a3c76c67374776a68434bfed161571';
+const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY;
+if (!FIRECRAWL_API_KEY) {
+  console.error('[Firecrawl] FIRECRAWL_API_KEY environment variable is required.');
+  process.exit(1);
+}
 const FIRECRAWL_URL = 'https://api.firecrawl.dev/v1/scrape';
 const CONCURRENCY = 3;
 const TIMEOUT_MS = 15000;

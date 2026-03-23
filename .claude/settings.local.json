@@ -20,7 +20,14 @@
       "Bash(ls \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper\"/src/node/*.js | head -10)",
       "Bash(ls -la \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper/\"*.csv 2>&1)",
       "Bash(ls -d \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper/demo/output/\"*/ 2>&1 | wc -l)",
-      "Bash(find \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper\" -name \"*.csv\" -type f 2>/dev/null | head -20)"
+      "Bash(find \"/mnt/c/Users/roryu/Build Google Maps Lead Scraper\" -name \"*.csv\" -type f 2>/dev/null | head -20)",
+      "Skill(sc:analyze)",
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(API_KEY=test-key node:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)"
     ]
   }
 }

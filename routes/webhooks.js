@@ -42,11 +42,14 @@ router.post('/webhook/call', webhookLimiter, async (req, res) => {
     }
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
-    const agentId = process.env.ELEVENLABS_AGENT_ID || 'agent_0901kk068cm9fats660z2mzqwnhy';
+    const agentId = process.env.ELEVENLABS_AGENT_ID;
     const phoneNumberId = process.env.ELEVENLABS_PHONE_NUMBER_ID;
 
     if (!apiKey) {
         return res.status(500).json({ error: 'ELEVENLABS_API_KEY not set' });
+    }
+    if (!agentId) {
+        return res.status(500).json({ error: 'ELEVENLABS_AGENT_ID not set. Please add it to your .env file.' });
     }
     if (!phoneNumberId) {
         return res.status(500).json({ error: 'ELEVENLABS_PHONE_NUMBER_ID not set. Please add it to your .env file.' });
@@ -81,7 +84,16 @@ router.post('/webhook/call', webhookLimiter, async (req, res) => {
 });
 
 // POST /webhook/vapi — Vapi end-of-call webhook
-router.post('/webhook/vapi', async (req, res) => {
+router.post('/webhook/vapi', webhookLimiter, async (req, res) => {
+    const vapiSecret = process.env.VAPI_WEBHOOK_SECRET;
+    if (!vapiSecret) {
+        console.error('[VAPI] VAPI_WEBHOOK_SECRET not set — rejecting webhook');
+        return res.status(503).json({ error: 'Webhook secret not configured' });
+    }
+    if (req.headers['x-vapi-secret'] !== vapiSecret) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     res.status(200).json({ received: true });
 
     try {
@@ -108,7 +120,7 @@ router.post('/webhook/vapi', async (req, res) => {
         const messages = artifact?.messages || [];
         for (const msg of messages) {
             const text = (msg.message || msg.content || '').toLowerCase();
-            const emailMatch = text.match(/[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}/i);
+            const emailMatch = text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
             if (emailMatch) {
                 collected_email = emailMatch[0];
                 break;
@@ -232,31 +244,20 @@ router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async 
         return res.status(500).send('Stripe not configured');
     }
 
-    // Fix #3: Always require webhook signature in production
-    if (!endpointSecret && process.env.NODE_ENV === 'production') {
-        console.error('STRIPE_WEBHOOK_SECRET is required in production');
+    if (!endpointSecret) {
+        console.error('STRIPE_WEBHOOK_SECRET is not set — rejecting webhook');
         return res.status(500).send('Stripe webhook secret not configured');
     }
 
     const stripe = require('stripe')(stripeKey);
     let event;
 
-    if (endpointSecret) {
-        const sig = req.headers['stripe-signature'];
-        try {
-            event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-        } catch (err) {
-            console.error('Stripe webhook signature failed:', err.message);
-            return res.status(400).send(`Webhook Error: ${err.message}`);
-        }
-    } else {
-        // Dev mode only — signature not verified
-        console.warn('⚠️  Stripe webhook signature verification skipped (dev mode)');
-        try {
-            event = JSON.parse(req.body);
-        } catch (err) {
-            return res.status(400).send('Invalid JSON');
-        }
+    const sig = req.headers['stripe-signature'];
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } catch (err) {
+        console.error('Stripe webhook signature failed:', err.message);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     if (event.type === 'checkout.session.completed') {

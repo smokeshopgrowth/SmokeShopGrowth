@@ -10,8 +10,8 @@ Usage:
     python main.py --upsell         → run upsell drip cron
 """
 
-import sys
 import os
+import sys
 
 # Add source directories to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src', 'python'))

@@ -27,6 +27,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from urllib.parse import quote_plus
 
+import config
 import pandas as pd
 from playwright.async_api import (
     Browser,
@@ -37,8 +38,6 @@ from playwright.async_api import (
     TimeoutError as PlaywrightTimeout,
 )
 from tqdm import tqdm
-
-import config
 
 # ──────────────────────────────────────────────
 # Logging

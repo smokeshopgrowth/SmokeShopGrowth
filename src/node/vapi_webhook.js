@@ -128,9 +128,14 @@ async function notifyZapier(payload) {
 
 app.post("/vapi/webhook", webhookLimiter, async (req, res) => {
     console.log("📥 Incoming webhook type:", req.body?.message?.type || "unknown");
-    const secret = process.env.WEBHOOK_SECRET;
-    if (secret && req.headers['x-webhook-secret'] !== secret) {
-        return res.status(401).json({ error: 'Unauthorized' });
+    const secret = process.env.VAPI_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
+    if (!secret) {
+        console.error("[VAPI] VAPI_WEBHOOK_SECRET not set — rejecting webhook");
+        return res.status(503).json({ error: "Webhook secret not configured" });
+    }
+    const provided = req.headers['x-vapi-secret'] || req.headers['x-webhook-secret'];
+    if (provided !== secret) {
+        return res.status(401).json({ error: "Unauthorized" });
     }
 
     const event = req.body;

@@ -1,8 +1,7 @@
 import gspread
+from config import GOOGLE_SHEET_URL
 from google.oauth2.service_account import Credentials
 from logger import get_logger
-
-from config import GOOGLE_SHEET_URL
 
 log = get_logger(__name__)
 

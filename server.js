@@ -187,25 +187,9 @@ app.get('/api/status/:jobId', (req, res) => {
     });
 });
 
-// ──────────────────────────────────────────────
-// Route: download a result file
-// ──────────────────────────────────────────────
-app.get('/api/download/:jobId/:file', (req, res) => {
-    const job = jobs.get(req.params.jobId);
-    if (!job) return res.status(404).json({ error: 'Job not found.' });
-
-    const fileMap = {
-        leads: job.files.leads,
-        audited: job.files.audited,
-        outreach: job.files.outreach,
-        demo: job.files.demo,
-    };
-    const filePath = fileMap[req.params.file];
-    if (!filePath || !fs.existsSync(filePath)) {
-        return res.status(404).json({ error: 'File not ready.' });
-    }
-
-    res.download(filePath);
+// Health check
+app.get('/api/ping', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // ──────────────────────────────────────────────
@@ -233,271 +217,22 @@ app.post('/webhook/call', webhookLimiter, async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const {
-        business_name = '',
-        phone = '',
-        city = '',
-        agent_name = process.env.AGENT_NAME || 'Alex',
-    } = req.body;
-
-    if (!phone) {
-        return res.status(400).json({ error: 'phone is required' });
-    }
-
-    const apiKey = process.env.ELEVENLABS_API_KEY;
-    const agentId = process.env.ELEVENLABS_AGENT_ID || 'agent_0901kk068cm9fats660z2mzqwnhy';
-    const phoneNumberId = process.env.ELEVENLABS_PHONE_NUMBER_ID;
-
-    if (!apiKey) {
-        return res.status(500).json({ error: 'ELEVENLABS_API_KEY not set' });
-    }
-    if (!phoneNumberId) {
-        return res.status(500).json({ error: 'ELEVENLABS_PHONE_NUMBER_ID not set. Please add it to your .env file.' });
-    }
-
-    pushLog('call', `Attempting call to ${phone} using agent ${agentId}…`, 'log');
-
-    try {
-        const response = await fetch('https://api.elevenlabs.io/v1/convai/twilio/outbound-call', {
-            method: 'POST',
-            headers: {
-                'xi-api-key': apiKey,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                agent_id: agentId,
-                agent_phone_number_id: phoneNumberId,
-                to_number: phone,
-                dynamic_variables: { business_name, city, agent_name },
-            }),
-        });
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.detail?.message || JSON.stringify(data));
-
-        console.log(`📞 Call started → ${business_name} (${phone}) — conversation: ${data.conversation_id}`);
-        res.json({ success: true, conversation_id: data.conversation_id });
-    } catch (err) {
-        console.error(`❌ Call failed for ${phone}: ${err.message}`);
-        res.status(500).json({ error: err.message });
-    }
+// ── Global error handler ────────────────────────────────────────────────────
+// Must be defined AFTER all routes
+app.use((err, req, res, _next) => {
+    console.error('[ERROR]', err.stack || err.message || err);
+    const status = err.status || err.statusCode || 500;
+    res.status(status).json({
+        error: process.env.NODE_ENV === 'production'
+            ? 'Internal server error'
+            : err.message || 'Internal server error',
+    });
 });
 
-
-// ──────────────────────────────────────────────
-// Pipeline runner
-// ──────────────────────────────────────────────
-async function runPipeline(jobId) {
-    const job = jobs.get(jobId);
-
-    // ── Step 1: Scrape ────────────────────────
-    pushLog(jobId, '🔍 Step 1/3 — Scraping Google Maps…', 'step');
-    job.step = 1;
-    await runChild(jobId, 'python', [
-        'scraper.py',
-        '--city', job.city,
-        '--type', job.bizType,
-        '--max-results', String(job.maxResults),
-        '--output', job.files.leads,
-        '--headless',
-    ]);
-
-    if (!fs.existsSync(job.files.leads)) {
-        throw new Error('Scraper completed but no leads.csv was created.');
-    }
-
-    const leadCount = await countCsvRows(job.files.leads);
-    pushLog(jobId, `✅ Scraped ${leadCount} businesses.`, 'success');
-
-    // ── Step 2: Audit ─────────────────────────
-    pushLog(jobId, '🌐 Step 2/3 — Auditing websites…', 'step');
-    job.step = 2;
-    const auditorArgs = [
-        'auditor.js',
-        '--input', job.files.leads,
-        '--output', job.files.audited,
-        '--concurrency', '8',
-    ];
-    if (job.skipLighthouse !== false) auditorArgs.push('--skip-lighthouse');
-    await runChild(jobId, 'node', auditorArgs);
-
-    const auditedCount = await countCsvRows(job.files.audited);
-    pushLog(jobId, `✅ Audited ${auditedCount} websites.`, 'success');
-
-    // ── Step 3: Outreach ──────────────────────
-    if (process.env.OPENAI_API_KEY) {
-        pushLog(jobId, '✍️  Step 3/3 — Generating outreach messages…', 'step');
-        job.step = 3;
-        await runChild(jobId, 'node', [
-            'generate_outreach.js',
-            '--input', job.files.audited,
-            '--output', job.files.outreach,
-        ]);
-        const outreachCount = await countCsvRows(job.files.outreach);
-        pushLog(jobId, `✅ Generated ${outreachCount} outreach messages.`, 'success');
-    } else {
-        pushLog(jobId, '⚠️  Step 3 skipped — OPENAI_API_KEY not set.', 'warn');
-    }
-
-    // ── Step 4: Demo Video ────────────────────
-    if (job.generateDemo && process.env.MINIMAX_API_KEY) {
-        pushLog(jobId, '🎥 Step 4/4 — Generating Minimax demo videos…', 'step');
-        job.step = 4;
-        await runChild(jobId, 'node', [
-            'generate_demo.js',
-            '--input', fs.existsSync(job.files.outreach) ? job.files.outreach : job.files.audited,
-            '--output', job.files.demo,
-            '--limit', '10'
-        ]);
-        const demoCount = await countCsvRows(job.files.demo);
-        pushLog(jobId, `✅ Generated demo video entries  (${demoCount} leads processed).`, 'success');
-    } else if (job.generateDemo && !process.env.MINIMAX_API_KEY) {
-        pushLog(jobId, '⚠️  Step 4 skipped — MINIMAX_API_KEY not set.', 'warn');
-    } else {
-        pushLog(jobId, '⏩ Step 4 skipped — Demo generation turned off.', 'log');
-    }
-
-    // ── Step 5: Export to Google Sheets ───────
-    if (job.exportSheets && job.sheetsId) {
-        pushLog(jobId, '📊 Exporting to Google Sheets…', 'step');
-        try {
-            let finalOutput = job.files.audited;
-            if (fs.existsSync(job.files.demo)) finalOutput = job.files.demo;
-            else if (fs.existsSync(job.files.outreach)) finalOutput = job.files.outreach;
-
-            await exportToSheets(job.sheetsId, finalOutput, job.city);
-            pushLog(jobId, '✅ Exported to Google Sheets.', 'success');
-        } catch (err) {
-            pushLog(jobId, `⚠️  Google Sheets export failed: ${err.message}`, 'warn');
-        }
-    }
-
-    job.status = 'done';
-    job.step = 5;
-    pushLog(jobId, '🎉 Pipeline complete!', 'success');
-    broadcast(jobId, { type: 'done', status: 'done', files: job.files });
-}
-
-// ──────────────────────────────────────────────
-// Child process helper
-// ──────────────────────────────────────────────
-function runChild(jobId, cmd, args) {
-    return new Promise((resolve, reject) => {
-        const proc = spawn(cmd, args, {
-            shell: false,
-            env: { ...process.env, PYTHONUNBUFFERED: '1' },
-        });
-
-        const onData = (data) => {
-            String(data).split('\n').forEach(line => {
-                line = line.trim();
-                if (line) pushLog(jobId, line, 'log');
-            });
-        };
-
-        proc.stdout.on('data', onData);
-        proc.stderr.on('data', onData);
-        proc.on('close', code => {
-            if (code === 0) resolve();
-            else reject(new Error(`${cmd} exited with code ${code}`));
-        });
-        proc.on('error', reject);
-    });
-}
-
-// ──────────────────────────────────────────────
-// SSE helpers
-// ──────────────────────────────────────────────
-function pushLog(jobId, message, type = 'log') {
-    const entry = { type, message, ts: Date.now() };
-    const job = jobs.get(jobId);
-    if (!job) return;
-    job.logs.push(entry);
-    broadcast(jobId, entry);
-    _saveJobsToDisk();
-}
-
-function broadcast(jobId, payload) {
-    const job = jobs.get(jobId);
-    if (!job) return;
-    const data = `data: ${JSON.stringify(payload)}\n\n`;
-    job.clients.forEach(res => { try { res.write(data); } catch { } });
-    if (payload.type === 'done') {
-        job.clients.forEach(res => { try { res.end(); } catch { } });
-        job.clients = [];
-    }
-}
-
-// ──────────────────────────────────────────────
-// CSV row counter
-// ──────────────────────────────────────────────
-function countCsvRows(filePath) {
-    return new Promise(resolve => {
-        if (!fs.existsSync(filePath)) return resolve(0);
-        let count = 0;
-        fs.createReadStream(filePath)
-            .pipe(csv())
-            .on('data', () => count++)
-            .on('end', () => resolve(count))
-            .on('error', () => resolve(0));
-    });
-}
-
-// ──────────────────────────────────────────────
-// Google Sheets export
-// ──────────────────────────────────────────────
-async function exportToSheets(spreadsheetId, csvPath, sheetTitle) {
-    const credPath = path.join(__dirname, 'credentials.json');
-    if (!fs.existsSync(credPath)) {
-        throw new Error('credentials.json not found. See README for Google Sheets setup.');
-    }
-
-    const auth = new google.auth.GoogleAuth({
-        keyFile: credPath,
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    const rows = await new Promise((resolve, reject) => {
-        const data = [];
-        let headerPushed = false;
-        fs.createReadStream(csvPath)
-            .pipe(csv())
-            .on('data', row => {
-                if (!headerPushed) {
-                    data.push(Object.keys(row));
-                    headerPushed = true;
-                }
-                data.push(Object.values(row));
-            })
-            .on('end', () => resolve(data))
-            .on('error', reject);
-    });
-
-    const meta = await sheets.spreadsheets.get({ spreadsheetId });
-    const existingSheet = meta.data.sheets.find(
-        s => s.properties.title === sheetTitle
-    );
-
-    if (existingSheet) {
-        await sheets.spreadsheets.values.clear({
-            spreadsheetId,
-            range: `${sheetTitle}!A1:Z10000`,
-        });
-    } else {
-        await sheets.spreadsheets.batchUpdate({
-            spreadsheetId,
-            requestBody: {
-                requests: [{ addSheet: { properties: { title: sheetTitle } } }],
-            },
-        });
-    }
-
-    await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: `${sheetTitle}!A1`,
-        valueInputOption: 'RAW',
-        requestBody: { values: rows },
+// Start server
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`\n🚀 Dashboard running at http://localhost:${PORT}\n`);
     });
 }
 

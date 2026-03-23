@@ -32,7 +32,7 @@ function broadcast(jobId, payload) {
     deadClients.reverse().forEach(idx => job.clients.splice(idx, 1));
     
     if (payload.type === 'done') {
-        job.clients.forEach(res => { try { res.end(); } catch { } });
+        job.clients.forEach(res => { try { res.end(); } catch { /* ignore close errors */ } });
         job.clients = [];
     }
 }
