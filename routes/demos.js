@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const { makeJobId } = require('../services/sse');
 const { webhookLimiter } = require('../middleware/rate-limit');
+const { redactEmail } = require('../utils/redact');
 
 // GET /demos - Gallery page
 router.get('/demos', (req, res) => {
@@ -163,7 +164,7 @@ router.post('/api/submit-lead', webhookLimiter, async (req, res) => {
         const csvPath = path.join(dataDir, 'submissions.csv');
         if (!fs.existsSync(csvPath)) fs.writeFileSync(csvPath, "Date,Contact Name,Email,Phone,Tier,Business,City\n");
         fs.appendFileSync(csvPath, `"${submissionDate}","${contactName}","${email}","${phone}","${tier}","${businessName}","${city}"\n`);
-        console.log(`✅ Lead captured: ${email} for ${businessName}`);
+        console.log(`Lead captured: ${redactEmail(email)} for ${businessName}`);
         res.json({ success: true, message: 'Lead captured!' });
     } catch (err) {
         console.error('Lead capture error:', err.message);

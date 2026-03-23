@@ -9,6 +9,7 @@ const n8nService = require('../src/node/n8n_service');
 const { pushLog } = require('../services/sse');
 const { webhookLimiter } = require('../middleware/rate-limit');
 const { insertPayment } = require('../src/node/db');
+const { redactEmail, redactPhone } = require('../utils/redact');
 
 const PORT = process.env.PORT || 3000;
 
@@ -75,10 +76,10 @@ router.post('/webhook/call', webhookLimiter, async (req, res) => {
         const data = await response.json();
         if (!response.ok) throw new Error(data.detail?.message || JSON.stringify(data));
 
-        console.log(`📞 Call started → ${business_name} (${phone}) — conversation: ${data.conversation_id}`);
+        console.log(`Call started → ${business_name} (${redactPhone(phone)}) — conversation: ${data.conversation_id}`);
         res.json({ success: true, conversation_id: data.conversation_id });
     } catch (err) {
-        console.error(`❌ Call failed for ${phone}: ${err.message}`);
+        console.error(`Call failed for ${redactPhone(phone)}: ${err.message}`);
         res.status(500).json({ error: err.message });
     }
 });
@@ -127,7 +128,7 @@ router.post('/webhook/vapi', webhookLimiter, async (req, res) => {
             }
         }
 
-        console.log(`📞 Vapi call ended — ${business_name} (${phone}) | email: ${collected_email || 'none'} | outcome: ${outcome}`);
+        console.log(`Vapi call ended — ${business_name} (${redactPhone(phone)}) | email: ${redactEmail(collected_email) || 'none'} | outcome: ${outcome}`);
 
         if (collected_email && business_name) {
             try {
@@ -140,7 +141,7 @@ router.post('/webhook/vapi', webhookLimiter, async (req, res) => {
                         city,
                     }),
                 });
-                console.log(`✅ Demo email auto-triggered to ${collected_email}`);
+                console.log(`Demo email auto-triggered to ${redactEmail(collected_email)}`);
             } catch (emailErr) {
                 console.error('Failed to auto-send demo email:', emailErr.message);
             }
@@ -271,7 +272,7 @@ router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async 
         const tier = meta.tier || 'starter';
 
         console.log(`\n[STRIPE] Payment received!`);
-        console.log(`  Customer: ${email}`);
+        console.log(`  Customer: ${redactEmail(email)}`);
         console.log(`  Amount: $${amount}`);
         console.log(`  Business: ${businessName} (${city})`);
         console.log(`  Tier: ${tier}`);
@@ -355,7 +356,7 @@ router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async 
                         </div>`,
                     text: `Hey ${businessName}! Your website is live: ${fullUrl}\n\nReply with any changes. — SmokeShopGrowth`,
                 });
-                console.log(`[DELIVERY] Email sent to ${email} with live URL`);
+                console.log(`[DELIVERY] Email sent to ${redactEmail(email)} with live URL`);
             }
 
             if (transporter) {
