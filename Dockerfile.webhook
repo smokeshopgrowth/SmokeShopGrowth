@@ -10,8 +10,8 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Install Python packages
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY python-requirements.txt .
+RUN pip install --no-cache-dir -r python-requirements.txt
 
 # Copy source tree
 COPY . .
