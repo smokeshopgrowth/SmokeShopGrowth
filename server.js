@@ -1,9 +1,9 @@
 /**
- * Dashboard Server
- * ================
- * Express web server that powers the lead generation dashboard.
- * Provides a form UI, runs the pipeline steps as child processes,
- * streams real-time progress via SSE, and exports to Google Sheets.
+ * SmokeShopGrowth Server
+ * ======================
+ * Express web server — serves the public marketing site at /,
+ * the internal lead-gen dashboard at /dashboard, and all API +
+ * webhook routes for the pipeline, voice agent, and Stripe.
  *
  * Start:  node server.js
  * Open:   http://localhost:3000
@@ -34,6 +34,20 @@ const webhookLimiter = rateLimit({
     legacyHeaders: false,
     message: { error: 'Too many requests, please try again later.' },
 });
+
+// ──────────────────────────────────────────────
+// Dashboard route — serves the internal tool at /dashboard
+// ──────────────────────────────────────────────
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Serve static files (public/index.html = marketing landing page)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ──────────────────────────────────────────────
@@ -79,6 +93,29 @@ const jobs = _loadJobsFromDisk(); // jobId → { status, logs, city, type, files
 
 function makeJobId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function pushLog(jobId, message, type = 'log') {
+    const entry = { type, message, ts: Date.now() };
+    const job = jobs.get(jobId);
+    if (!job) return;
+    job.logs.push(entry);
+    broadcast(jobId, entry);
+}
+
+function broadcast(jobId, payload) {
+    const job = jobs.get(jobId);
+    if (!job) return;
+    const data = `data: ${JSON.stringify(payload)}\n\n`;
+    const deadClients = [];
+    job.clients.forEach((res, idx) => {
+        try { res.write(data); } catch (err) { deadClients.push(idx); }
+    });
+    deadClients.reverse().forEach(idx => job.clients.splice(idx, 1));
+    if (payload.type === 'done') {
+        job.clients.forEach(res => { try { res.end(); } catch { /* ignore */ } });
+        job.clients = [];
+    }
 }
 
 // ──────────────────────────────────────────────
@@ -174,7 +211,7 @@ app.get('/api/status/:jobId', (req, res) => {
     });
 });
 
-// Health check
+// Health check (legacy path)
 app.get('/api/ping', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -204,24 +241,102 @@ app.post('/webhook/call', webhookLimiter, async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-// ── Global error handler ────────────────────────────────────────────────────
-// Must be defined AFTER all routes
-app.use((err, req, res, _next) => {
-    console.error('[ERROR]', err.stack || err.message || err);
-    const status = err.status || err.statusCode || 500;
-    res.status(status).json({
-        error: process.env.NODE_ENV === 'production'
-            ? 'Internal server error'
-            : err.message || 'Internal server error',
-    });
+    const {
+        business_name = '',
+        phone = '',
+        city = '',
+        agent_name = process.env.AGENT_NAME || 'Alex',
+    } = req.body;
+
+    if (!phone) {
+        return res.status(400).json({ error: 'phone is required' });
+    }
+
+    const apiKey = process.env.ELEVENLABS_API_KEY;
+    const agentId = process.env.ELEVENLABS_AGENT_ID;
+    const phoneNumberId = process.env.ELEVENLABS_PHONE_NUMBER_ID;
+
+    if (!apiKey) return res.status(500).json({ error: 'ELEVENLABS_API_KEY not set' });
+    if (!agentId) return res.status(500).json({ error: 'ELEVENLABS_AGENT_ID not set' });
+    if (!phoneNumberId) return res.status(500).json({ error: 'ELEVENLABS_PHONE_NUMBER_ID not set' });
+
+    try {
+        const response = await fetch('https://api.elevenlabs.io/v1/convai/twilio/outbound-call', {
+            method: 'POST',
+            headers: {
+                'xi-api-key': apiKey,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                agent_id: agentId,
+                agent_phone_number_id: phoneNumberId,
+                to_number: phone,
+                dynamic_variables: { business_name, city, agent_name },
+            }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail?.message || JSON.stringify(data));
+
+        console.log(`📞 Call started → ${business_name} (${phone}) — conversation: ${data.conversation_id}`);
+        res.json({ success: true, conversation_id: data.conversation_id });
+    } catch (err) {
+        console.error(`❌ Call failed for ${phone}: ${err.message}`);
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// Start server
-if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log(`\n🚀 Dashboard running at http://localhost:${PORT}\n`);
-    });
-}
+// ──────────────────────────────────────────────
+// Demo preview route — renders template.html with query params
+// ──────────────────────────────────────────────
+app.get('/demo', (req, res) => {
+    const templatePath = path.join(__dirname, 'template.html');
+    if (!fs.existsSync(templatePath)) {
+        return res.status(404).send('Demo template not found.');
+    }
+
+    const business = {
+        name: req.query.name || req.query.shop || 'Your Smoke Shop',
+        city: req.query.city || 'Your City',
+        state: req.query.state || 'TX',
+        phone: req.query.phone || '(000) 000-0000',
+        hours: req.query.hours || 'Mon–Sun 9am–10pm',
+        rating: req.query.rating || '4.5',
+        reviews: req.query.reviews || '50+',
+    };
+
+    let html = fs.readFileSync(templatePath, 'utf8');
+
+    const nameParts = business.name.split(' ');
+    const mid = Math.ceil(nameParts.length / 2);
+    const stars = '★'.repeat(Math.round(parseFloat(business.rating))) +
+                  '☆'.repeat(5 - Math.round(parseFloat(business.rating)));
+
+    html = html.replace(/{{BUSINESS_NAME}}/g, business.name);
+    html = html.replace(/{{BUSINESS_LINE1}}/g, nameParts.slice(0, mid).join(' '));
+    html = html.replace(/{{BUSINESS_LINE2}}/g, nameParts.slice(mid).join(' '));
+    html = html.replace(/{{CITY}}/g, business.city);
+    html = html.replace(/{{STATE}}/g, business.state);
+    html = html.replace(/{{ADDRESS}}/g, `${business.city}, ${business.state}`);
+    html = html.replace(/{{PHONE}}/g, business.phone);
+    html = html.replace(/{{PHONE_CLEAN}}/g, business.phone.replace(/\D/g, ''));
+    html = html.replace(/{{RATING}}/g, business.rating);
+    html = html.replace(/{{STARS}}/g, stars);
+    html = html.replace(/{{REVIEWS}}/g, business.reviews);
+    html = html.replace(/{{HOURS}}/g, business.hours);
+    html = html.replace(/{{SLUG}}/g, business.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+    html = html.replace(/{{MAP_EMBED}}/g, `https://www.google.com/maps?q=${encodeURIComponent(business.name + ', ' + business.city + ', ' + business.state)}&output=embed`);
+    html = html.replace(/{{CONTACT_PHONE}}/g, process.env.CONTACT_PHONE || '2813230450');
+    html = html.replace(/{{CONTACT_PHONE_FORMATTED}}/g, '(281) 323-0450');
+
+    // Fill any remaining placeholders with empty string to avoid {{...}} showing
+    html = html.replace(/{{REVIEW_AUTHOR_\d+}}/g, 'Happy Customer');
+    html = html.replace(/{{REVIEW_TEXT_\d+}}/g, 'Great shop with amazing selection. Highly recommend!');
+    html = html.replace(/{{[A-Z_]+}}/g, '');
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+});
 
 // ──────────────────────────────────────────────
 // Template Form Submission Endpoint
@@ -266,7 +381,23 @@ app.get('/api/template-submissions', (req, res) => {
     });
 });
 
+// ── Global error handler ────────────────────────────────────────────────────
+// Must be defined AFTER all routes
+app.use((err, req, res, _next) => {
+    console.error('[ERROR]', err.stack || err.message || err);
+    const status = err.status || err.statusCode || 500;
+    res.status(status).json({
+        error: process.env.NODE_ENV === 'production'
+            ? 'Internal server error'
+            : err.message || 'Internal server error',
+    });
+});
+
+// ──────────────────────────────────────────────
+// Start server
 // ──────────────────────────────────────────────
 app.listen(PORT, () => {
-    console.log(`\n🚀 Dashboard running at http://localhost:${PORT}\n`);
+    console.log(`\n🚀 SmokeShopGrowth running at http://localhost:${PORT}`);
+    console.log(`   Landing page: http://localhost:${PORT}/`);
+    console.log(`   Dashboard:    http://localhost:${PORT}/dashboard\n`);
 });

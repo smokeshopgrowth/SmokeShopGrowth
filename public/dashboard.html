@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Generator Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #09090b;
+      --surface: rgba(255, 255, 255, 0.03);
+      --surface2: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --text: #f0f0f3;
+      --muted: #71717a;
+      --radius: 16px;
+      --glow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 100px;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.12), transparent);
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2), #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      color: var(--muted);
+      margin-top: 10px;
+      font-size: 0.95rem;
+      font-weight: 400;
+    }
+
+    /* ── Layout ── */
+    .container {
+      width: 100%;
+      max-width: 880px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 0 40px -12px rgba(99, 102, 241, 0.08);
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* ── Form ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    label span {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="url"],
+    select {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 11px 16px;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      width: 100%;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    input::placeholder {
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    /* Range slider */
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+      transition: box-shadow 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.7);
+    }
+
+    .slider-val {
+      min-width: 48px;
+      text-align: center;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1rem;
+    }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .toggle-label {
+      font-size: 0.875rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .toggle-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-track::before {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toggle input:checked+.toggle-track {
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .toggle input:checked+.toggle-track::before {
+      transform: translateX(20px);
+    }
+
+    /* Sheets field — smooth show/hide */
+    #sheets-field {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin 0.3s ease;
+      margin-top: 0;
+    }
+
+    #sheets-field.visible {
+      max-height: 80px;
+      opacity: 1;
+      margin-top: 14px;
+    }
+
+    /* ── Buttons ── */
+    .btn-run {
+      width: 100%;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-run:hover {
+      opacity: 0.92;
+      box-shadow: 0 4px 24px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-run:active {
+      transform: scale(0.98);
+    }
+
+    .btn-run:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-run .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Progress Card — smooth show/hide ── */
+    #progress-card {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      padding: 0 32px;
+      border: none;
+      margin-top: -24px;
+      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.4s ease,
+                  padding 0.4s ease,
+                  margin 0.4s ease,
+                  border 0.4s ease;
+    }
+
+    #progress-card.visible {
+      max-height: 600px;
+      opacity: 1;
+      padding: 28px 32px;
+      border: 1px solid var(--border);
+      margin-top: 0;
+      overflow: visible;
+    }
+
+    .steps-track {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .steps-track::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.06);
+      z-index: 0;
+    }
+
+    .step-dot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--muted);
+    }
+
+    .dot.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(99, 102, 241, 0.12);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .dot.done {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .step-name {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+    }
+
+    /* ── Log Terminal (macOS style) ── */
+    .terminal-wrap {
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .terminal-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: #ff5f57; }
+    .terminal-dot.yellow { background: #febc2e; }
+    .terminal-dot.green { background: #28c840; }
+
+    .terminal-title-text {
+      flex: 1;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .log-terminal {
+      padding: 16px;
+      height: 280px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.8;
+    }
+
+    .log-terminal::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .log-terminal::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .log-terminal::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+    }
+
+    .log-line {
+      display: flex;
+      gap: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+
+    .log-line:nth-child(even) {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .log-line:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .log-ts {
+      color: rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+      font-size: 0.72rem;
+    }
+
+    .log-msg.log { color: #9ca3af; }
+    .log-msg.step { color: #818cf8; font-weight: 600; }
+    .log-msg.success { color: var(--green); font-weight: 600; }
+    .log-msg.warn { color: var(--yellow); }
+    .log-msg.error { color: var(--red); font-weight: 600; }
+
+    /* ── Results Card — smooth show/hide ── */
+    #results-card {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      padding: 0 32px;
+      border: none;
+      margin-top: -24px;
+      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.4s ease,
+                  padding 0.4s ease,
+                  margin 0.4s ease,
+                  border 0.4s ease;
+    }
+
+    #results-card.visible {
+      max-height: 500px;
+      opacity: 1;
+      padding: 28px 32px;
+      border: 1px solid var(--border);
+      margin-top: 0;
+      overflow: visible;
+    }
+
+    /* Skeleton rows */
+    .skeleton-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .skeleton-row:last-child { border-bottom: none; }
+
+    .skeleton-bar {
+      height: 14px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .result-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeUp 0.35s ease forwards;
+    }
+
+    .result-row:last-child { border-bottom: none; }
+    .result-row:nth-child(1) { animation-delay: 0.05s; }
+    .result-row:nth-child(2) { animation-delay: 0.1s; }
+    .result-row:nth-child(3) { animation-delay: 0.15s; }
+    .result-row:nth-child(4) { animation-delay: 0.2s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .result-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .btn-dl {
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.25s ease;
+      display: inline-block;
+    }
+
+    .btn-dl:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(99, 102, 241, 0.08);
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Status badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: all 0.3s ease;
+    }
+
+    .badge.running {
+      background: rgba(99, 102, 241, 0.12);
+      color: #818cf8;
+    }
+
+    .badge.done {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--green);
+    }
+
+    .badge.failed {
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--red);
+    }
+
+    .dot-blink {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
+
+    /* ── Toast System ── */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transform: translateX(120%);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+      max-width: 380px;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .toast.hide {
+      transform: translateX(120%);
+      opacity: 0;
+    }
+
+    .toast.success {
+      background: rgba(16, 185, 129, 0.12);
+      color: #6ee7b7;
+      border-color: rgba(16, 185, 129, 0.15);
+    }
+
+    .toast.error {
+      background: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.15);
+    }
+
+    .toast.info {
+      background: rgba(99, 102, 241, 0.12);
+      color: #a5b4fc;
+      border-color: rgba(99, 102, 241, 0.15);
+    }
+
+    .toast-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Quick Call ── */
+    .btn-call {
+      width: 100%;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, var(--green), #059669);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-call:hover {
+      opacity: 0.92;
+      box-shadow: 0 4px 24px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-call:active { transform: scale(0.98); }
+    .btn-call:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+    .btn-call .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    #qc-status {
+      transition: opacity 0.3s ease;
+    }
+
+    /* ── Utility classes (replaces inline styles) ── */
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .qc-status-bar { margin-top: 16px; font-size: 0.85rem; color: var(--muted); text-align: center; }
+    .card-title--row { display: flex; justify-content: space-between; align-items: center; }
+    .terminal-spacer { width: 36px; }
+    .sk-100 { width: 100px; }
+    .sk-120 { width: 120px; }
+    .sk-140 { width: 140px; }
+    .sk-150 { width: 150px; }
+    .sk-160 { width: 160px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      body { padding: 28px 14px 60px; }
+
+      .header h1 { font-size: 1.6rem; }
+
+      .form-grid { grid-template-columns: 1fr; }
+
+      .card { padding: 22px 18px; }
+
+      #progress-card.visible { padding: 22px 18px; }
+      #results-card.visible { padding: 22px 18px; }
+
+      .dot {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+      }
+
+      .step-name { font-size: 0.62rem; }
+
+      .toast-container {
+        top: 12px;
+        right: 12px;
+        left: 12px;
+      }
+
+      .toast { max-width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="header">
+    <h1>Lead Generator</h1>
+    <p>Scrape Google Maps &rarr; Audit websites &rarr; Generate outreach &rarr; Export to Sheets</p>
+  </div>
+
+  <div class="container">
+
+    <!-- ── Leads & Conversions Card ── -->
+    <div class="card mt-16" id="leads-section">
+      <div class="card-title--row">
+        <div class="card-title" style="margin-bottom:0">Recent Leads & Conversions</div>
+        <button class="btn-dl" onclick="refreshLeads()" style="padding: 6px 14px">Refresh</button>
+      </div>
+      <div id="leads-container" class="mt-24">
+        <div class="skeleton-row"><div class="skeleton-bar sk-150"></div><div class="skeleton-bar sk-100"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar sk-150"></div><div class="skeleton-bar sk-100"></div></div>
+      </div>
+    </div>
+
+    <!-- ── Search Form ── -->
+    <div class="card">
+      <div class="card-title">Search Settings</div>
+      <form id="pipeline-form">
+        <div class="form-grid">
+
+          <label>
+            <span>City</span>
+            <input type="text" id="city" placeholder="e.g. Houston TX" required />
+          </label>
+
+          <label>
+            <span>Business Type</span>
+            <input type="text" id="bizType" value="smoke shop" placeholder="e.g. vape shop, dispensary" />
+          </label>
+
+          <!-- Toggles -->
+          <label class="full">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Skip Lighthouse Audit</div>
+                <div class="toggle-desc">Faster — uses basic Axios + Cheerio checks instead</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="skipLighthouse" checked aria-label="Skip Lighthouse Audit" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+          </label>
+
+          <label class="full" id="demo-toggle">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Generate Demo Videos</div>
+                <div class="toggle-desc">Uses Minimax T2V to create website previews (Requires API Key)</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="generateDemo" checked aria-label="Generate Demo Videos" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+          </label>
+
+          <label class="full" id="sheets-toggle">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Export to Google Sheets</div>
+                <div class="toggle-desc">Requires credentials.json in project root</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="exportSheets" checked aria-label="Export to Google Sheets"
+                  onchange="document.getElementById('sheets-field').classList.toggle('visible', this.checked)" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+            <div id="sheets-field" class="visible">
+              <input type="text" id="sheetsId" value="1cCWHElqtVl8sE7lIfOxoGqfkmr8aE5tkcsyoF8RGmTU"
+                placeholder="Google Spreadsheet ID (from the URL)" />
+            </div>
+          </label>
+
+        </div>
+
+        <div class="mt-24">
+          <button type="submit" class="btn-run" id="run-btn">
+            <span id="run-btn-text">Run Pipeline</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ── Quick Call Agent ── -->
+    <div class="card">
+      <div class="card-title">Quick Call Agent</div>
+      <form id="quick-call-form">
+        <label>
+          <span>Phone Number</span>
+          <input type="text" id="qc-phone" placeholder="e.g. +1 555 123 4567" required />
+        </label>
+
+        <div class="form-grid mt-16">
+          <label>
+            <span>Business Name (Optional)</span>
+            <input type="text" id="qc-biz" placeholder="e.g. Acme Corp" />
+          </label>
+          <label>
+            <span>City (Optional)</span>
+            <input type="text" id="qc-city" placeholder="e.g. Austin TX" />
+          </label>
+        </div>
+
+        <div class="mt-24">
+          <button type="submit" class="btn-call" id="qc-btn">
+            <span id="qc-btn-text">Call Now (ElevenLabs)</span>
+          </button>
+        </div>
+        <div id="qc-status" class="qc-status-bar">
+        </div>
+      </form>
+    </div>
+
+    <!-- ── Single Business ── -->
+    <div class="card">
+      <div class="card-title">🎯 Run on Single Business</div>
+      <form id="single-biz-form">
+        <label>
+          <span>Business Name <span style="color:var(--red)">*</span></span>
+          <input type="text" id="sb-name" placeholder="e.g. Cloud Nine Smoke Shop" required />
+        </label>
+        <div class="form-grid mt-16">
+          <label>
+            <span>Website</span>
+            <input type="text" id="sb-website" placeholder="e.g. cloudninesmoke.com" />
+          </label>
+          <label>
+            <span>Phone</span>
+            <input type="text" id="sb-phone" placeholder="e.g. +15121234567" />
+          </label>
+        </div>
+        <div class="form-grid mt-16">
+          <label>
+            <span>City</span>
+            <input type="text" id="sb-city" placeholder="e.g. Austin TX" />
+          </label>
+          <label style="padding-top:24px;">
+            <label class="toggle-label">
+              <input type="checkbox" id="sb-call" class="toggle-input" />
+              <span class="toggle-track"></span>
+              <span>Place AI Call</span>
+            </label>
+          </label>
+        </div>
+        <div class="mt-24">
+          <button type="submit" class="btn-run" id="sb-btn" style="background:linear-gradient(135deg,#7c3aed,#db2777);">
+            <span id="sb-btn-text">🔥 Enrich + Generate Demo</span>
+          </button>
+        </div>
+        <div id="sb-status" class="qc-status-bar"></div>
+      </form>
+    </div>
+
+    <!-- ── Live Pipeline Log ── -->
+    <div class="card" id="live-log-card" style="display:none;">
+      <div class="card-title card-title--row">
+        <span>📡 Live Pipeline Log</span>
+        <button onclick="document.getElementById('live-log-card').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;">✕</button>
+      </div>
+      <div id="live-log-steps" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
+      <div id="live-log-output" style="
+        background:var(--bg);border:1px solid var(--border);border-radius:8px;
+        padding:12px;height:280px;overflow-y:auto;font-family:monospace;font-size:0.78rem;
+        color:var(--text-dim);line-height:1.6;
+      ">
+        <div style="color:var(--muted);text-align:center;padding:40px 0;">Waiting for pipeline events…</div>
+      </div>
+    </div>
+
+    <!-- ── Progress ── -->
+    <div class="card" id="progress-card">
+      <div class="card-title card-title--row">
+        <span>Pipeline Progress</span>
+        <span id="status-badge" class="badge running"><span class="dot-blink"></span> Running</span>
+      </div>
+
+      <div class="steps-track">
+        <div class="step-dot">
+          <div class="dot" id="dot-1">1</div>
+          <div class="step-name">Scrape</div>
+        </div>
+        <div class="step-dot">
+          <div class="dot" id="dot-2">2</div>
+          <div class="step-name">Audit</div>
+        </div>
+        <div class="step-dot">
+          <div class="dot" id="dot-3">3</div>
+          <div class="step-name">Outreach</div>
+        </div>
+        <div class="step-dot">
+          <div class="dot" id="dot-4">4</div>
+          <div class="step-name">Demo</div>
+        </div>
+        <div class="step-dot">
+          <div class="dot" id="dot-5">&#10003;</div>
+          <div class="step-name">Done</div>
+        </div>
+      </div>
+
+      <div class="terminal-wrap">
+        <div class="terminal-titlebar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title-text">pipeline &mdash; live output</div>
+          <div class="terminal-spacer"></div>
+        </div>
+        <div class="log-terminal" id="log-terminal"></div>
+      </div>
+    </div>
+
+    <!-- ── Results ── -->
+    <div class="card" id="results-card">
+      <div class="card-title">Results</div>
+      <div id="result-rows">
+        <!-- skeleton placeholder -->
+        <div class="skeleton-row"><div class="skeleton-bar sk-120"></div><div class="skeleton-bar sk-100"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar sk-140"></div><div class="skeleton-bar sk-100"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar sk-150"></div><div class="skeleton-bar sk-100"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar sk-160"></div><div class="skeleton-bar sk-100"></div></div>
+      </div>
+    </div>
+
+    <!-- ── Social Media Manager ── -->
+    <div class="card" id="social-card">
+      <div class="card-title card-title--row">
+        <div class="card-title" style="margin-bottom:0">📱 Social Media Manager</div>
+        <span class="badge" style="background:rgba(139,92,246,0.12);color:#a78bfa">Buffer + Instagram</span>
+      </div>
+
+      <!-- Step 1: Generate Content Calendar -->
+      <div style="margin-top:20px">
+        <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Step 1 — Generate Content Calendar</div>
+        <div class="form-grid">
+          <label>
+            <span>Business Name</span>
+            <input type="text" id="soc-biz" placeholder="e.g. Cloud 9 Smoke Shop" />
+          </label>
+          <label>
+            <span>City</span>
+            <input type="text" id="soc-city" placeholder="e.g. Houston TX" />
+          </label>
+          <label>
+            <span>Instagram Handle (optional)</span>
+            <input type="text" id="soc-ig" placeholder="e.g. cloud9smokeshop" />
+          </label>
+          <label>
+            <span>Specialty</span>
+            <input type="text" id="soc-specialty" value="smoke shop products" placeholder="smoke shop products, vapes" />
+          </label>
+        </div>
+        <div class="mt-16">
+          <button class="btn-run" id="soc-gen-btn" onclick="generateCalendar()" type="button" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">
+            <span id="soc-gen-text">✨ Generate 30-Day Calendar (GPT-4o)</span>
+          </button>
+        </div>
+        <div id="soc-calendar-preview" style="margin-top:14px;display:none">
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px">Preview (first 3 posts):</div>
+          <div id="soc-preview-rows" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.8;background:rgba(0,0,0,0.3);border-radius:8px;padding:12px 16px;color:#9ca3af;white-space:pre-wrap"></div>
+        </div>
+      </div>
+
+      <!-- Step 2: Schedule to Buffer -->
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+        <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Step 2 — Schedule to Buffer</div>
+        <div class="form-grid">
+          <label>
+            <span>Buffer Profile ID</span>
+            <input type="text" id="soc-profile" placeholder="Run --list-profiles to find yours" />
+          </label>
+          <label style="align-self:end">
+            <button class="btn-dl" onclick="listBufferProfiles()" type="button" style="width:100%;padding:11px 16px;text-align:center">📋 List My Profiles</button>
+          </label>
+        </div>
+        <div class="mt-16">
+          <button class="btn-run" id="soc-sched-btn" onclick="scheduleCalendar()" type="button" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)" disabled>
+            <span id="soc-sched-text">📅 Schedule All 30 Posts to Buffer</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: DM Outreach -->
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+        <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Step 3 — Instagram DM Outreach</div>
+        <div class="form-grid">
+          <label>
+            <span>Input CSV (with instagram column)</span>
+            <input type="text" id="soc-outreach-file" value="social_audited.csv" placeholder="social_audited.csv" />
+          </label>
+          <label>
+            <span>Max DMs per Day</span>
+            <input type="number" id="soc-dm-limit" value="20" min="5" max="50" />
+          </label>
+        </div>
+        <div class="mt-16" style="display:flex;gap:12px">
+          <button class="btn-dl" onclick="dryRunOutreach()" type="button" style="flex:1;padding:12px;text-align:center;font-weight:600">
+            🔍 Dry Run (Preview)
+          </button>
+          <button class="btn-run" onclick="runOutreach()" type="button" style="flex:2;background:linear-gradient(135deg,#059669,#10b981)">
+            <span>📨 Start DM Outreach</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Social Status log -->
+      <div id="soc-log" style="margin-top:16px;display:none">
+        <div class="terminal-wrap">
+          <div class="terminal-titlebar">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+            <div class="terminal-title-text">social manager — output</div>
+            <div class="terminal-spacer"></div>
+          </div>
+          <div class="log-terminal" id="soc-terminal" style="height:160px"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Toast System ──
+    function showToast(message, variant = 'info') {
+      const container = document.getElementById('toast-container');
+      const icons = { success: '\u2713', error: '\u2717', info: '\u24D8' };
+      const toast = document.createElement('div');
+      toast.className = `toast ${variant}`;
+      toast.innerHTML = `<span class="toast-icon">${icons[variant] || icons.info}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => toast.classList.add('show'));
+      });
+      setTimeout(() => {
+        toast.classList.remove('show');
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 400);
+      }, 4000);
+    }
+
+    // ── Authenticated fetch helper ──
+    // All API calls go through this to include the x-api-key header.
+    // The key is read from a prompt on first use and cached in sessionStorage.
+    function getApiKey() {
+      let key = sessionStorage.getItem('ssg-api-key');
+      if (!key) {
+        key = prompt('Enter your API key:');
+        if (key) sessionStorage.setItem('ssg-api-key', key);
+      }
+      return key || '';
+    }
+
+    async function apiFetch(url, options = {}) {
+      const headers = { ...options.headers, 'x-api-key': getApiKey() };
+      if (options.body && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+      }
+      return fetch(url, { ...options, headers });
+    }
+
+    let currentJobId = null;
+
+    const form = document.getElementById('pipeline-form');
+    const runBtn = document.getElementById('run-btn');
+    const runBtnText = document.getElementById('run-btn-text');
+    const progCard = document.getElementById('progress-card');
+    const resultsCard = document.getElementById('results-card');
+    const terminal = document.getElementById('log-terminal');
+    const badge = document.getElementById('status-badge');
+
+    const dots = [null, ...Array.from({ length: 5 }, (_, i) => document.getElementById(`dot-${i + 1}`))];
+
+    function setStep(step) {
+      dots.forEach((dot, i) => {
+        if (!dot) return;
+        dot.classList.remove('active', 'done');
+        if (i < step) dot.classList.add('done');
+        if (i === step) dot.classList.add('active');
+      });
+    }
+
+    function appendLog({ type, message, ts }) {
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      const d = new Date(ts);
+      const time = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      line.innerHTML = `<span class="log-ts">${time}</span><span class="log-msg ${type}">${escHtml(message)}</span>`;
+      terminal.appendChild(line);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function setRunLoading(loading) {
+      runBtn.disabled = loading;
+      if (loading) {
+        runBtnText.textContent = 'Running\u2026';
+        if (!runBtn.querySelector('.spinner')) {
+          const sp = document.createElement('span');
+          sp.className = 'spinner';
+          runBtn.insertBefore(sp, runBtnText);
+        }
+      } else {
+        runBtnText.textContent = 'Run Pipeline';
+        const sp = runBtn.querySelector('.spinner');
+        if (sp) sp.remove();
+      }
+    }
+
+    function showSkeletonResults() {
+      const rows = document.getElementById('result-rows');
+      rows.innerHTML = `
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:120px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:140px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:150px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+        <div class="skeleton-row"><div class="skeleton-bar" style="width:160px"></div><div class="skeleton-bar" style="width:100px"></div></div>
+      `;
+      resultsCard.classList.add('visible');
+    }
+
+    function showResults(files, jobId) {
+      const rows = document.getElementById('result-rows');
+      const items = [
+        { label: 'Raw Leads', key: 'leads', file: 'leads' },
+        { label: 'Audited Leads', key: 'audited', file: 'audited' },
+        { label: 'Outreach Messages', key: 'outreach', file: 'outreach' },
+        { label: 'Demo Videos (Links)', key: 'demo', file: 'demo' },
+      ];
+      rows.innerHTML = items.map(({ label, file }) => `
+      <div class="result-row">
+        <span class="result-label">${label}</span>
+        <a class="btn-dl" href="/api/download/${jobId}/${file}" download>
+          Download CSV
+        </a>
+      </div>
+    `).join('');
+      resultsCard.classList.add('visible');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const city = document.getElementById('city').value.trim();
+      const bizType = document.getElementById('bizType').value.trim() || 'smoke shop';
+      const maxResults = parseInt(document.getElementById('maxResults').value);
+      const skipLighthouse = document.getElementById('skipLighthouse').checked;
+      const generateDemo = document.getElementById('generateDemo').checked;
+      const exportSheets = document.getElementById('exportSheets').checked;
+      const sheetsId = document.getElementById('sheetsId').value.trim();
+
+      // Reset UI
+      terminal.innerHTML = '';
+      resultsCard.classList.remove('visible');
+      progCard.classList.add('visible');
+      setRunLoading(true);
+      badge.className = 'badge running';
+      badge.innerHTML = '<span class="dot-blink"></span> Running';
+      setStep(1);
+      showToast('Pipeline started \u2014 scraping leads\u2026', 'info');
+
+      // Start job
+      let jobId;
+      try {
+        const resp = await apiFetch('/api/run', {
+          method: 'POST',
+          body: JSON.stringify({ city, bizType, maxResults, skipLighthouse, generateDemo, exportSheets, sheetsId }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Server error');
+        jobId = data.jobId;
+        currentJobId = jobId;
+        startLiveLog(jobId);
+      } catch (err) {
+        appendLog({ type: 'error', message: `Failed to start: ${err.message}`, ts: Date.now() });
+        showToast(`Pipeline error: ${err.message}`, 'error');
+        setRunLoading(false);
+        return;
+      }
+
+      // Show skeleton results
+      showSkeletonResults();
+
+      // Stream SSE
+      const es = new EventSource(`/api/status/${jobId}`);
+      es.onmessage = ({ data }) => {
+        const msg = JSON.parse(data);
+
+        if (msg.type === 'done') {
+          es.close();
+          setRunLoading(false);
+
+          if (msg.status === 'done') {
+            badge.className = 'badge done';
+            badge.textContent = '\u2713 Complete';
+            setStep(6);
+            showResults(msg.files, jobId);
+            showToast('Pipeline complete \u2014 results ready!', 'success');
+            refreshLeads(); // Refresh leads after pipeline completion
+          } else {
+            badge.className = 'badge failed';
+            badge.textContent = '\u2717 Failed';
+            showToast('Pipeline failed \u2014 check logs for details.', 'error');
+          }
+          return;
+        }
+
+        // Update step dots based on log messages
+        if (msg.type === 'step') {
+          if (msg.message.includes('Step 1')) setStep(1);
+          else if (msg.message.includes('Step 2')) setStep(2);
+          else if (msg.message.includes('Step 3')) setStep(3);
+          else if (msg.message.includes('Step 4')) setStep(4);
+          else if (msg.message.includes('Step 5') || msg.message.includes('Exporting')) setStep(4);
+        }
+
+        appendLog(msg);
+      };
+
+      es.onerror = () => {
+        es.close();
+        appendLog({ type: 'warn', message: 'Connection to server lost.', ts: Date.now() });
+        showToast('Lost connection to server.', 'error');
+        setRunLoading(false);
+      };
+    });
+
+    // ── Quick Call Logic ──
+    const qcForm = document.getElementById('quick-call-form');
+    const qcBtn = document.getElementById('qc-btn');
+    const qcBtnText = document.getElementById('qc-btn-text');
+    const qcStatus = document.getElementById('qc-status');
+
+    qcForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const phone = document.getElementById('qc-phone').value.trim();
+      const business_name = document.getElementById('qc-biz').value.trim();
+      const city = document.getElementById('qc-city').value.trim();
+
+      qcBtn.disabled = true;
+      qcBtnText.textContent = 'Calling\u2026';
+      if (!qcBtn.querySelector('.spinner')) {
+        const sp = document.createElement('span');
+        sp.className = 'spinner';
+        qcBtn.insertBefore(sp, qcBtnText);
+      }
+      qcStatus.textContent = '';
+      qcStatus.style.color = 'var(--muted)';
+
+      try {
+        const resp = await apiFetch('/webhook/call', {
+          method: 'POST',
+          body: JSON.stringify({ phone, business_name, city }),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          throw new Error(data.error || 'Server error');
+        }
+
+        qcStatus.textContent = `Call initiated! (Conv ID: ${data.conversation_id})`;
+        qcStatus.style.color = 'var(--green)';
+        showToast('Call initiated successfully!', 'success');
+      } catch (err) {
+        qcStatus.textContent = err.message;
+        qcStatus.style.color = 'var(--red)';
+        showToast(`Call failed: ${err.message}`, 'error');
+      } finally {
+        qcBtn.disabled = false;
+        qcBtnText.textContent = 'Call Now (ElevenLabs)';
+        const sp = qcBtn.querySelector('.spinner');
+        if (sp) sp.remove();
+      }
+    });
+    // ── Single Business Logic ──
+    const sbForm = document.getElementById('single-biz-form');
+    const sbBtn = document.getElementById('sb-btn');
+    const sbBtnText = document.getElementById('sb-btn-text');
+    const sbStatus = document.getElementById('sb-status');
+
+    sbForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const businessName = document.getElementById('sb-name').value.trim();
+      const website = document.getElementById('sb-website').value.trim();
+      const phone = document.getElementById('sb-phone').value.trim();
+      const city = document.getElementById('sb-city').value.trim();
+      const makeCall = document.getElementById('sb-call').checked;
+
+      sbBtn.disabled = true;
+      sbBtnText.textContent = 'Starting…';
+      sbStatus.textContent = '';
+
+      try {
+        const resp = await apiFetch('/api/run-single', {
+          method: 'POST',
+          body: JSON.stringify({ businessName, website, phone, city, makeCall, generateDemo: true }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Server error');
+
+        sbStatus.textContent = `✅ Pipeline started! Job: ${data.jobId}`;
+        sbStatus.style.color = 'var(--green)';
+        showToast(`Pipeline started for "${businessName}"`, 'success');
+        startLiveLog(data.jobId);
+      } catch (err) {
+        sbStatus.textContent = `❌ ${err.message}`;
+        sbStatus.style.color = 'var(--red)';
+        showToast(`Error: ${err.message}`, 'error');
+      } finally {
+        sbBtn.disabled = false;
+        sbBtnText.textContent = '🔥 Enrich + Generate Demo';
+      }
+    });
+
+    // ── Live Pipeline Log (SSE) ──
+    let liveLogEs = null;
+    const STEP_LABELS = ['Scrape','Audit','Enrich','Outreach','Demo','Email','Calls','Done'];
+
+    function startLiveLog(jobId) {
+      const card = document.getElementById('live-log-card');
+      const output = document.getElementById('live-log-output');
+      const steps = document.getElementById('live-log-steps');
+
+      card.style.display = 'block';
+      output.innerHTML = '';
+      steps.innerHTML = STEP_LABELS.map((l, i) =>
+        `<span id="step-${i}" style="padding:2px 8px;border-radius:4px;font-size:0.72rem;background:var(--border);color:var(--muted)">${l}</span>`
+      ).join('');
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      if (liveLogEs) liveLogEs.close();
+      liveLogEs = new EventSource(`/api/status/${jobId}`);
+
+      liveLogEs.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg.type === 'log' || msg.type === 'step' || msg.type === 'success' || msg.type === 'warn' || msg.type === 'error') {
+            const color = msg.type === 'success' ? '#22c55e'
+                        : msg.type === 'step'    ? '#60a5fa'
+                        : msg.type === 'warn'    ? '#f59e0b'
+                        : msg.type === 'error'   ? '#ef4444'
+                        : 'var(--text-dim)';
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${msg.message || msg.data || JSON.stringify(msg)}`;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+          }
+          if (msg.step !== undefined) {
+            document.querySelectorAll('#live-log-steps span').forEach((s, i) => {
+              s.style.background = i < msg.step ? '#22c55e33' : i === msg.step ? '#60a5fa33' : 'var(--border)';
+              s.style.color = i <= msg.step ? 'var(--text)' : 'var(--muted)';
+            });
+          }
+          if (msg.type === 'done') {
+            liveLogEs.close();
+            const line = document.createElement('div');
+            line.style.color = '#22c55e';
+            line.style.fontWeight = 'bold';
+            line.textContent = '🎉 Pipeline complete!';
+            output.appendChild(line);
+          }
+        } catch {}
+      };
+
+      liveLogEs.onerror = () => {
+        liveLogEs.close();
+      };
+    }
+
+    // ── Lead Management Logic ──
+    async function refreshLeads() {
+      const container = document.getElementById('leads-container');
+      try {
+        const res = await apiFetch('/api/leads');
+        const data = await res.json();
+        
+        if (!data.leads || data.leads.length === 0) {
+          container.innerHTML = '<p style="color:var(--muted); text-align:center; padding: 20px;">No leads captured yet.</p>';
+          return;
+        }
+
+        container.innerHTML = data.leads.reverse().map(lead => `
+          <div class="result-row">
+            <div>
+              <div style="font-weight:600; color:var(--text)">${lead.business || lead.business_name || 'Prospect'}</div>
+              <div style="font-size:0.75rem; color:var(--muted)">${lead.contact_name} | ${lead.email} | ${lead.tier || 'Starter'}</div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center">
+              <span style="font-size:0.7rem; color:var(--muted)">${new Date(lead.date).toLocaleDateString()}</span>
+              <button class="btn-dl" onclick="deploySite('${lead.business || lead.business_name}', '${lead.email}', '${lead.tier}')">
+                Deliver Site
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        showToast('Failed to load leads', 'error');
+      }
+    }
+
+    async function deploySite(business, email, tier) {
+      showToast(`Building site for ${business}...`, 'info');
+      try {
+        const res = await apiFetch('/api/deploy-site', {
+          method: 'POST',
+          body: JSON.stringify({ business, email, tier })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`✅ Site ready in: /deployments/${data.folder}`, 'success');
+          window.open(data.url, '_blank');
+        } else {
+          showToast(data.error || 'Deployment failed', 'error');
+        }
+      } catch (err) {
+        showToast('Deployment error', 'error');
+      }
+    }
+
+    // Initial load
+    refreshLeads();
+
+    // ── Social Media Manager Logic ──
+    let currentCalendar = null;
+    let currentCalendarBiz = null;
+
+    function socLog(msg, type = 'log') {
+      const terminal = document.getElementById('soc-terminal');
+      const log = document.getElementById('soc-log');
+      log.style.display = 'block';
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      const now = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      line.innerHTML = `<span class="log-ts">${now}</span><span class="log-msg ${type}">${escHtml(msg)}</span>`;
+      terminal.appendChild(line);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    async function generateCalendar() {
+      const biz = document.getElementById('soc-biz').value.trim();
+      const city = document.getElementById('soc-city').value.trim();
+      const ig = document.getElementById('soc-ig').value.trim();
+      const specialty = document.getElementById('soc-specialty').value.trim();
+      if (!biz) { showToast('Enter a business name first', 'error'); return; }
+
+      const btn = document.getElementById('soc-gen-btn');
+      const btnText = document.getElementById('soc-gen-text');
+      btn.disabled = true;
+      btnText.textContent = 'Generating…';
+      if (!btn.querySelector('.spinner')) {
+        const sp = document.createElement('span'); sp.className = 'spinner';
+        btn.insertBefore(sp, btnText);
+      }
+
+      socLog(`Generating 30-day calendar for "${biz}" via GPT-4o…`, 'step');
+
+      try {
+        const res = await apiFetch('/api/social/generate-calendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ business_name: biz, city, instagram: ig, specialty }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Server error');
+
+        currentCalendar = data.posts;
+        currentCalendarBiz = biz;
+
+        // Show preview
+        const preview = document.getElementById('soc-calendar-preview');
+        const previewRows = document.getElementById('soc-preview-rows');
+        preview.style.display = 'block';
+        previewRows.innerHTML = data.posts.slice(0, 3).map(p =>
+          `Day ${p.day} [${p.post_type}] ${p.platform} @ ${p.best_time}\n${p.caption.substring(0, 90)}…`
+        ).join('\n\n');
+
+        // Enable scheduler
+        document.getElementById('soc-sched-btn').disabled = false;
+
+        socLog(`✅ ${data.posts.length} posts generated! Preview shown above.`, 'success');
+        showToast(`30-day calendar ready for ${biz}!`, 'success');
+      } catch (err) {
+        socLog(`Error: ${err.message}`, 'error');
+        showToast(`Failed: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = '✨ Generate 30-Day Calendar (GPT-4o)';
+        const sp = btn.querySelector('.spinner');
+        if (sp) sp.remove();
+      }
+    }
+
+    async function listBufferProfiles() {
+      socLog('Fetching Buffer profiles…', 'step');
+      try {
+        const res = await apiFetch('/api/social/buffer-profiles');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Server error');
+        data.profiles.forEach(p => {
+          socLog(`  ${p.service} | ${p.formatted_username} | ID: ${p.id}`, 'log');
+        });
+        showToast('Profiles listed in log below', 'info');
+      } catch (err) {
+        socLog(`Error: ${err.message}`, 'error');
+        showToast(`Failed: ${err.message}`, 'error');
+      }
+    }
+
+    async function scheduleCalendar() {
+      if (!currentCalendar) { showToast('Generate a calendar first', 'error'); return; }
+      const profileId = document.getElementById('soc-profile').value.trim();
+      if (!profileId) { showToast('Enter a Buffer Profile ID', 'error'); return; }
+
+      const btn = document.getElementById('soc-sched-btn');
+      const btnText = document.getElementById('soc-sched-text');
+      btn.disabled = true;
+      btnText.textContent = 'Scheduling…';
+
+      socLog(`Scheduling ${currentCalendar.length} posts to Buffer profile ${profileId}…`, 'step');
+
+      try {
+        const res = await apiFetch('/api/social/schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ posts: currentCalendar, profileId, businessName: currentCalendarBiz }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Server error');
+        socLog(`✅ Scheduled! ${data.success} posted, ${data.failed} failed.`, 'success');
+        showToast(`${data.success} posts scheduled to Buffer!`, 'success');
+      } catch (err) {
+        socLog(`Error: ${err.message}`, 'error');
+        showToast(`Failed: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = '📅 Schedule All 30 Posts to Buffer';
+      }
+    }
+
+    async function dryRunOutreach() {
+      const inputFile = document.getElementById('soc-outreach-file').value.trim();
+      const limit = document.getElementById('soc-dm-limit').value;
+      socLog('Running DM outreach dry-run (preview only)…', 'step');
+      try {
+        const res = await apiFetch('/api/social/outreach-preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ inputFile, limit }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Server error');
+        data.preview.forEach(p => socLog(`  @${p.handle}: "${p.message.substring(0, 60)}…"`, 'log'));
+        showToast(`Preview: ${data.preview.length} DMs would be sent`, 'info');
+      } catch (err) {
+        socLog(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function runOutreach() {
+      const inputFile = document.getElementById('soc-outreach-file').value.trim();
+      const limit = document.getElementById('soc-dm-limit').value;
+      if (!confirm(`Send up to ${limit} Instagram DMs? This will open a browser and run for ~${Math.round(limit * 67 / 60)} minutes.`)) return;
+      socLog(`Starting DM outreach (${limit}/day limit)…`, 'step');
+      try {
+        const res = await apiFetch('/api/social/outreach-run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ inputFile, limit }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Server error');
+        socLog(`✅ Outreach started as background job.`, 'success');
+        showToast('DM outreach running in background!', 'success');
+      } catch (err) {
+        socLog(`Error: ${err.message}`, 'error');
+        showToast(`Failed: ${err.message}`, 'error');
+      }
+    }
+
+    // Initial load
+    refreshLeads();
+  </script>
+</body>
+
+</html>
