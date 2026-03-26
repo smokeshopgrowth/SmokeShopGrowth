@@ -25,6 +25,7 @@ RUN npm ci --omit=dev
 
 # Copy Python requirements and install
 COPY requirements.txt .
+COPY python-requirements.txt .
 RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
 
 # Install Playwright browser binaries
