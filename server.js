@@ -11,6 +11,7 @@
 
 'use strict';
 require('dotenv').config();
+const config = require('./utils/config'); // Early fail-fast validation
 
 const express = require('express');
 const path = require('path');

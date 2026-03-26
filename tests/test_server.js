@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert');
 const http = require('http');
