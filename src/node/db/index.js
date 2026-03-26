@@ -177,6 +177,15 @@ const getLeadsByStatusPaginated = db.prepare(`
 
 const getLeadsByStatusCount = db.prepare('SELECT COUNT(*) as total FROM leads WHERE status = ?');
 
+const getLeadsByCityAndStatusPaginated = db.prepare(`
+  SELECT * FROM leads 
+  WHERE city_slug = ? AND status = ? 
+  ORDER BY score DESC 
+  LIMIT ? OFFSET ?
+`);
+
+const getLeadsByCityAndStatusCount = db.prepare('SELECT COUNT(*) as total FROM leads WHERE city_slug = ? AND status = ?');
+
 const updateLeadStatus = db.prepare('UPDATE leads SET status = ?, updated_at = datetime(\'now\') WHERE place_id = ?');
 const updateLeadEmail = db.prepare('UPDATE leads SET email = ?, updated_at = datetime(\'now\') WHERE place_id = ?');
 
@@ -389,6 +398,8 @@ module.exports = {
     getLeadsByCityCount,
     getLeadsByStatusPaginated,
     getLeadsByStatusCount,
+    getLeadsByCityAndStatusPaginated,
+    getLeadsByCityAndStatusCount,
     getLeadsPaginated,
     getLeadsCount,
     updateLeadStatus,
