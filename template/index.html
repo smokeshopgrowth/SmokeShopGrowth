@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title data-bind="title">Smoke Shop Premium</title>
+  <title data-bind="title">Premium Smoke Shop</title>
   <meta name="description" data-bind="meta-description" content="Premium smoke shop website template." />
   <meta name="theme-color" content="#10b981" />
   <meta name="format-detection" content="telephone=yes" />
@@ -42,1331 +42,562 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="preload" as="script" href="config.js" />
   <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" />
-  <!-- Dark mode support -->
-  <script>
-    const isDark = localStorage.getItem('dark-mode') !== 'false';
-    if (isDark) document.documentElement.setAttribute('data-dark', 'true');
-  </script>
   <script src="config.js"></script>
-  <style>
-    /* ── Sticky CTA Bar ─────────────────────────────────────────────────────── */
-    .sticky-cta {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: var(--accent);
-      color: white;
-      padding: 10px 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      z-index: 1001;
-      transform: translateY(-100%);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .sticky-cta.visible {
-      transform: translateY(0);
-    }
-
-    .sticky-cta-text {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .sticky-cta-btn {
-      background: rgba(0, 0, 0, 0.2);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 8px 20px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .sticky-cta-btn:hover {
-      background: rgba(0, 0, 0, 0.35);
-      transform: scale(1.05);
-    }
-
-    .nav.scrolled {
-      top: 48px;
-    }
-
-    /* ── Social Proof Ticker ────────────────────────────────────────────────── */
-    .social-proof-ticker {
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.15);
-      border-radius: 12px;
-      padding: 12px 20px;
-      margin: 24px auto;
-      max-width: fit-content;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: fadeInUp 0.6s ease-out;
-    }
-
-    .social-proof-ticker .avatar-stack {
-      display: flex;
-    }
-
-    .social-proof-ticker .avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--accent);
-      border: 2px solid var(--bg);
-      margin-left: -10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: white;
-    }
-
-    .social-proof-ticker .avatar:first-child {
-      margin-left: 0;
-    }
-
-    .social-proof-ticker .proof-text {
-      font-size: 0.85rem;
-      color: var(--accent);
-      font-weight: 500;
-    }
-
-    .social-proof-ticker .proof-text strong {
-      color: var(--text);
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Countdown Timer ────────────────────────────────────────────────────── */
-    .countdown-banner {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--surface-border);
-      border-radius: 16px;
-      padding: 20px 28px;
-      margin: 32px auto;
-      max-width: 600px;
-      text-align: center;
-    }
-
-    .countdown-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .countdown-timer {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-    }
-
-    .countdown-unit {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .countdown-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      padding: 8px 16px;
-      min-width: 70px;
-    }
-
-    .countdown-label {
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-top: 6px;
-    }
-
-    /* ── Trust Badges ───────────────────────────────────────────────────────── */
-    .trust-badges {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      flex-wrap: wrap;
-      padding: 40px 20px;
-      margin: 40px 0;
-      border-top: 1px solid var(--surface-border);
-      border-bottom: 1px solid var(--surface-border);
-    }
-
-    .trust-badge {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      opacity: 0.7;
-      transition: opacity 0.3s ease;
-    }
-
-    .trust-badge:hover {
-      opacity: 1;
-    }
-
-    .trust-badge-text {
-      font-size: 0.75rem;
-      color: var(--muted);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* ── FAQ Accordion ──────────────────────────────────────────────────────── */
-    .faq-section {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .faq-item {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      margin-bottom: 12px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .faq-item:hover {
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .faq-question {
-      width: 100%;
-      padding: 20px 24px;
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 1rem;
-      font-weight: 600;
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      font-family: inherit;
-    }
-
-    .faq-question:hover {
-      color: var(--accent);
-    }
-
-    .faq-icon {
-      font-size: 1.2rem;
-      transition: transform 0.3s ease;
-      color: var(--muted);
-    }
-
-    .faq-item.open .faq-icon {
-      transform: rotate(45deg);
-      color: var(--accent);
-    }
-
-    .faq-answer {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease, padding 0.3s ease;
-    }
-
-    .faq-item.open .faq-answer {
-      max-height: 300px;
-    }
-
-    .faq-answer-content {
-      padding: 0 24px 20px;
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.7;
-    }
-
-    /* ── Exit Intent Popup ──────────────────────────────────────────────────── */
-    .exit-popup-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.4s ease;
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-    }
-
-    .exit-popup-overlay.visible {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .exit-popup {
-      background: var(--bg);
-      border: 1px solid var(--surface-border);
-      border-radius: 24px;
-      padding: 48px 40px;
-      max-width: 480px;
-      width: 90%;
-      text-align: center;
-      position: relative;
-      transform: scale(0.9) translateY(20px);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-
-    .exit-popup-overlay.visible .exit-popup {
-      transform: scale(1) translateY(0);
-    }
-
-    .exit-popup-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--muted);
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .exit-popup-close:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text);
-    }
-
-    .exit-popup-icon {
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .exit-popup h3 {
-      font-size: 1.75rem;
-      font-weight: 800;
-      margin-bottom: 12px;
-      color: var(--accent);
-    }
-
-    .exit-popup p {
-      color: var(--muted);
-      font-size: 1rem;
-      margin-bottom: 24px;
-      line-height: 1.6;
-    }
-
-    .exit-popup .discount-code {
-      background: rgba(16, 185, 129, 0.06);
-      border: 2px dashed var(--accent);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 24px;
-    }
-
-    .exit-popup .discount-label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 4px;
-    }
-
-    .exit-popup .discount-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: 0.1em;
-    }
-
-    .exit-popup .btn {
-      width: 100%;
-      padding: 16px;
-      font-size: 1.05rem;
-    }
-
-    /* ── Live Visitor Counter ───────────────────────────────────────────────── */
-    .live-visitors {
-      position: fixed;
-      bottom: 80px;
-      left: 20px;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      border-radius: 999px;
-      padding: 10px 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: var(--accent);
-      z-index: 100;
-      animation: slideInLeft 0.5s ease-out 2s both;
-    }
-
-    .live-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes slideInLeft {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.2); }
-    }
-
-    /* ── Floating Action Button ─────────────────────────────────────────────── */
-    .fab-contact {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 100;
-      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border: none;
-    }
-
-    .fab-contact:hover {
-      background: var(--accent-hover);
-      transform: scale(1.1);
-      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.4);
-    }
-
-    .fab-contact:active {
-      transform: scale(0.95);
-    }
-
-    /* ── Guarantee Badge ────────────────────────────────────────────────────── */
-    .guarantee-section {
-      text-align: center;
-      padding: 48px 20px;
-      margin: 48px 0;
-    }
-
-    .guarantee-badge {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(16, 185, 129, 0.15);
-      border-radius: 24px;
-      padding: 32px 48px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-    }
-
-    .guarantee-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .guarantee-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .guarantee-text {
-      color: var(--muted);
-      font-size: 0.95rem;
-      max-width: 300px;
-      line-height: 1.6;
-    }
-
-    /* ── Mobile Optimizations ───────────────────────────────────────────────── */
-    @media (max-width: 768px) {
-      .sticky-cta {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-        gap: 10px;
-      }
-
-      .sticky-cta-btn {
-        padding: 6px 14px;
-        font-size: 0.75rem;
-      }
-
-      .countdown-timer {
-        gap: 10px;
-      }
-
-      .countdown-value {
-        font-size: 1.5rem;
-        padding: 6px 12px;
-        min-width: 55px;
-      }
-
-      .trust-badges {
-        gap: 20px;
-      }
-
-      .live-visitors {
-        left: 12px;
-        bottom: 70px;
-        padding: 8px 14px;
-        font-size: 0.75rem;
-      }
-
-      .fab-contact {
-        width: 52px;
-        height: 52px;
-      }
-
-      .exit-popup {
-        padding: 36px 24px;
-      }
-
-      .exit-popup h3 {
-        font-size: 1.4rem;
-      }
-    }
-  </style>
 </head>
 
 <body>
-  <!-- Sticky CTA Bar -->
-  <div class="sticky-cta" id="sticky-cta">
-    <span class="sticky-cta-text">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span>Launch Pricing:</span> <strong>20% OFF</strong> all packages
-    </span>
-    <a href="#pricing" class="sticky-cta-btn">Claim Offer</a>
-  </div>
-
-  <div class="ambient-glow glow-1"></div>
-  <div class="ambient-glow glow-2"></div>
-  <div id="smoke-canvas"></div>
-  <div class="cursor-glow" id="cursor-glow"></div>
-
-  <!-- ── Nav ───────────────────────────────────────────────────────────────── -->
-  <nav class="nav" id="main-nav">
-    <span class="nav-logo" data-bind="name">Smoke Shop</span>
-    <div class="nav-actions">
-      <a data-bind="href:phone-tel" class="btn btn-glass" id="nav-phone" aria-label="Call us">Call Us</a>
-      <a href="#contact" class="btn btn-primary">Get Website</a>
-      <button id="dark-mode-toggle" class="btn btn-glass dark-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
-        <span class="dark-icon">&#127769;</span><span class="light-icon">&#9728;&#65039;</span>
+  <!-- ══════════════════════════════════════════════════════════════════════
+       STICKY HEADER
+       ══════════════════════════════════════════════════════════════════════ -->
+  <header class="header" id="main-header">
+    <div class="header-inner">
+      <a href="#" class="logo" data-bind="name">Smoke Shop</a>
+      
+      <nav class="nav-links">
+        <a href="#products">Products</a>
+        <a href="#about">About</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      
+      <div class="header-actions">
+        <a data-bind="href:phone-tel" class="btn btn-ghost" id="nav-phone">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          <span class="btn-text">Call Now</span>
+        </a>
+        <a href="#contact" class="btn btn-primary">Get Started</a>
+      </div>
+      
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
       </button>
     </div>
-  </nav>
+    
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobile-nav">
+      <a href="#products">Products</a>
+      <a href="#about">About</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#contact">Contact</a>
+      <a data-bind="href:phone-tel" class="btn btn-primary btn-block">Call Now</a>
+    </div>
+  </header>
 
-  <!-- ── Hero ──────────────────────────────────────────────────────────────── -->
-  <section class="hero">
-    <div class="hero-content gs-reveal">
-      <!-- Social Proof Ticker -->
-      <div class="social-proof-ticker">
-        <div class="avatar-stack">
-          <div class="avatar">J</div>
-          <div class="avatar">M</div>
-          <div class="avatar">S</div>
+  <main>
+    <!-- ══════════════════════════════════════════════════════════════════════
+         HERO SECTION
+         ══════════════════════════════════════════════════════════════════════ -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <!-- Location Badge -->
+        <div class="location-badge gs-reveal">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          <span data-bind="city">Houston</span>, <span data-bind="state">TX</span>
         </div>
-        <span class="proof-text"><strong>127 shop owners</strong> claimed their site this month</span>
-      </div>
-
-      <h1>
-        Dominate Local Search For<br>
-        <span class="text-gradient" data-bind="name">Your Smoke Shop</span>
-      </h1>
-      <p>Premium websites designed to help <strong data-bind="name">your shop</strong> in <strong data-bind="city">your
-          city</strong> rank higher, build trust, and bring in more foot traffic.</p>
-
-      <div class="hero-actions">
-        <a href="#contact" class="btn btn-primary">Claim This Design</a>
-        <a data-bind="href:googleMaps" class="btn btn-glass" target="_blank" rel="noopener">Find Us</a>
-      </div>
-    </div>
-    <div class="hero-visual gs-reveal">
-      <img 
-        src="https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=640&auto=format&fit=crop"
-        srcset="https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=640&auto=format&fit=crop 640w, https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=1280&auto=format&fit=crop 1280w, https://images.unsplash.com/photo-1579761925697-3fadcc9eac04?q=80&w=1974&auto=format&fit=crop 1974w"
-        sizes="(max-width: 768px) 100vw, 50vw"
-        class="hero-img" alt="Premium Smoke Shop Interior" 
-        loading="lazy"
-        width="1974" height="1200"
-      />
-    </div>
-  </section>
-
-  <!-- ── Countdown Timer ────────────────────────────────────────────────────── -->
-  <div class="countdown-banner gs-reveal">
-    <div class="countdown-title">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Launch Pricing Ends In
-    </div>
-    <div class="countdown-timer" id="countdown-timer">
-      <div class="countdown-unit">
-        <div class="countdown-value" id="countdown-hours">23</div>
-        <div class="countdown-label">Hours</div>
-      </div>
-      <div class="countdown-unit">
-        <div class="countdown-value" id="countdown-minutes">59</div>
-        <div class="countdown-label">Minutes</div>
-      </div>
-      <div class="countdown-unit">
-        <div class="countdown-value" id="countdown-seconds">59</div>
-        <div class="countdown-label">Seconds</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Fast Info Strip ────────────────────────────────────────────────────── -->
-  <div class="info-grid gs-reveal">
-    <div class="info-card">
-      <span class="info-label">Location</span>
-      <span class="info-value"><a data-bind="href:googleMaps" target="_blank" data-bind-text="address">123 Main
-          St</a></span>
-    </div>
-    <div class="info-card">
-      <span class="info-label">Contact</span>
-      <span class="info-value"><a data-bind="href:phone-tel" data-bind-text="phone">(713) 555-0100</a></span>
-    </div>
-    <div class="info-card">
-      <span class="info-label">Hours</span>
-      <span class="info-value" data-bind="hours">Open daily</span>
-    </div>
-    <div class="info-card">
-      <span class="info-label">Social</span>
-      <span class="info-value"><a data-bind="href:instagram" target="_blank" rel="noopener">@yourshop</a></span>
-    </div>
-  </div>
-
-  <!-- ── Trust Badges ───────────────────────────────────────────────────────── -->
-  <div class="trust-badges gs-reveal">
-    <div class="trust-badge">
-      <span class="trust-badge-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      </span>
-      <span class="trust-badge-text">SSL Secured</span>
-    </div>
-    <div class="trust-badge">
-      <span class="trust-badge-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>
-      </span>
-      <span class="trust-badge-text">Mobile Optimized</span>
-    </div>
-    <div class="trust-badge">
-      <span class="trust-badge-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      </span>
-      <span class="trust-badge-text">Fast Loading</span>
-    </div>
-    <div class="trust-badge">
-      <span class="trust-badge-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </span>
-      <span class="trust-badge-text">SEO Ready</span>
-    </div>
-    <div class="trust-badge">
-      <span class="trust-badge-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-      </span>
-      <span class="trust-badge-text">Money Back</span>
-    </div>
-  </div>
-
-  <!-- ── Products ───────────────────────────────────────────────────────────── -->
-  <section class="products-section pt-8rem">
-    <div class="section-inner gs-reveal">
-      <h2 class="section-title">Premium Inventory</h2>
-      <p class="section-subtitle">We stock the highest quality products in <span data-bind="city">your city</span>.</p>
-      <div class="categories-wrapper" id="categories-grid">
-        <!-- Filled by bindBusiness() from BUSINESS.categories -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Features ──────────────────────────────────────────────────────────── -->
-  <section>
-    <div class="section-inner">
-      <h2 class="section-title text-center mb-3-5rem">
-        Why <span data-bind="name">Your Shop</span> Needs This
-      </h2>
-      <div class="features-list">
-        <div class="feature-item gs-reveal">
-          <span class="feature-num">01</span>
-          <div class="feature-item-content">
-            <div class="feature-icon-wrap">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>
-            </div>
-            <h3>Mobile Perfection</h3>
-            <p>Over 80% of smoke shop searches happen on phones. This site feels like a native app — fast, responsive, and frictionless on every screen size.</p>
+        
+        <!-- Main Headline -->
+        <h1 class="hero-title gs-reveal">
+          <span data-bind="city">Houston</span>&apos;s Premier
+          <span class="text-accent">Smoke Shop</span>
+        </h1>
+        
+        <!-- Subheadline -->
+        <p class="hero-subtitle gs-reveal" data-bind="tagline">
+          Premium vapes, CBD, kratom, hookah, and accessories. Expert staff. Fair prices. A welcoming experience for everyone.
+        </p>
+        
+        <!-- CTA Buttons -->
+        <div class="hero-actions gs-reveal">
+          <a href="#contact" class="btn btn-primary btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            Visit Us Today
+          </a>
+          <a data-bind="href:googleMaps" class="btn btn-outline btn-lg" target="_blank" rel="noopener">
+            Get Directions
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+        
+        <!-- Trust Badges -->
+        <div class="trust-badges gs-reveal">
+          <div class="trust-badge">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Expert Staff
           </div>
-        </div>
-        <div class="feature-item gs-reveal">
-          <span class="feature-num">02</span>
-          <div class="feature-item-content">
-            <div class="feature-icon-wrap">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            </div>
-            <h3>Local SEO Dominance</h3>
-            <p>Schema markup, optimized metadata, and Google Business Profile integration help your shop show up first when locals search nearby.</p>
+          <div class="trust-badge">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Top Brands
           </div>
-        </div>
-        <div class="feature-item gs-reveal">
-          <span class="feature-num">03</span>
-          <div class="feature-item-content">
-            <div class="feature-icon-wrap">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            </div>
-            <h3>Lightning Fast</h3>
-            <p>Built with modern web standards and zero bloat. Near-instant load times on any connection — because slow sites lose customers before the page even opens.</p>
+          <div class="trust-badge">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Fair Prices
+          </div>
+          <div class="trust-badge">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Locally Owned
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── Testimonials ──────────────────────────────────────────────────────── -->
-  <section>
-    <div class="section-inner">
-      <h2 class="section-title neon-text text-center mb-2-5rem">What Shop Owners Say</h2>
-      <div class="testimonials-grid" id="testimonials-grid">
-        <!-- Filled by bindBusiness() from BUSINESS.testimonials -->
+    <!-- ══════════════════════════════════════════════════════════════════════
+         STATS SECTION
+         ══════════════════════════════════════════════════════════════════════ -->
+    <section class="stats-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item gs-reveal">
+            <div class="stat-value" data-bind="rating">4.8</div>
+            <div class="stat-label">Google Rating</div>
+            <div class="stat-stars">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            </div>
+          </div>
+          <div class="stat-item gs-reveal">
+            <div class="stat-value" data-bind="reviewCount">200+</div>
+            <div class="stat-label">Happy Customers</div>
+          </div>
+          <div class="stat-item gs-reveal">
+            <div class="stat-value">500+</div>
+            <div class="stat-label">Products In Stock</div>
+          </div>
+          <div class="stat-item gs-reveal">
+            <div class="stat-value">5+</div>
+            <div class="stat-label">Years Serving</div>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── Guarantee Section ──────────────────────────────────────────────────── -->
-  <div class="guarantee-section gs-reveal">
-    <div class="guarantee-badge">
-      <span class="guarantee-icon">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-      </span>
-      <span class="guarantee-title">30-Day Money Back Guarantee</span>
-      <span class="guarantee-text">Not satisfied with your website? Get a full refund within 30 days, no questions asked.</span>
-    </div>
-  </div>
-
-  <!-- ── Pricing ───────────────────────────────────────────────────────────── -->
-  <section id="pricing">
-    <div class="section-inner">
-      <h2 class="section-title text-center mb-3-5rem">Flexible Pricing</h2>
-      <div class="pricing-grid">
-
-        <!-- Tier 1 -->
-        <div class="pricing-card gs-reveal">
-          <h3 class="tier-name">Starter</h3>
-          <p class="price-tag neon-text">$99<span class="price-sub"> one-time</span></p>
-          <p class="price-monthly">no monthly fees</p>
-          <ul class="checklist">
-            <li>Custom Landing Page</li>
-            <li>Google Maps Optimization</li>
-            <li>Directions + Hours Info</li>
-            <li>Click-to-Call Button</li>
-            <li>Mobile-First Design</li>
-            <li>Testimonial from You</li>
-          </ul>
-          <a href="https://buy.stripe.com/cNi8wO5Na2DwfSB9WJ1Jm05" class="btn btn-glass btn-block-large stripe-checkout-btn" data-tier="starter" target="_blank"
-            rel="noopener noreferrer">Get Started - $99</a>
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PRODUCTS SECTION
+         ══════════════════════════════════════════════════════════════════════ -->
+    <section id="products" class="products-section">
+      <div class="container">
+        <div class="section-header gs-reveal">
+          <span class="section-label">What We Carry</span>
+          <h2 class="section-title">Premium Selection</h2>
+          <p class="section-subtitle">From premium glass to everyday accessories - we stock the best and our staff knows it all.</p>
         </div>
-
-        <!-- Tier 2 -->
-        <div class="pricing-card popular gs-reveal">
-          <span class="popular-badge">Most Popular</span>
-          <h3 class="tier-name">Growth</h3>
-          <p class="price-tag neon-text">$299<span class="price-sub"> one-time</span></p>
-          <p class="price-monthly">no monthly fees</p>
-          <ul class="checklist">
-            <li>Everything in Starter</li>
-            <li>Custom Domain Setup</li>
-            <li>Product Category Pages</li>
-            <li>Instagram + Social Links</li>
-            <li>Google Business Optimization</li>
-            <li>Priority Support</li>
-          </ul>
-          <a href="https://buy.stripe.com/dRmfZgcby1zs9ud2uh1Jm06" class="btn btn-primary btn-block-large stripe-checkout-btn" data-tier="growth" target="_blank"
-            rel="noopener noreferrer">Get Growth - $299</a>
+        
+        <div class="products-grid">
+          <!-- Product Card 1 -->
+          <div class="product-card gs-reveal">
+            <div class="product-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="9"/>
+                <circle cx="9" cy="9" r="2" fill="currentColor" opacity="0.4"/>
+                <circle cx="14" cy="14" r="3" fill="none"/>
+                <circle cx="8" cy="14" r="1.2" fill="currentColor" opacity="0.6"/>
+              </svg>
+            </div>
+            <h3>Premium Glass</h3>
+            <p>Hand-blown pipes, water pipes, and rigs from top artists. Every piece is selected for quality and craftsmanship.</p>
+          </div>
+          
+          <!-- Product Card 2 -->
+          <div class="product-card gs-reveal">
+            <div class="product-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="9" y="3" width="6" height="13" rx="3"/>
+                <path d="M12 16v5M9 20h6"/>
+                <path d="M7 8c-2 0-3 1-3 2s1 2 3 2" opacity="0.5"/>
+                <path d="M17 7c2 0 3 1 3 2s-1 2-3 2" opacity="0.5"/>
+              </svg>
+            </div>
+            <h3>Vaporizers</h3>
+            <p>The latest dry herb and concentrate vaporizers from trusted brands. Portable and desktop options available.</p>
+          </div>
+          
+          <!-- Product Card 3 -->
+          <div class="product-card gs-reveal">
+            <div class="product-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22c0-6-4-10-9-10 0 5 4 9 9 10z" fill="currentColor" opacity="0.3"/>
+                <path d="M12 22c0-6 4-10 9-10-1 5-4 9-9 10z" fill="none"/>
+                <path d="M12 22V10M12 16c-2-1-4-3-4-5"/>
+                <path d="M3 12c0-5 4-9 9-10" fill="none"/>
+              </svg>
+            </div>
+            <h3>CBD &amp; Hemp</h3>
+            <p>High-quality CBD flower, tinctures, gummies, and topicals. Third-party tested, lab-verified products only.</p>
+          </div>
+          
+          <!-- Product Card 4 -->
+          <div class="product-card gs-reveal">
+            <div class="product-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.4"/>
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                <path d="M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" opacity="0.6"/>
+              </svg>
+            </div>
+            <h3>Accessories</h3>
+            <p>Grinders, papers, rolling trays, torches, and cleaning supplies. Everything to complete your setup.</p>
+          </div>
+          
+          <!-- Product Card 5 -->
+          <div class="product-card gs-reveal">
+            <div class="product-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <ellipse cx="12" cy="6" rx="8" ry="3"/>
+                <path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/>
+                <path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>
+              </svg>
+            </div>
+            <h3>Kratom</h3>
+            <p>Premium kratom powders and capsules. Multiple strains available with knowledgeable staff to guide you.</p>
+          </div>
+          
+          <!-- Product Card 6 -->
+          <div class="product-card gs-reveal">
+            <div class="product-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <h3>Hookah</h3>
+            <p>Complete hookah setups and premium shisha flavors. Everything you need for the perfect session.</p>
+          </div>
         </div>
-
-        <!-- Tier 3 -->
-        <div class="pricing-card gs-reveal">
-          <h3 class="tier-name">Pro</h3>
-          <p class="price-tag neon-text">$499<span class="price-sub"> one-time</span></p>
-          <p class="price-monthly">no monthly fees</p>
-          <ul class="checklist">
-            <li>Everything in Growth</li>
-            <li>E-Commerce / Online Store</li>
-            <li>Age Verification Modal</li>
-            <li>Advanced SEO Setup</li>
-            <li>Monthly Analytics Report</li>
-            <li>Social Media Management</li>
-          </ul>
-          <a href="https://buy.stripe.com/eVq28qdfC5PI7m57OB1Jm04" class="btn btn-glass btn-block-large stripe-checkout-btn" data-tier="pro" target="_blank"
-            rel="noopener noreferrer">Get Pro - $499</a>
-        </div>
-
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── FAQ Section ────────────────────────────────────────────────────────── -->
-  <section>
-    <div class="section-inner">
-      <h2 class="section-title text-center mb-3-5rem">Frequently Asked Questions</h2>
-      <div class="faq-section" id="faq-section">
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            How long does it take to build my website?
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              Most websites are completed within 24-48 hours after you provide your business information. For Pro tier sites with e-commerce, it may take 3-5 business days.
-            </div>
+    <!-- ══════════════════════════════════════════════════════════════════════
+         ABOUT SECTION
+         ══════════════════════════════════════════════════════════════════════ -->
+    <section id="about" class="about-section">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-content gs-reveal">
+            <span class="section-label">Our Story</span>
+            <h2 class="section-title"><span data-bind="city">Houston</span>&apos;s Friendliest Smoke Shop</h2>
+            <p class="about-text">
+              <span data-bind="name">Our shop</span> has been serving the community with passion and professionalism. We believe that shopping for smoking accessories should be a welcoming, informed experience.
+            </p>
+            <p class="about-text">
+              Our hand-picked inventory covers everything from artisan glass pieces to the latest vaporizer technology. We work directly with manufacturers and local glass artists to bring you the best selection at fair prices.
+            </p>
+            
+            <ul class="feature-list">
+              <li>
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Locally owned and operated
+              </li>
+              <li>
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Staff trained on every product we carry
+              </li>
+              <li>
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Satisfaction guaranteed on all purchases
+              </li>
+              <li>
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Clean, welcoming environment
+              </li>
+            </ul>
           </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            Do I need to pay monthly fees?
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              No! All our packages are one-time payments. The only recurring cost is your domain name ($12-15/year) if you want a custom domain.
+          
+          <div class="about-info gs-reveal">
+            <!-- Hours Card -->
+            <div class="info-card">
+              <div class="info-card-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <h3>Store Hours</h3>
+              </div>
+              <div class="hours-list">
+                <div class="hours-row">
+                  <span>Monday - Friday</span>
+                  <span data-bind="hours">9:00 AM - 10:00 PM</span>
+                </div>
+                <div class="hours-row">
+                  <span>Saturday</span>
+                  <span>10:00 AM - 11:00 PM</span>
+                </div>
+                <div class="hours-row">
+                  <span>Sunday</span>
+                  <span>11:00 AM - 9:00 PM</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            Can I update my website myself?
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              Yes! We provide a simple content management system for basic updates like hours, contact info, and images. For major changes, we offer affordable update packages.
+            
+            <!-- Location Card -->
+            <div class="info-card">
+              <div class="info-card-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <h3>Location</h3>
+              </div>
+              <p class="location-address" data-bind="address">123 Main St, Houston TX 77001</p>
+              <a data-bind="href:googleMaps" class="btn btn-outline btn-sm" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                </svg>
+                Get Directions
+              </a>
             </div>
-          </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            What if I'm not satisfied with my website?
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              We offer a 30-day money-back guarantee. If you're not completely satisfied with your website, we'll provide a full refund - no questions asked.
-            </div>
-          </div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            Will my website show up on Google?
-            <span class="faq-icon">+</span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-content">
-              Absolutely! All our websites are built with SEO best practices and optimized for local search. We also help set up your Google Business Profile for maximum visibility.
+            
+            <!-- Contact Card -->
+            <div class="info-card">
+              <div class="info-card-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <h3>Contact</h3>
+              </div>
+              <a data-bind="href:phone-tel" class="phone-link" data-bind-text="phone">(713) 555-0100</a>
+              <a data-bind="href:phone-tel" class="btn btn-primary btn-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"/>
+                </svg>
+                Call Now
+              </a>
             </div>
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         REVIEWS SECTION
+         ══════════════════════════════════════════════════════════════════════ -->
+    <section id="reviews" class="reviews-section">
+      <div class="container">
+        <div class="section-header gs-reveal">
+          <span class="section-label">Customer Reviews</span>
+          <h2 class="section-title">What People Are Saying</h2>
+          <p class="section-subtitle">See why customers love shopping with us.</p>
+        </div>
+        
+        <div class="reviews-grid">
+          <div class="review-card gs-reveal">
+            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="review-text">"Best smoke shop in the area! The staff is incredibly knowledgeable and always helps me find exactly what I need. Prices are fair and the selection is unmatched."</p>
+            <div class="review-author">
+              <div class="author-avatar">M</div>
+              <div class="author-info">
+                <strong>Mike R.</strong>
+                <span>Local Guide</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="review-card gs-reveal">
+            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="review-text">"Clean store, friendly staff, great prices. I've been coming here for years and they never disappoint. Highly recommend to anyone looking for quality products."</p>
+            <div class="review-author">
+              <div class="author-avatar">S</div>
+              <div class="author-info">
+                <strong>Sarah T.</strong>
+                <span>Regular Customer</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="review-card gs-reveal">
+            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="review-text">"Amazing selection of glass and CBD products. The staff took time to explain everything and helped me make the right choice. Will definitely be back!"</p>
+            <div class="review-author">
+              <div class="author-avatar">J</div>
+              <div class="author-info">
+                <strong>James L.</strong>
+                <span>Verified Buyer</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Google Review CTA -->
+        <div class="review-cta gs-reveal">
+          <div class="google-rating">
+            <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" width="60" height="20" loading="lazy" />
+            <div class="rating-display">
+              <span class="rating-value" data-bind="rating">4.8</span>
+              <span class="rating-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="rating-count">(<span data-bind="reviewCount">200</span>+ reviews)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CONTACT/CTA SECTION
+         ══════════════════════════════════════════════════════════════════════ -->
+    <section id="contact" class="contact-section">
+      <div class="container">
+        <div class="contact-card gs-reveal">
+          <div class="contact-content">
+            <h2>Ready to Visit?</h2>
+            <p>Stop by today and experience the difference. Our friendly staff is ready to help you find exactly what you need.</p>
+            
+            <div class="contact-actions">
+              <a data-bind="href:phone-tel" class="btn btn-primary btn-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"/>
+                </svg>
+                Call <span data-bind="phone">(713) 555-0100</span>
+              </a>
+              <a data-bind="href:googleMaps" class="btn btn-outline btn-lg" target="_blank" rel="noopener">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                </svg>
+                Get Directions
+              </a>
+            </div>
+            
+            <div class="contact-details">
+              <div class="contact-detail">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span data-bind="address">123 Main St, Houston TX 77001</span>
+              </div>
+              <div class="contact-detail">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span data-bind="hours">Open 9AM - 10PM Daily</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       FOOTER
+       ══════════════════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <span class="footer-logo" data-bind="name">Smoke Shop</span>
+          <p data-bind="address">123 Main St, Houston TX 77001</p>
+        </div>
+        <div class="footer-links">
+          <a href="#products">Products</a>
+          <a href="#about">About</a>
+          <a href="#reviews">Reviews</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span id="current-year">2025</span> <span data-bind="name">Smoke Shop</span>. All rights reserved.</p>
+      </div>
     </div>
-  </section>
-
-  <!-- ── Contact ─────────────────────────────────────────────────────────────── -->
-  <section id="contact">
-    <div class="contact-container gs-reveal">
-      <h2 class="section-title">Secure Your Site</h2>
-      <p class="section-subtitle">Lock in this premium design for <span data-bind="name">your shop</span> today.
-        <br><span class="text-gradient font-bold">Pick your plan when we talk.</span>
-      </p>
-
-      <form class="premium-form" id="leadForm" novalidate>
-        <div class="form-group">
-          <input id="formShop" placeholder="Shop Name" autocomplete="organization" required aria-required="true" aria-label="Business name" />
-          <span class="error-msg" id="shopError"></span>
-        </div>
-        <div class="form-group">
-          <input id="formCity" placeholder="City" autocomplete="address-level2" required aria-required="true" aria-label="City" />
-          <span class="error-msg" id="cityError"></span>
-        </div>
-        <div class="form-group">
-          <input id="formPhone" placeholder="Your Phone" type="tel" autocomplete="tel" required aria-required="true" aria-label="Phone number" />
-          <span class="error-msg" id="phoneError"></span>
-        </div>
-        <div class="form-group">
-          <input id="formEmail" placeholder="Your Email" type="email" autocomplete="email" required aria-required="true" aria-label="Email address" />
-          <span class="error-msg" id="emailError"></span>
-        </div>
-        <button type="submit" class="btn btn-primary btn-submit-large" id="submitBtn">
-          Launch My Website
-        </button>
-      </form>
-    </div>
-  </section>
-
-  <!-- ── Footer ──────────────────────────────────────────────────────────────── -->
-  <footer>
-    <p>
-      &copy; <span data-bind="name">Your Shop</span> - Demo created by <a href="https://smokeshopgrowth.com"
-        target="_blank" rel="noopener" class="text-accent font-semibold">SmokeShopGrowth</a>
-    </p>
   </footer>
 
-  <!-- ── Demo Banner ─────────────────────────────────────────────────────────── -->
-  <div class="demo-banner">
-    Demo website generated for <span data-bind="name">this smoke shop</span> in <span data-bind="city">your city</span>
+  <!-- ══════════════════════════════════════════════════════════════════════
+       FLOATING CALL BUTTON (Mobile)
+       ══════════════════════════════════════════════════════════════════════ -->
+  <a data-bind="href:phone-tel" class="floating-cta" aria-label="Call us">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+    </svg>
+  </a>
+
+  <!-- Demo Banner -->
+  <div class="demo-banner" id="demo-banner">
+    This is a demo website for <span data-bind="name">your shop</span>
   </div>
 
-  <!-- ── Live Visitors Counter ─────────────────────────────────────────────── -->
-  <div class="live-visitors" id="live-visitors">
-    <span class="live-dot"></span>
-    <span><strong id="visitor-count">3</strong> people viewing this page</span>
-  </div>
-
-  <!-- ── Floating Action Button ────────────────────────────────────────────── -->
-  <button class="fab-contact" onclick="scrollToContact()" aria-label="Contact us">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-  </button>
-
-  <!-- ── Exit Intent Popup ─────────────────────────────────────────────────── -->
-  <div class="exit-popup-overlay" id="exit-popup">
-    <div class="exit-popup">
-      <button class="exit-popup-close" onclick="closeExitPopup()" aria-label="Close">&times;</button>
-      <div class="exit-popup-icon">
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent)"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-      </div>
-      <h3>Wait! Don't Miss Out</h3>
-      <p>Get an exclusive 10% discount on any website package when you sign up today.</p>
-      <div class="discount-code">
-        <div class="discount-label">Your Discount Code</div>
-        <div class="discount-value">SAVE10</div>
-      </div>
-      <a href="#contact" class="btn btn-primary" onclick="closeExitPopup()">Claim My Discount</a>
-    </div>
-  </div>
-
-  <!-- ── Scripts ─────────────────────────────────────────────────────────────── -->
+  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-
+  <script src="animations.js"></script>
   <script>
-    // ── Sticky CTA Bar ──
-    let lastScrollY = 0;
-    const stickyCta = document.getElementById('sticky-cta');
-    const mainNav = document.getElementById('main-nav');
-
-    window.addEventListener('scroll', () => {
-      const scrollY = window.scrollY;
+    // Data binding system
+    document.addEventListener('DOMContentLoaded', () => {
+      const B = window.BUSINESS || {};
       
-      if (scrollY > 300) {
-        stickyCta.classList.add('visible');
-        mainNav.classList.add('scrolled');
-      } else {
-        stickyCta.classList.remove('visible');
-        mainNav.classList.remove('scrolled');
-      }
-      
-      lastScrollY = scrollY;
-    });
-
-    // ── Countdown Timer ──
-    function updateCountdown() {
-      const now = new Date();
-      const midnight = new Date();
-      midnight.setHours(23, 59, 59, 999);
-      
-      const diff = midnight - now;
-      
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      
-      document.getElementById('countdown-hours').textContent = String(hours).padStart(2, '0');
-      document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
-      document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
-    }
-    
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-
-    // ── Live Visitor Counter ──
-    function updateVisitorCount() {
-      const base = 2;
-      const variation = Math.floor(Math.random() * 4);
-      document.getElementById('visitor-count').textContent = base + variation;
-    }
-    
-    updateVisitorCount();
-    setInterval(updateVisitorCount, 30000);
-
-    // ── FAQ Accordion ──
-    function toggleFaq(button) {
-      const item = button.closest('.faq-item');
-      const isOpen = item.classList.contains('open');
-      
-      // Close all
-      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-      
-      // Open clicked if it was closed
-      if (!isOpen) {
-        item.classList.add('open');
-      }
-    }
-
-    // ── Exit Intent Popup ──
-    let exitPopupShown = false;
-    
-    function showExitPopup() {
-      if (exitPopupShown) return;
-      if (sessionStorage.getItem('exitPopupShown')) return;
-      
-      exitPopupShown = true;
-      sessionStorage.setItem('exitPopupShown', 'true');
-      document.getElementById('exit-popup').classList.add('visible');
-    }
-    
-    function closeExitPopup() {
-      document.getElementById('exit-popup').classList.remove('visible');
-    }
-    
-    document.addEventListener('mouseout', (e) => {
-      if (e.clientY < 10 && e.relatedTarget === null) {
-        showExitPopup();
-      }
-    });
-
-    // ── Scroll to Contact ──
-    function scrollToContact() {
-      document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // ── Bind Business Data ──
-    (function bindBusiness() {
-      const B = window.BUSINESS;
-      if (!B) return;
-
-      const phoneDigits = (B.phone || "").replace(/\D/g, "");
-      const phoneTel = "tel:" + (phoneDigits.length === 10 ? "+1" + phoneDigits : phoneDigits.length === 11 && phoneDigits[0] === "1" ? "+" + phoneDigits : "+" + phoneDigits);
-      
-      const lookup = {
-        name: B.name || "",
-        city: B.city || "",
-        state: B.state || "",
-        phone: B.phone || "",
-        address: B.address || "",
-        hours: B.hours || "",
-        price: B.price || "",
-        instagram: B.instagram || "#",
-        googleMaps: B.googleMaps || "#",
-        "phone-tel": phoneTel,
-        title: `${B.name} | Premium Smoke Shop Website`,
-        "meta-description": `Premium website demo for ${B.name} in ${B.city}. Mobile-optimized, SEO-ready smoke shop website.`,
-        "og-title": `${B.name} - Premium Smoke Shop`,
-        "og-description": `Discover ${B.name}, your premium smoke shop in ${B.city}.`,
-      };
-
-      document.title = lookup.title;
-      document.querySelector('meta[name="description"]').setAttribute('content', lookup["meta-description"]);
-      
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute('content', lookup["og-title"]);
-      
-      const ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.setAttribute('content', lookup["og-description"]);
-
-      const schema = document.getElementById('schema-data');
-      if (schema) {
-        try {
-          const schemaData = JSON.parse(schema.textContent);
-          schemaData.name = B.name || "Smoke Shop";
-          schemaData.description = B.tagline || "Premium smoke shop";
-          schemaData.telephone = B.phone || "";
-          if (B.address) {
-            const parts = B.address.split(',');
-            schemaData.address.streetAddress = parts[0]?.trim() || "";
-            schemaData.address.addressLocality = B.city || "";
-            schemaData.address.addressRegion = B.state || "TX";
+      // Update text content
+      document.querySelectorAll('[data-bind]').forEach(el => {
+        const key = el.getAttribute('data-bind');
+        if (key.startsWith('href:')) {
+          const prop = key.replace('href:', '');
+          if (prop === 'phone-tel' && B.phone) {
+            el.href = 'tel:' + B.phone.replace(/\D/g, '');
+          } else if (prop === 'googleMaps' && B.googleMaps) {
+            el.href = B.googleMaps;
+          } else if (prop === 'instagram' && B.instagram) {
+            el.href = B.instagram;
           }
-          schemaData.url = window.location.origin + window.location.pathname;
-          schema.textContent = JSON.stringify(schemaData);
-        } catch (e) {
-          console.log('Schema update skipped:', e.message);
-        }
-      }
-
-      document.querySelectorAll("[data-bind]").forEach(el => {
-        const raw = el.getAttribute("data-bind");
-        if (raw.startsWith("href:")) {
-          const key = raw.replace("href:", "");
-          const val = lookup[key] || "#";
-          const safeHref = /^javascript:/i.test(val.trim()) ? "#" : val;
-          el.setAttribute("href", safeHref);
-          if (!el.hasAttribute("data-bind-text") && !el.children.length) {
-            el.textContent = lookup[key.replace("-tel", "").replace("phone", "phone")] || val;
-          }
-        } else if (raw === "title") {
-          document.title = lookup.title;
-        } else if (raw === "meta-description") {
-          el.setAttribute("content", lookup["meta-description"]);
-        } else {
-          el.textContent = lookup[raw] || "";
+        } else if (B[key] !== undefined) {
+          el.textContent = B[key];
         }
       });
-
-      document.querySelectorAll("[data-bind-text]").forEach(el => {
-        const key = el.getAttribute("data-bind-text");
-        el.textContent = lookup[key] || "";
-      });
-
-      const navPhone = document.getElementById("nav-phone");
-      if (navPhone && B.phone) navPhone.textContent = B.phone;
-
-      if (B.heroImage) {
-        const heroImg = document.querySelector(".hero-img");
-        if (heroImg) {
-          heroImg.src = B.heroImage;
-          heroImg.loading = "lazy";
+      
+      // Update text content with separate attribute
+      document.querySelectorAll('[data-bind-text]').forEach(el => {
+        const key = el.getAttribute('data-bind-text');
+        if (B[key] !== undefined) {
+          el.textContent = B[key];
         }
-      }
-
-      const fShop = document.getElementById("formShop");
-      const fCity = document.getElementById("formCity");
-      const fPhone = document.getElementById("formPhone");
-      if (fShop) fShop.value = B.name || "";
-      if (fCity) fCity.value = B.city || "";
-      if (fPhone) fPhone.value = B.phone || "";
-
-      const grid = document.getElementById("categories-grid");
-      if (grid && Array.isArray(B.categories)) {
-        grid.innerHTML = B.categories.map(c => `<span class="category-pill">${c}</span>`).join("");
-      }
-
-      const tGrid = document.getElementById("testimonials-grid");
-      if (tGrid && Array.isArray(B.testimonials)) {
-        tGrid.innerHTML = B.testimonials.map(t => `
-          <div class="testimonial-card">
-            <div class="stars">${'\u2605'.repeat(t.stars)}${'\u2606'.repeat(5 - t.stars)}</div>
-            <p class="quote">"${t.quote}"</p>
-            <div class="author">
-              <div class="avatar">${t.name.charAt(0)}</div>
-              <div><strong>${t.name}</strong><br><span class="role">${t.role}</span></div>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      // Form submission with validation
-      const form = document.getElementById("leadForm");
-      if (form) {
-        const validateForm = (e) => {
-          const shop = document.getElementById("formShop");
-          const city = document.getElementById("formCity");
-          const phone = document.getElementById("formPhone");
-          const email = document.getElementById("formEmail");
-          
-          let isValid = true;
-          
-          if (!shop.value.trim()) {
-            document.getElementById("shopError").textContent = "Shop name is required";
-            isValid = false;
-          } else if (shop.value.trim().length < 2) {
-            document.getElementById("shopError").textContent = "Shop name must be at least 2 characters";
-            isValid = false;
-          } else {
-            document.getElementById("shopError").textContent = "";
-          }
-          
-          if (!city.value.trim()) {
-            document.getElementById("cityError").textContent = "City is required";
-            isValid = false;
-          } else {
-            document.getElementById("cityError").textContent = "";
-          }
-          
-          const phoneRegex = /^[\d\s()+-]{10,}$/;
-          if (!phone.value.trim()) {
-            document.getElementById("phoneError").textContent = "Phone number is required";
-            isValid = false;
-          } else if (!phoneRegex.test(phone.value.trim())) {
-            document.getElementById("phoneError").textContent = "Please enter a valid phone number";
-            isValid = false;
-          } else {
-            document.getElementById("phoneError").textContent = "";
-          }
-          
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!email.value.trim()) {
-            document.getElementById("emailError").textContent = "Email is required";
-            isValid = false;
-          } else if (!emailRegex.test(email.value.trim())) {
-            document.getElementById("emailError").textContent = "Please enter a valid email";
-            isValid = false;
-          } else {
-            document.getElementById("emailError").textContent = "";
-          }
-          
-          return isValid;
-        };
+      });
+      
+      // Set current year
+      const yearEl = document.getElementById('current-year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+      
+      // Mobile menu toggle
+      const menuBtn = document.getElementById('mobile-menu-btn');
+      const mobileNav = document.getElementById('mobile-nav');
+      if (menuBtn && mobileNav) {
+        menuBtn.addEventListener('click', () => {
+          mobileNav.classList.toggle('open');
+          menuBtn.setAttribute('aria-expanded', mobileNav.classList.contains('open'));
+        });
         
-        document.getElementById("formShop").addEventListener("blur", validateForm);
-        document.getElementById("formCity").addEventListener("blur", validateForm);
-        document.getElementById("formPhone").addEventListener("blur", validateForm);
-        document.getElementById("formEmail").addEventListener("blur", validateForm);
-        
-        form.addEventListener("submit", function (e) {
-          e.preventDefault();
-          
-          if (!validateForm(e)) return;
-          
-          const formData = {
-            shopName: document.getElementById("formShop").value,
-            city: document.getElementById("formCity").value,
-            phone: document.getElementById("formPhone").value,
-            email: document.getElementById("formEmail").value
-          };
-          
-          const submitBtn = document.getElementById("submitBtn");
-          submitBtn.disabled = true;
-          submitBtn.textContent = "Submitting...";
-          
-          fetch('/api/template-submission', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              if (window.gtag) {
-                gtag('event', 'form_submit', {
-                  'event_category': 'engagement',
-                  'event_label': 'website_inquiry'
-                });
-              }
-
-              form.innerHTML = '<div class="text-center" style="padding:2rem"><p class="font-bold" style="color:var(--accent); font-size:1.4rem;">Request Received!</p><p style="color:var(--muted); margin-bottom:1.5rem;">Ready to get your website live? Pick a plan above to get started instantly.</p><a href="#pricing" class="btn btn-primary" style="display:inline-block;">View Pricing</a></div>';
-            } else {
-              alert('Error: ' + (data.error || 'Unknown error'));
-              submitBtn.disabled = false;
-              submitBtn.textContent = 'Launch My Website';
-            }
-          })
-          .catch(err => {
-            console.error('Form submission error:', err);
-            alert('Failed to submit form. Please try again.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Launch My Website';
-          });
+        // Close menu when clicking links
+        mobileNav.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => mobileNav.classList.remove('open'));
         });
       }
-
-      document.querySelectorAll("[data-bind='href:instagram']").forEach(el => {
-        if (!el.hasAttribute("data-bind-text") && B.instagram) {
-          el.textContent = B.instagram.replace(/.*instagram\.com\//, "@");
-        }
-      });
-
-    })();
-    
-    // Dark mode toggle
-    (function darkModeToggle() {
-      const toggle = document.getElementById('dark-mode-toggle');
-      if (!toggle) return;
       
-      const isDarkMode = () => document.documentElement.getAttribute('data-dark') === 'true';
-      
-      const updateToggle = () => {
-        const dark = isDarkMode();
-        toggle.style.opacity = dark ? '1' : '0.7';
-        toggle.setAttribute('aria-pressed', dark);
-      };
-      
-      toggle.addEventListener('click', () => {
-        const currentDark = isDarkMode();
-        const newDark = !currentDark;
-        
-        if (newDark) {
-          document.documentElement.setAttribute('data-dark', 'true');
-          localStorage.setItem('dark-mode', 'true');
+      // Header scroll effect
+      const header = document.getElementById('main-header');
+      let lastScroll = 0;
+      window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+        if (currentScroll > 50) {
+          header.classList.add('scrolled');
         } else {
-          document.documentElement.removeAttribute('data-dark');
-          localStorage.setItem('dark-mode', 'false');
+          header.classList.remove('scrolled');
         }
-        
-        updateToggle();
+        lastScroll = currentScroll;
       });
       
-      updateToggle();
-    })();
+      // Hide demo banner if not in demo mode
+      if (!B.showDemoBanner) {
+        const banner = document.getElementById('demo-banner');
+        if (banner) banner.style.display = 'none';
+      }
+    });
   </script>
-
-  <script>
-    // ── Stripe Payment Link personalization ──
-    (function personalizeStripeLinks() {
-      const B = window.BUSINESS;
-      if (!B || !B.name) return;
-
-      document.querySelectorAll('.stripe-checkout-btn').forEach(btn => {
-        const baseUrl = btn.getAttribute('href');
-        if (!baseUrl || !baseUrl.includes('buy.stripe.com')) return;
-
-        const sep = baseUrl.includes('?') ? '&' : '?';
-        const params = new URLSearchParams();
-        params.set('client_reference_id', B.name + '|' + (B.city || ''));
-
-        const urlEmail = new URLSearchParams(window.location.search).get('email');
-        if (urlEmail) params.set('prefilled_email', urlEmail);
-
-        btn.setAttribute('href', baseUrl + sep + params.toString());
-      });
-    })();
-  </script>
-  <script src="animations.js"></script>
 </body>
-
 </html>

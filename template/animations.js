@@ -1,195 +1,281 @@
 /**
  * animations.js
- * Requires GSAP and ScrollTrigger.
- * Aura-inspired: subtle, smooth, premium.
+ * Smooth, performant animations using GSAP
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Wait for GSAP to load
+  if (typeof gsap === 'undefined') {
+    console.warn('GSAP not loaded, animations disabled');
+    // Fallback: reveal all elements
+    document.querySelectorAll('.gs-reveal').forEach(el => {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+    return;
+  }
 
-    // ── Cursor glow (skip on touch devices) ───────────────────────────────
-    if (!window.matchMedia('(hover: none)').matches) {
-        const cursorGlow = document.getElementById("cursor-glow");
-        if (cursorGlow) {
-            document.addEventListener("mousemove", (e) => {
-                cursorGlow.style.left = e.clientX + "px";
-                cursorGlow.style.top = e.clientY + "px";
-            });
+  // Register ScrollTrigger plugin
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ── Initial page load animations ────────────────────────────────────────
+  
+  // Hero content staggered entrance
+  gsap.from(".hero .location-badge", {
+    y: 20,
+    opacity: 0,
+    duration: 0.8,
+    ease: "power3.out",
+    delay: 0.2
+  });
+
+  gsap.from(".hero .hero-title", {
+    y: 30,
+    opacity: 0,
+    duration: 1,
+    ease: "power3.out",
+    delay: 0.35
+  });
+
+  gsap.from(".hero .hero-subtitle", {
+    y: 25,
+    opacity: 0,
+    duration: 0.9,
+    ease: "power3.out",
+    delay: 0.5
+  });
+
+  gsap.from(".hero .hero-actions", {
+    y: 20,
+    opacity: 0,
+    duration: 0.8,
+    ease: "power3.out",
+    delay: 0.65
+  });
+
+  gsap.from(".hero .trust-badges", {
+    y: 15,
+    opacity: 0,
+    duration: 0.7,
+    ease: "power3.out",
+    delay: 0.8
+  });
+
+  // ── Scroll-triggered animations ─────────────────────────────────────────
+
+  // Generic reveal for elements with .gs-reveal
+  const revealElements = gsap.utils.toArray(".gs-reveal:not(.hero .gs-reveal)");
+  
+  revealElements.forEach(elem => {
+    gsap.fromTo(elem, 
+      {
+        y: 30,
+        opacity: 0
+      },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: elem,
+          start: "top 85%",
+          toggleActions: "play none none none"
         }
+      }
+    );
+  });
+
+  // Stats counter animation
+  const statValues = document.querySelectorAll('.stat-value');
+  
+  statValues.forEach(stat => {
+    const text = stat.textContent;
+    const hasPlus = text.includes('+');
+    const numericValue = parseFloat(text.replace(/[^0-9.]/g, ''));
+    
+    if (!isNaN(numericValue)) {
+      const isDecimal = numericValue % 1 !== 0;
+      
+      ScrollTrigger.create({
+        trigger: stat,
+        start: "top 85%",
+        onEnter: () => {
+          gsap.from(stat, {
+            textContent: 0,
+            duration: 1.5,
+            ease: "power2.out",
+            snap: isDecimal ? false : { textContent: 1 },
+            modifiers: {
+              textContent: value => {
+                const num = isDecimal 
+                  ? parseFloat(value).toFixed(1) 
+                  : Math.round(value);
+                return hasPlus ? num + '+' : num;
+              }
+            }
+          });
+        },
+        once: true
+      });
     }
+  });
 
-    // ── Wait briefly for data bindings to populate ─────────────────────────
-    setTimeout(() => {
-        gsap.registerPlugin(ScrollTrigger);
+  // Product cards staggered reveal
+  const productCards = gsap.utils.toArray(".product-card");
+  
+  if (productCards.length > 0) {
+    gsap.fromTo(productCards, 
+      {
+        y: 40,
+        opacity: 0
+      },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".products-grid",
+          start: "top 80%",
+          toggleActions: "play none none none"
+        }
+      }
+    );
+  }
 
-        // 1. Navbar fade in
-        gsap.from(".nav", {
-            y: -40,
-            opacity: 0,
-            duration: 0.9,
-            ease: "power3.out"
-        });
+  // Review cards staggered reveal
+  const reviewCards = gsap.utils.toArray(".review-card");
+  
+  if (reviewCards.length > 0) {
+    gsap.fromTo(reviewCards, 
+      {
+        y: 30,
+        opacity: 0
+      },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.15,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".reviews-grid",
+          start: "top 80%",
+          toggleActions: "play none none none"
+        }
+      }
+    );
+  }
 
-        // 2. Hero content staggered entrance
-        gsap.from(".hero-content > *", {
-            y: 25,
-            opacity: 0,
-            duration: 1,
-            stagger: 0.12,
-            ease: "power3.out",
-            delay: 0.2
-        });
+  // Info cards staggered reveal
+  const infoCards = gsap.utils.toArray(".info-card");
+  
+  if (infoCards.length > 0) {
+    gsap.fromTo(infoCards, 
+      {
+        x: 30,
+        opacity: 0
+      },
+      {
+        x: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".about-info",
+          start: "top 80%",
+          toggleActions: "play none none none"
+        }
+      }
+    );
+  }
 
-        // 3. Hero image fade in & slight scale
-        gsap.from(".hero-visual", {
-            scale: 0.92,
-            opacity: 0,
-            duration: 1.3,
-            ease: "power3.out",
-            delay: 0.35
-        });
+  // Contact card reveal
+  const contactCard = document.querySelector(".contact-card");
+  
+  if (contactCard) {
+    gsap.fromTo(contactCard, 
+      {
+        y: 40,
+        opacity: 0,
+        scale: 0.98
+      },
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: contactCard,
+          start: "top 85%",
+          toggleActions: "play none none none"
+        }
+      }
+    );
+  }
 
-        // 4. Scroll Reveal Elements (.gs-reveal)
-        gsap.utils.toArray(".gs-reveal").forEach(function (elem) {
-            gsap.from(elem, {
-                scrollTrigger: {
-                    trigger: elem,
-                    start: "top 85%",
-                    toggleActions: "play none none none"
-                },
-                y: 30,
-                opacity: 0,
-                duration: 0.9,
-                ease: "power3.out"
-            });
-        });
+  // ── Hover animations ────────────────────────────────────────────────────
 
-        // 5. Hero parallax on scroll
-        gsap.to(".hero-content", {
-            yPercent: -30,
-            ease: "none",
-            scrollTrigger: {
-                trigger: ".hero",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
-        });
+  // Product card hover effect
+  productCards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      gsap.to(card.querySelector('.product-icon'), {
+        scale: 1.1,
+        duration: 0.3,
+        ease: "power2.out"
+      });
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      gsap.to(card.querySelector('.product-icon'), {
+        scale: 1,
+        duration: 0.3,
+        ease: "power2.out"
+      });
+    });
+  });
 
-        gsap.to(".hero-visual", {
-            yPercent: -15,
-            ease: "none",
-            scrollTrigger: {
-                trigger: ".hero",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
-        });
+  // ── Smooth scroll for anchor links ──────────────────────────────────────
 
-        // 6. Parallax effect for ambient glows
-        gsap.to(".glow-1", {
-            yPercent: 25,
-            ease: "none",
-            scrollTrigger: {
-                trigger: "body",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
-        });
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (href === '#') return;
+      
+      const target = document.querySelector(href);
+      if (!target) return;
+      
+      e.preventDefault();
+      
+      const headerOffset = 80;
+      const elementPosition = target.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    });
+  });
 
-        // 7. Testimonial cards staggered reveal
-        gsap.utils.toArray(".testimonial-card").forEach(function (card, i) {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 88%",
-                    toggleActions: "play none none none"
-                },
-                y: 30,
-                opacity: 0,
-                duration: 0.8,
-                delay: i * 0.1,
-                ease: "power3.out"
-            });
-        });
+  // ── Parallax effects (subtle) ───────────────────────────────────────────
 
-        // 8. Pricing card scale-in
-        gsap.from(".pricing-card", {
-            scrollTrigger: {
-                trigger: ".pricing-card",
-                start: "top 85%",
-                toggleActions: "play none none none"
-            },
-            scale: 0.9,
-            opacity: 0,
-            duration: 0.9,
-            ease: "power3.out"
-        });
-
-    }, 100);
-
-    // ── Ambient Smoke Particle Canvas Effect ────────────────────────────────
-    initSmokeCanvas();
+  const heroBg = document.querySelector('.hero-bg');
+  
+  if (heroBg && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    gsap.to(heroBg, {
+      yPercent: 30,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".hero",
+        start: "top top",
+        end: "bottom top",
+        scrub: true
+      }
+    });
+  }
 });
-
-function initSmokeCanvas() {
-    const canvas = document.getElementById("smoke-canvas");
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    let width, height;
-    let particles = [];
-
-    function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-    }
-
-    window.addEventListener("resize", resize);
-    resize();
-
-    class Particle {
-        constructor() {
-            this.x = Math.random() * width;
-            this.y = height + Math.random() * 100;
-            this.size = Math.random() * 35 + 15;
-            this.speedX = Math.random() * 0.8 - 0.4;
-            this.speedY = Math.random() * -0.8 - 0.3;
-            this.color = Math.random() > 0.5 ? "rgba(16, 185, 129, 0.018)" : "rgba(16, 185, 129, 0.012)";
-        }
-        update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            this.size += 0.08;
-
-            if (this.y < -100) {
-                this.y = height + 100;
-                this.x = Math.random() * width;
-                this.size = Math.random() * 35 + 15;
-            }
-        }
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-            ctx.fill();
-        }
-    }
-
-    // 200 particles (reduced from 350 for performance)
-    for (let i = 0; i < 200; i++) {
-        particles.push(new Particle());
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, width, height);
-        for (let i = 0; i < particles.length; i++) {
-            particles[i].update();
-            particles[i].draw();
-        }
-        requestAnimationFrame(animate);
-    }
-
-    animate();
-}
