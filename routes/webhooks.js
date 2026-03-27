@@ -7,6 +7,7 @@ const fs = require('fs');
 const nodemailer = require('nodemailer');
 const n8nService = require('../src/node/n8n_service');
 const { pushLog } = require('../services/sse');
+const storage = require('../services/storage');
 const { webhookLimiter } = require('../middleware/rate-limit');
 const { insertPayment } = require('../src/node/db');
 
@@ -289,19 +290,10 @@ router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async 
             email, amount, businessName, city, tier, refId,
             paid_at: new Date().toISOString(),
         };
-        fs.mkdirSync('logs', { recursive: true });
-        fs.appendFileSync(
-            path.join('logs', 'payments.jsonl'),
-            JSON.stringify(paymentLog) + '\n'
-        );
+        storage.appendJsonl('payments.jsonl', paymentLog);
 
         try {
-            const deployRoot = path.join(__dirname, '..', 'deployments');
-            if (!fs.existsSync(deployRoot)) fs.mkdirSync(deployRoot);
-
             const slug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
-            const projectPath = path.join(deployRoot, `shop-${slug}`);
-            if (!fs.existsSync(projectPath)) fs.mkdirSync(projectPath, { recursive: true });
 
             const templateHtml = fs.readFileSync(path.join(__dirname, '..', 'template', 'index.html'), 'utf-8');
             const templateCss = path.join(__dirname, '..', 'template', 'styles.css');
@@ -322,12 +314,7 @@ router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async 
                 showDemoBanner: false,
             }, null, 2)};`;
 
-            fs.writeFileSync(path.join(projectPath, 'index.html'), templateHtml);
-            fs.writeFileSync(path.join(projectPath, 'config.js'), shopConfig);
-            if (fs.existsSync(templateCss)) fs.copyFileSync(templateCss, path.join(projectPath, 'styles.css'));
-            if (fs.existsSync(templateAnimations)) fs.copyFileSync(templateAnimations, path.join(projectPath, 'animations.js'));
-
-            const liveUrl = `/deployments/shop-${slug}/index.html`;
+            const liveUrl = storage.scaffoldDeployment(slug, templateHtml, shopConfig, templateCss, templateAnimations);
             console.log(`[DEPLOY] Site generated: ${liveUrl}`);
 
             const transporter = getTransporter();
@@ -371,10 +358,9 @@ router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async 
 
         } catch (deployErr) {
             console.error('[DEPLOY] Failed:', deployErr.message);
-            fs.appendFileSync(
-                path.join('logs', 'failed_deploys.jsonl'),
-                JSON.stringify({ email, businessName, city, tier, error: deployErr.message, ts: new Date().toISOString() }) + '\n'
-            );
+            storage.appendJsonl('failed_deploys.jsonl', {
+                email, businessName, city, tier, error: deployErr.message, ts: new Date().toISOString()
+            });
         }
     }
 

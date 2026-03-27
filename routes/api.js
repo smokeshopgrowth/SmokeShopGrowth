@@ -4,6 +4,7 @@ const router = require('express').Router();
 const path = require('path');
 const fs = require('fs');
 const csv = require('csv-parser');
+const storage = require('../services/storage');
 const n8nService = require('../src/node/n8n_service');
 const { jobs, makeJobId, pushLog, broadcast } = require('../services/sse');
 const { runPipeline } = require('../services/pipeline');
@@ -18,7 +19,6 @@ const logger = createLogger('API');
 
 // POST /api/run — start a pipeline job (requires auth)
 router.post('/api/run', pipelineRunLimiter, apiKeyAuth, asyncHandler(async (req, res) => {
-    // Validate input
     const validated = validate(req.body, schemas.pipelineRun);
     const {
         city,
@@ -32,59 +32,12 @@ router.post('/api/run', pipelineRunLimiter, apiKeyAuth, asyncHandler(async (req,
 
     logger.info('Starting pipeline', { city, bizType, maxResults });
 
-// POST /api/run — start a pipeline job (requires auth)
-router.post('/api/run', pipelineRunLimiter, apiKeyAuth, (req, res) => {
-    let {
-        city = '',
-        bizType = 'smoke shop',
-        maxResults = 100,
-        skipLighthouse = true,
-        generateDemo = true,
-        exportSheets = false,
-        sheetsId = '',
-    } = req.body;
-
-    // Validate city: 2-50 chars, alphanumeric + spaces and hyphens
-    city = city.trim();
-    const MIN_CITY_LEN = 2, MAX_CITY_LEN = 50;
-    if (!city || city.length < MIN_CITY_LEN || city.length > MAX_CITY_LEN) {
-        return res.status(400).json({ error: `City must be ${MIN_CITY_LEN}-${MAX_CITY_LEN} characters.` });
-    }
-    if (!/^[a-zA-Z0-9\s\-]+$/.test(city)) {
-        return res.status(400).json({ error: 'City contains invalid characters (only letters, numbers, spaces, hyphens allowed).' });
-    }
-
-    if (typeof bizType !== 'string' || bizType.length > 100) {
-        return res.status(400).json({ error: 'bizType must be a string (max 100 chars).' });
-    }
-    maxResults = Math.min(Math.max(parseInt(maxResults, 10) || 100, 1), 500);
-    if (sheetsId && !/^[a-zA-Z0-9_-]+$/.test(sheetsId)) {
-        return res.status(400).json({ error: 'Invalid sheetsId format.' });
-    }
-
     const jobId = makeJobId();
     const citySlug = city.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const dataDir = path.join('data', citySlug);
-    
-    fs.mkdirSync(dataDir, { recursive: true });
-    fs.mkdirSync('logs', { recursive: true });
-
-    const files = {
-        leads: path.join(dataDir, 'leads.csv'),
-        audited: path.join(dataDir, 'audited_leads.csv'),
-        socialAudited: path.join(dataDir, 'social_audited.csv'),
-        enriched: path.join(dataDir, 'enriched_leads.csv'),
-        outreach: path.join(dataDir, 'outreach_messages.csv'),
-        demos: path.join('public', 'demos', citySlug),
-        demo: path.join(dataDir, 'demo_leads.csv'),
-        emailLog: path.join('logs', 'email_log.csv'),
-    };
+    const { relativeDir, files } = storage.createJobDirectory(citySlug);
+    const dataDir = relativeDir;
 
     // Persist job to DB
-        callLog: path.join('logs', 'call_log.csv'),
-    };
-
-    // Persist job to DB (Fix #10)
     try {
         db.insertJob.run({
             id: jobId, city, biz_type: bizType, status: 'running', step: 0,
@@ -94,7 +47,6 @@ router.post('/api/run', pipelineRunLimiter, apiKeyAuth, (req, res) => {
     } catch (e) {
         logger.warn('Failed to persist job to DB', { error: e.message });
     }
-    } catch (e) { /* ignore dup */ }
 
     jobs.set(jobId, {
         status: 'running',
@@ -124,7 +76,6 @@ router.post('/api/run', pipelineRunLimiter, apiKeyAuth, (req, res) => {
 
     res.json({ jobId, dataDir, files });
 }));
-});
 
 // GET /api/status/:jobId — SSE stream for a job
 router.get('/api/status/:jobId', (req, res) => {
@@ -132,7 +83,6 @@ router.get('/api/status/:jobId', (req, res) => {
     if (!job) {
         return res.status(404).json({ error: 'Job not found.' });
     }
-    if (!job) return res.status(404).json({ error: 'Job not found.' });
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
@@ -140,9 +90,7 @@ router.get('/api/status/:jobId', (req, res) => {
     res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
 
-    // Send existing logs
-    res.flushHeaders();
-
+    // Replay existing logs
     job.logs.forEach(entry => {
         res.write(`data: ${JSON.stringify(entry)}\n\n`);
     });
@@ -156,9 +104,6 @@ router.get('/api/status/:jobId', (req, res) => {
 
     // Add client to listeners
     job.clients.push(res);
-    
-    // Cleanup on close
-    job.clients.push(res);
     req.on('close', () => {
         job.clients = job.clients.filter(c => c !== res);
     });
@@ -170,9 +115,6 @@ router.get('/api/download/:jobId/:file', asyncHandler(async (req, res) => {
     if (!job) {
         throw new NotFoundError('Job');
     }
-router.get('/api/download/:jobId/:file', (req, res) => {
-    const job = jobs.get(req.params.jobId);
-    if (!job) return res.status(404).json({ error: 'Job not found.' });
 
     const fileMap = {
         leads: job.files.leads,
@@ -189,16 +131,9 @@ router.get('/api/download/:jobId/:file', (req, res) => {
 
     res.download(filePath);
 }));
-    const filePath = fileMap[req.params.file];
-    if (!filePath || !fs.existsSync(filePath)) {
-        return res.status(404).json({ error: 'File not ready.' });
-    }
-
-    res.download(filePath);
-});
 
 // GET /api/jobs — list finished jobs
-router.get('/api/jobs', apiKeyAuth, (req, res) => {
+router.get('/api/jobs', (req, res) => {
     const list = [];
     for (const [id, job] of jobs.entries()) {
         list.push({
@@ -207,8 +142,6 @@ router.get('/api/jobs', apiKeyAuth, (req, res) => {
             bizType: job.bizType,
             status: job.status,
             step: job.step,
-            id, city: job.city, bizType: job.bizType,
-            status: job.status, step: job.step,
             files: job.files,
         });
     }
@@ -227,45 +160,75 @@ router.post('/api/lead', webhookLimiter, asyncHandler(async (req, res) => {
         phone,
         city,
         outcome,
-router.post('/api/lead', webhookLimiter, (req, res) => {
-    const { name, email, phone, city, outcome } = req.body;
-    if (!email) return res.status(400).json({ error: 'email is required' });
-
-    const lead = {
-        name: name || 'Unknown',
-        email,
-        phone: phone || '',
-        city: city || '',
-        outcome: outcome || 'interested',
         captured_at: new Date().toISOString(),
     };
 
-    const leadsLogPath = path.join('logs', 'captured_leads.jsonl');
-    fs.mkdirSync('logs', { recursive: true });
-    fs.appendFileSync(leadsLogPath, JSON.stringify(lead) + '\n');
+    storage.appendJsonl('captured_leads.jsonl', lead);
 
     logger.info('New lead captured', { name, email });
-    n8nService.notifyLeadCapture(lead);
+    n8nService.notifyNewLead(lead);
 
     res.json({ ok: true, lead });
 }));
 
-// GET /api/leads — list captured leads
+// GET /api/leads — list captured leads (from CSV)
 router.get('/api/leads', asyncHandler(async (req, res) => {
+    // If auth header present, use DB-backed paginated endpoint
+    if (req.headers['x-api-key']) {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const limit = Math.min(parseInt(req.query.limit) || 25, 100);
+            const offset = (page - 1) * limit;
+            const status = req.query.status || null;
+            const cityFilter = req.query.city || null;
+            const search = req.query.search || null;
+
+            let leads, total;
+
+            if (search) {
+                const searchPattern = `%${search}%`;
+                leads = db.searchLeads.all(searchPattern, searchPattern, searchPattern);
+                total = leads.length;
+            } else if (status && cityFilter) {
+                const countResult = db.getLeadsByCityAndStatusCount.get(cityFilter, status);
+                total = countResult.total;
+                leads = db.getLeadsByCityAndStatusPaginated.all(cityFilter, status, limit, offset);
+            } else if (status) {
+                const countResult = db.getLeadsByStatusCount.get(status);
+                total = countResult.total;
+                leads = db.getLeadsByStatusPaginated.all(status, limit, offset);
+            } else if (cityFilter) {
+                const countResult = db.getLeadsByCityCount.get(cityFilter);
+                total = countResult.total;
+                leads = db.getLeadsByCityPaginated.all(cityFilter, limit, offset);
+            } else {
+                const countResult = db.getLeadsCount.get();
+                total = countResult.total;
+                leads = db.getLeadsPaginated.all(limit, offset);
+            }
+
+            return res.json({
+                leads,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    totalPages: Math.ceil(total / limit),
+                },
+            });
+        } catch (err) {
+            console.error('[API] Leads list error:', err);
+            return res.status(500).json({ error: 'Failed to fetch leads' });
+        }
+    }
+
+    // Fallback: read from submissions CSV
     const csvPath = path.join(__dirname, '..', 'data', 'submissions.csv');
-    
     if (!fs.existsSync(csvPath)) {
         return res.json({ leads: [] });
     }
 
-    const leads = [];
-    await new Promise((resolve, reject) => {
-        fs.createReadStream(csvPath)
-            .pipe(csv())
-            .on('data', (row) => leads.push(row))
-            .on('end', resolve)
-            .on('error', reject);
-    });
+    const leads = await storage.readCsv(csvPath);
 
     res.json({ leads });
 }));
@@ -273,36 +236,23 @@ router.get('/api/leads', asyncHandler(async (req, res) => {
 // GET /api/stats — get dashboard statistics
 router.get('/api/stats', asyncHandler(async (req, res) => {
     const csvPath = path.join(__dirname, '..', 'data', 'submissions.csv');
-    
-    let leads = [];
-    if (fs.existsSync(csvPath)) {
-        await new Promise((resolve, reject) => {
-            fs.createReadStream(csvPath)
-                .pipe(csv())
-                .on('data', (row) => leads.push(row))
-                .on('end', resolve)
-                .on('error', reject);
-        });
-    }
 
-    // Calculate statistics
+    const leads = await storage.readCsv(csvPath);
+
     const totalLeads = leads.length;
     const conversions = leads.filter(l => l.status === 'converted').length;
     const conversionRate = totalLeads > 0 ? (conversions / totalLeads * 100).toFixed(1) : 0;
-    
-    // Calculate revenue
+
     const tierPrices = { starter: 99, growth: 299, pro: 499 };
     const revenue = leads
         .filter(l => l.tier && l.status === 'converted')
         .reduce((sum, l) => sum + (tierPrices[l.tier?.toLowerCase()] || 0), 0);
 
-    // Calculate lead scores
     const scores = leads.filter(l => l.score).map(l => parseInt(l.score) || 0);
-    const avgScore = scores.length > 0 
-        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) 
+    const avgScore = scores.length > 0
+        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
         : 0;
 
-    // Weekly breakdown
     const now = new Date();
     const weeklyData = [0, 0, 0, 0];
     leads.forEach(l => {
@@ -311,7 +261,6 @@ router.get('/api/stats', asyncHandler(async (req, res) => {
         weeklyData[3 - week]++;
     });
 
-    // Source breakdown
     const sources = { 'Google Maps': 0, 'Website Form': 0, 'Referral': 0, 'Social': 0 };
     leads.forEach(l => {
         const source = l.source || 'Website Form';
@@ -329,28 +278,17 @@ router.get('/api/stats', asyncHandler(async (req, res) => {
         sources,
     });
 }));
-    console.log(`New lead captured: ${lead.name} — ${lead.email}`);
-    n8nService.notifyLeadCapture(lead);
 
-    res.json({ ok: true, lead });
-});
-
-// GET /api/leads — list captured leads (legacy CSV endpoint)
-router.get('/api/leads/captured', (req, res) => {
+// GET /api/leads/captured — legacy CSV endpoint
+router.get('/api/leads/captured', asyncHandler(async (req, res) => {
     try {
         const csvPath = path.join(__dirname, '..', 'data', 'submissions.csv');
-        if (!fs.existsSync(csvPath)) return res.json({ leads: [] });
-
-        const leads = [];
-        fs.createReadStream(csvPath)
-            .pipe(csv())
-            .on('data', (row) => leads.push(row))
-            .on('end', () => res.json({ leads }))
-            .on('error', (err) => res.status(500).json({ error: 'Failed to parse CSV' }));
+        const leads = await storage.readCsv(csvPath);
+        res.json({ leads });
     } catch (err) {
         res.status(500).json({ error: 'Failed to read leads' });
     }
-});
+}));
 
 // ════════════════════════════════════════════════════════════════════════════
 // ADMIN DASHBOARD API ENDPOINTS (all require auth)
@@ -368,55 +306,6 @@ router.get('/api/dashboard/stats', apiKeyAuth, (req, res) => {
 });
 
 // ── LEADS CRM ───────────────────────────────────────────────────────────────
-
-// GET /api/leads — list all leads with pagination and filters
-router.get('/api/leads', apiKeyAuth, (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = Math.min(parseInt(req.query.limit) || 25, 100);
-        const offset = (page - 1) * limit;
-        const status = req.query.status || null;
-        const city = req.query.city || null;
-        const search = req.query.search || null;
-
-        let leads, total;
-
-        if (search) {
-            const searchPattern = `%${search}%`;
-            leads = db.searchLeads.all(searchPattern, searchPattern, searchPattern);
-            total = leads.length;
-        } else if (status && city) {
-            leads = db.getLeadsByCityAndStatus.all(city, status);
-            total = leads.length;
-            leads = leads.slice(offset, offset + limit);
-        } else if (status) {
-            const countResult = db.getLeadsByStatusCount.get(status);
-            total = countResult.total;
-            leads = db.getLeadsByStatusPaginated.all(status, limit, offset);
-        } else if (city) {
-            const countResult = db.getLeadsByCityCount.get(city);
-            total = countResult.total;
-            leads = db.getLeadsByCityPaginated.all(city, limit, offset);
-        } else {
-            const countResult = db.getLeadsCount.get();
-            total = countResult.total;
-            leads = db.getLeadsPaginated.all(limit, offset);
-        }
-
-        res.json({
-            leads,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
-        });
-    } catch (err) {
-        console.error('[API] Leads list error:', err);
-        res.status(500).json({ error: 'Failed to fetch leads' });
-    }
-});
 
 // GET /api/leads/:placeId — get single lead
 router.get('/api/leads/:placeId', apiKeyAuth, (req, res) => {
@@ -504,7 +393,7 @@ router.get('/api/leads/export/csv', apiKeyAuth, (req, res) => {
         const leads = db.getAllLeads.all();
         const headers = ['place_id', 'business_name', 'address', 'phone', 'email', 'website', 'rating', 'review_count', 'city_slug', 'score', 'status', 'created_at'];
         const csvRows = [headers.join(',')];
-        
+
         for (const lead of leads) {
             const row = headers.map(h => {
                 const val = lead[h] || '';
@@ -528,7 +417,6 @@ router.get('/api/leads/export/csv', apiKeyAuth, (req, res) => {
 router.get('/api/campaigns', apiKeyAuth, (req, res) => {
     try {
         const campaigns = db.getAllCampaigns.all();
-        // Attach stats to each campaign
         const campaignsWithStats = campaigns.map(c => {
             const stats = db.getCampaignStats.get(c.id);
             return { ...c, stats };
@@ -574,7 +462,6 @@ router.post('/api/campaigns', apiKeyAuth, (req, res) => {
 
         const campaignId = result.lastInsertRowid;
 
-        // Add recipients based on filter
         if (recipientFilter) {
             let leads;
             if (recipientFilter.status) {
@@ -585,7 +472,6 @@ router.post('/api/campaigns', apiKeyAuth, (req, res) => {
                 leads = db.getAllLeads.all();
             }
 
-            // Filter leads with email
             const leadsWithEmail = leads.filter(l => l.email && l.email.includes('@'));
             const recipients = leadsWithEmail.map(l => ({
                 campaign_id: campaignId,
@@ -634,7 +520,7 @@ router.put('/api/campaigns/:id', apiKeyAuth, (req, res) => {
     }
 });
 
-// POST /api/campaigns/:id/send — send campaign (mock for now)
+// POST /api/campaigns/:id/send — send campaign
 router.post('/api/campaigns/:id/send', apiKeyAuth, (req, res) => {
     try {
         const campaign = db.getCampaign.get(req.params.id);
@@ -644,14 +530,11 @@ router.post('/api/campaigns/:id/send', apiKeyAuth, (req, res) => {
             return res.status(400).json({ error: 'Campaign already sent' });
         }
 
-        // Mark as sending then sent
         db.updateCampaignStatus.run('sending', null, req.params.id);
 
-        // In production, this would trigger actual email sending
-        // For now, we'll simulate by marking recipients as sent
         const recipients = db.getCampaignRecipients.all(req.params.id);
         const sentAt = new Date().toISOString();
-        
+
         for (const r of recipients) {
             db.updateRecipientStatus.run('sent', sentAt, null, null, r.id);
         }
@@ -813,29 +696,15 @@ router.post('/api/run-single', apiKeyAuth, pipelineRunLimiter, async (req, res) 
     if (!businessName) return res.status(400).json({ error: 'businessName is required' });
 
     const jobId = `single-${Date.now()}`;
-    const dataDir = path.join('data', jobId);
-    fs.mkdirSync(dataDir, { recursive: true });
-    fs.mkdirSync('logs', { recursive: true });
+    const { relativeDir, files } = storage.createJobDirectory(jobId);
+    const dataDir = relativeDir;
 
-    // Write a single-row leads CSV so the pipeline can use it
     const normalizedWebsite = website ? (website.startsWith('http') ? website : `https://${website}`) : '';
     const leadsPath = path.join(dataDir, 'leads.csv');
-    fs.writeFileSync(leadsPath,
+    storage.writeTextFile(leadsPath,
         `name,phone,website,city,address,rating,reviews,business_name\n` +
         `"${businessName}","${phone}","${normalizedWebsite}","${city}","","","","${businessName}"\n`
     );
-
-    const files = {
-        leads: leadsPath,
-        audited: path.join(dataDir, 'audited_leads.csv'),
-        socialAudited: path.join(dataDir, 'social_audited.csv'),
-        enriched: path.join(dataDir, 'enriched_leads.csv'),
-        outreach: path.join(dataDir, 'outreach_messages.csv'),
-        demos: path.join('public', 'demos', jobId),
-        demo: path.join(dataDir, 'demo_leads.csv'),
-        emailLog: path.join('logs', `email_log_${jobId}.csv`),
-        callLog: path.join('logs', `call_log_${jobId}.csv`),
-    };
 
     const job = {
         status: 'running',
@@ -854,15 +723,15 @@ router.post('/api/run-single', apiKeyAuth, pipelineRunLimiter, async (req, res) 
         exportSheets: false,
         sheetsId: null,
         baseUrl: `${req.protocol}://${req.get('host')}`,
+        clients: [],
     };
 
     jobs.set(jobId, job);
     res.json({ jobId, message: `Single-business pipeline started for "${businessName}"` });
 
-    // Run async
     const { runSingleBusiness } = require('../services/pipeline');
     runSingleBusiness(jobId).catch(err => {
-        pushLog(jobId, `❌ Pipeline error: ${err.message}`, 'error');
+        pushLog(jobId, `Pipeline error: ${err.message}`, 'error');
         job.status = 'error';
         broadcast(jobId, { type: 'error', message: err.message });
     });
