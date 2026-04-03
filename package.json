@@ -49,7 +49,7 @@
         "fast-csv": "^5.0.1",
         "googleapis": "^171.4.0",
         "helmet": "^8.1.0",
-        "lighthouse": "^10.1.1",
+        "lighthouse": "^13.0.3",
         "ngrok": "^4.2.2",
         "nodemailer": "^8.0.2",
         "openai": "^4.104.0",
