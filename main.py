@@ -18,6 +18,10 @@ Usage examples:
 """
 
 import sys
+import os
+
+# Ensure src/python is on the path so scraper and other modules resolve correctly
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src', 'python'))
 
 
 def print_help():
