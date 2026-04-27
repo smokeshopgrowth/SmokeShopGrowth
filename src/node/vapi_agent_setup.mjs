@@ -66,9 +66,14 @@ async function main() {
     try {
         let assistant;
 
-        // Force creation of a new assistant for a clean slate.
-        assistant = await createAssistant();
-        logger.info(`\n✅ PLEASE UPDATE YOUR .env FILE WITH THIS NEW VAPI_ASSISTANT_ID: ${assistant.id}`);
+        if (isUpdate && VAPI_ASSISTANT_ID) {
+            assistant = await updateAssistant(VAPI_ASSISTANT_ID);
+            logger.info(`\n✅ Successfully updated assistant: ${assistant.id}`);
+        } else {
+            // Force creation of a new assistant for a clean slate.
+            assistant = await createAssistant();
+            logger.info(`\n✅ PLEASE UPDATE YOUR .env FILE WITH THIS NEW VAPI_ASSISTANT_ID: ${assistant.id}`);
+        }
 
         // The original script also checked for WEBHOOK_URL. We'll keep that helpful check.
         const envPath = path.join(__dirname, "..", "..", ".env");
